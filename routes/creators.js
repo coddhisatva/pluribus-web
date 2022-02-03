@@ -1,15 +1,14 @@
 var express = require('express');
 var router = express.Router();
-var models = require('../models');
+var { Creator, User } = require('../models');
 
 router.get('/', async function(req, res, next) {
-	var creators = await models.Creator.findAll();
+	var creators = await Creator.findAll();
 	res.render('creators/index', { title: 'Creators', creators });
 });
 
 router.get('/:id', async function(req, res, next) {
-	var creator = await models.Creator.findByPk(req.params.id, { include: models.User });
-	console.log(creator);
+	var creator = await Creator.findByPk(req.params.id, { include: User });
 	res.render('creators/show', { title: creator.name, creator });
 });
 
