@@ -9,9 +9,6 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var creatorsRouter = require('./routes/creators');
 
-// Init sequelize DB
-require('./utils/db');
-
 var app = express();
 
 // view engine setup
