@@ -1,0 +1,6 @@
+<h1>Creators</h1>
+
+<% creators.forEach(function(creator) { %>
+	<h3><a href="/creators/<%= creator.id %>"><%= creator.name %></a></h3>
+	<p><%= creator.about %></p>
+<% }); %>
