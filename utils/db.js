@@ -1,10 +1,8 @@
-var mysql = require('mysql');
+const { Sequelize } = require('sequelize');
 
-var db = mysql.createConnection({
+const sequelize = new Sequelize('pluribus', 'pluribus-web', 'pluribus-web', {
 	host: 'localhost',
-	user: 'pluribus-web',
-	password: 'pluribus-web',
-	database: 'pluribus'
+	dialect: 'mysql'
 });
 
-module.exports = db;
+module.exports = sequelize;
