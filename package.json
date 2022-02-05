@@ -1,11 +1,12 @@
 {
-  "name": "express-locallibrary-tutorial",
+  "name": "pluribus",
   "version": "0.0.0",
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
     "devstart": "nodemon ./bin/www",
-    "serverstart": "DEBUG=express-locallibrary-tutorial:* npm run devstart"
+    "serverstart": "DEBUG=pluribus:* npm run devstart",
+    "test": "mocha"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
@@ -14,8 +15,10 @@
     "express": "~4.16.1",
     "express-ejs-layouts": "^2.5.1",
     "http-errors": "~1.6.3",
+    "mocha": "^9.2.0",
     "morgan": "~1.9.1",
     "mysql2": "^2.3.3",
+    "node-fetch": "^2.6.7",
     "sequelize": "^6.15.0",
     "sequelize-cli": "^6.4.1"
   },
