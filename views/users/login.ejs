@@ -1,2 +1,24 @@
-<h1>Login</h1>
-<p>TODO</p>
+<div class="row justify-content-center mt-4">
+	<div class="col col-md-4">
+		<h1>Log in to Pluribus</h1>
+
+		<form class="login-form" method="post">
+			<div class="mb-3">
+				<label class="form-label" for="email">Email</label>
+				<input class="form-control" name="email" type="text" />
+			</div>
+
+			<div class="mb-3">
+				<label class="form-label" for="password">Password</label>
+				<input class="form-control" name="password" type="password" />
+			</div>
+
+			<% if(locals.errors) { %>
+				<div class="text-danger fw-bold my-2">Please check your email address and password.</div>
+			<% } %>
+
+			<button class="btn btn-primary">Log in</button>
+
+		</form>
+	</div>
+</div>

@@ -4,12 +4,32 @@ console.log(locals);
 <nav class="navbar navbar-expand-md navbar-light bg-light">
 	<div class="container">
 
-		<a class="navbar-brand" href="/">Pluribus</a>
+		<a class="navbar-brand" href="/">
+			<img src="/images/logo.svg" width="20.67" height="25.67" />
+			Pluribus
+		</a>
 
-		<div class="collapse navbar-collapse">
-			<ul class="navbar-nav">
-				<li class="nav-item"><a href="/creators" class="nav-link <%= locals.nav == 'creators' ? 'active' : '' %>">Browse Creators</a></li>
-			</ul>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		  </button>
+
+		<div class="collapse navbar-collapse" id="mainNav">
+			<div class="navbar-nav me-auto">
+				<a href="/creators" class="nav-link <%= locals.nav == 'creators' ? 'active' : '' %>">Browse Creators</a>
+			</div>
+			<div class="navbar-nav">
+			<% if(locals.authUser) { %>
+				<%# User menu %>
+				<div class="nav-bar-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="userMenuDropdownLink" role="button" data-bs-toggle="dropdown" ><%= locals.authUser.email %></a>
+					<ul class="dropdown-menu"  aria-labelledby="userMenuDropdownLink">
+						<li><a class="dropdown-item" href="/users/logout">Log out</a></li>
+					</div>
+				</div>
+				<% } else { %>
+					<a href="/users/login" class="nav-link">Login</a>
+				<% } %>
+			</div>
 		</div>
 
 	</div>

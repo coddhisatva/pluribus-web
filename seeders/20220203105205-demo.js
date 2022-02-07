@@ -1,7 +1,6 @@
 'use strict';
 
-const creator = require("../models/creator");
-const user = require("../models/user");
+const models = require("../models");
 
 const { QueryTypes } = require('sequelize');
 
@@ -26,19 +25,19 @@ module.exports = {
 
     await queryInterface.bulkInsert('Users', [{
       email: 'joerogan@jre.com',
-      password: 'joerogan',
+      password: models.User.hashPassword('joerogan'),
       createdAt: d,
       updatedAt: d
     },
     {
       email: 'harrybergeron@substack.com',
-      password: 'harrybergeron',
+      password: models.User.hashPassword('harrybergeron'),
       createdAt: d,
       updatedAt: d
     },
     {
       email: 'test@pluribus.com',
-      password: 'test',
+      password: models.User.hashPassword('test'),
       createdAt: d,
       updatedAt: d
     }]);
@@ -51,7 +50,6 @@ module.exports = {
       { userId: userIds[0].id, name: 'Harry Bergeron', about: 'Writing American Alchemy at harrybergeron.substack.com', createdAt: d, updatedAt: d },
     ];
 
-    console.log(creators);
     await queryInterface.bulkInsert('Creators', creators);
   },
 

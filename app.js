@@ -1,9 +1,11 @@
-var createError = require('http-errors');
-var express = require('express');
-var expressLayouts = require('express-ejs-layouts');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const expressLayouts = require('express-ejs-layouts');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
+const logger = require('morgan');
+const auth = require('./utils/auth');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -19,6 +21,12 @@ app.use(expressLayouts);
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieSession({
+  name: '_auth',
+  secret: '!@)ktElMh;;SO2Fr)gCQdsc\'',
+  maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
+}));
+app.use(auth.prepareAuthUser);
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 

@@ -8,7 +8,7 @@ describe('Users routes', () => {
 			var res = await fetch(baseURL + '/users/login');
 			assert(res.status == 200);
 			var html = await res.text();
-			assert(/<h1>Login<\/h1>/.test(html));
+			assert(/<h1>Log in to Pluribus<\/h1>/.test(html));
 		})
-	})
+	});
 });

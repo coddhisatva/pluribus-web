@@ -1,8 +1,8 @@
 /* Bootstrap overrides */
 a {
-  color: palevioletred;
+  color: #159345;
 }
 
 a:hover {
-  color: mediumvioletred;
+  color: #9cca50;
 }
