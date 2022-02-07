@@ -1,8 +1,14 @@
-/* Bootstrap overrides */
-a {
-  color: #159345;
+/* CSS Variables */
+:root {
+  --primary: #159345;
 }
 
-a:hover {
-  color: #9cca50;
+/* Bootstrap overrides */
+a { color: var(--primary) }
+
+a:hover { color: #9cca50; }
+
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
 }
