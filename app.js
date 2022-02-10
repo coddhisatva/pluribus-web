@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const logger = require('morgan');
 const auth = require('./utils/auth');
+const flash = require('./utils/flash');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -28,6 +29,7 @@ app.use(cookieSession({
 }));
 app.use(auth.prepareAuthUser);
 app.use(cookieParser());
+app.use(flash);
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);

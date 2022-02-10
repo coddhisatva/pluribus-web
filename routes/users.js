@@ -34,6 +34,8 @@ router.post('/login', [
 		// Save authentication cookie
 		req.session.authUser = { id: user.id, email: user.email };
 
+		req.flash.notice = "Welcome back!";
+
 		var redirect = req.query.redirect;
 		if(redirect) {
 			res.redirect(redirect);
@@ -46,6 +48,7 @@ router.post('/login', [
 // GET /logout
 router.get('/logout', async function(req, res, next) {
 	req.session.authUser = null;
+	req.flash.notice = 'You\'ve been logged out.';
 	res.redirect('/');
 });
 
