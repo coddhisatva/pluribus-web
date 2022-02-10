@@ -4,7 +4,7 @@ var { Creator, User } = require('../models');
 
 router.get('/', async function(req, res, next) {
 	var creators = await Creator.findAll();
-	res.render('creators/index', { title: 'Creators', creators });
+	res.render('creators/index', { creators });
 });
 
 router.get('/:id', async function(req, res, next) {

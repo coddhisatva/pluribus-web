@@ -3,7 +3,6 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
 const { User } = require('../models');
-const { locals } = require('../app');
 
 /* GET /login */
 router.get('/login', function(req, res, next) {

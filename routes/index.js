@@ -6,9 +6,7 @@ var { Creator } = require('../models');
 /* GET home page. */
 router.get('/', async function(req, res, next) {
   creatorCount = await Creator.count();
-  res.render('index', { title: 'Pluribus', creatorCount });
-
-  console.log('user: ', res.locals.authUser);
+  res.render('index', { creatorCount });
 });
 
 module.exports = router;

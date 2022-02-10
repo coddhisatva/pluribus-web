@@ -1,5 +1,5 @@
 const assert = require('assert');
-const auth = require('../utils/auth');
+const auth = require('../../utils/auth');
 
 describe('Auth', () => {
 	describe('Password hashes', () => {
