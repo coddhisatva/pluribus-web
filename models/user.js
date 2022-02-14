@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       User.hasOne(models.Creator);
+      User.hasMany(models.Pledge);
     }
   }
   User.init({

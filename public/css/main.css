@@ -3,6 +3,44 @@
   --primary: #159345;
 }
 
+/* Fonts */
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: url(../fonts/DMSans-Regular.ttf) format('woff2');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: italic;
+  font-weight: 400;
+  src: url(../fonts/DMSans-Italic.ttf) format('woff2');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: url(../fonts/DMSans-Bold.ttf) format('woff2');
+}
+
+@font-face {
+  font-family: 'DM Serif Display';
+  font-style: normal;
+  font-weight: 400;
+  src: url(../fonts/DMSerifDisplay-Regular.ttf) format('woff2');
+}
+
+body {
+  font-family: 'DM Sans';
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'DM Serif Display';
+  font-weight: 400;
+}
+
 /* Bootstrap overrides */
 a { color: var(--primary) }
 

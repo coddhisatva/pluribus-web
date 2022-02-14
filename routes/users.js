@@ -2,14 +2,14 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
-const { User } = require('../models');
+const { User, Pledge, Creator } = require('../models');
 
 /* GET /login */
 router.get('/login', function(req, res, next) {
 	res.render('users/login', { title: 'Login' });
 });
 
-/* POST /login */
+/* POST /login (email:string, password:string) */
 router.post('/login', [
 	body('email').trim().isLength({min:1}).withMessage('Email is required').bail()
 		.isEmail().withMessage('Invalid email address'),
@@ -45,11 +45,25 @@ router.post('/login', [
 	}
 ]);
 
-// GET /logout
+/**
+ * GET /logout
+ */
 router.get('/logout', async function(req, res, next) {
 	req.session.authUser = null;
 	req.flash.notice = 'You\'ve been logged out.';
 	res.redirect('/');
+});
+
+/**
+ * GET /home
+ */
+router.get('/home', async function(req, res, next) {
+	if(!req.authorize()) return;
+
+	var user = await User.findByPk(req.authUser.id);
+	var pledges = await Pledge.findAll({ where: { userId: user.id }, include: Creator });
+
+	res.render('users/home', { user, pledges });
 });
 
 module.exports = router;

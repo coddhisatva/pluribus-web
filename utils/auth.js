@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 
-module.exports = {
+var auth = {
 	/**
 	 * Returns a Base-64 encoded hash of the supplied password.
 	 * @param {String} password 
@@ -40,10 +40,26 @@ module.exports = {
 	 * Middleware function to load the authenticated user from
 	 * session cookie into locals.authUser.
 	 */
-	prepareAuthUser: function(req, res, next) {
+	inject: function(req, res, next) {
 		if(req.session && req.session.authUser) {
-			res.locals.authUser = req.session.authUser;
+			req.authUser = res.locals.authUser = req.session.authUser;
+		}
+		req.authorize = () => {
+			return auth.authorize(req, res);
 		}
 		next();
+	},
+
+	authorize: function(req, res) {
+		var authorized = res.locals.authUser != null;
+		if(!authorized) {
+			req.flash.alert = 'Please log in to continue.';
+			res.status(401).redirect('/users/login?redirect=' + encodeURIComponent(req.originalUrl));
+			return false;
+		}
+
+		return true;
 	}
 }
+
+module.exports = auth;

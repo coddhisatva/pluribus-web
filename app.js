@@ -27,9 +27,9 @@ app.use(cookieSession({
   secret: '!@)ktElMh;;SO2Fr)gCQdsc\'',
   maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
 }));
-app.use(auth.prepareAuthUser);
-app.use(cookieParser());
 app.use(flash);
+app.use(auth.inject);
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
