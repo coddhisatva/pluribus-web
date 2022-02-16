@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
-const { User, Pledge, Creator } = require('../models');
+const { User, Follow, Creator } = require('../models');
 
 /* GET /login */
 router.get('/login', function(req, res, next) {
@@ -61,9 +61,10 @@ router.get('/home', async function(req, res, next) {
 	if(!req.authorize()) return;
 
 	var user = await User.findByPk(req.authUser.id);
-	var pledges = await Pledge.findAll({ where: { userId: user.id }, include: Creator });
+	var following = await Follow.findAll({ where: { userId: user.id }, include: Creator });
+	console.log(following);
 
-	res.render('users/home', { user, pledges });
+	res.render('users/home', { user, following });
 });
 
 module.exports = router;

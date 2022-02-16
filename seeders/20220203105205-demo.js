@@ -87,7 +87,7 @@ module.exports = {
 		console.log('Inserting creators');
 		await queryInterface.bulkInsert('Creators', creators);
 
-		// Test user supports first 2 creators
+		// Test user follows first 2 creators
 		var [creatorIds,] = await queryInterface.sequelize.query("select id from creators limit 2", { type: QueryTypes.select });
 
 		console.log('Getting test user id');
@@ -98,14 +98,14 @@ module.exports = {
 
 		//console.log(testUserId);
 
-		var pledges = [ ]
+		var follows = [ ]
 		creatorIds.forEach((creatorId) => {
-			pledges.push({ creatorId: creatorId.id, userId: testUserId.id, amount: 10 })
+			follows.push({ creatorId: creatorId.id, userId: testUserId.id })
 		});
-		addTimestamps(pledges);
+		addTimestamps(follows);
 
-		console.log('Inserting pledges');
-		await queryInterface.bulkInsert('Pledges', pledges);
+		console.log('Inserting follows');
+		await queryInterface.bulkInsert('Follows', follows);
 	},
 
 	async down (queryInterface, Sequelize) {
@@ -116,7 +116,7 @@ module.exports = {
 		 * await queryInterface.bulkDelete('People', null, {});
 		 */
 
-		await queryInterface.sequelize.query("delete from pledges where userId = (select id from users where email = 'test@pluribus.com')");
+		await queryInterface.sequelize.query("delete from follows where userId = (select id from users where email = 'test@pluribus.com')");
 		await queryInterface.sequelize.query("delete from creators where userId in (select id from users where email = 'test@pluribus.com' or email like '%.invalid')");
 		await queryInterface.sequelize.query("delete from users where email like 'test@pluribus.com' or email like '%.invalid'");
 	}

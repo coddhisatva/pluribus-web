@@ -1,10 +1,10 @@
 <h1>Home</h1>
 
-<% if(pledges) { %>
-	<h3>Your pledges</h3>
+<% if(following) { %>
+	<h3>Following</h3>
 	<ul>
-	<% pledges.forEach(pledge => { %>
-		<li><a href="/creators/<%= pledge.creatorId %>"><%= pledge.Creator.name %></a> ($<%= pledge.amount %>)</li>
+	<% following.forEach(follow => { %>
+		<li><a href="/creators/<%= follow.creatorId %>"><%= follow.Creator.name %></a></li>
 	<% }); %>
 	</ul>
 <% } %>

@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Pledges', {
+    await queryInterface.createTable('Follows', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -24,10 +24,6 @@ module.exports = {
           key: 'id'
         }
       },
-      amount: {
-        type: Sequelize.DECIMAL(10,2),
-        allowNull: false
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -38,17 +34,17 @@ module.exports = {
       }
     });
 
-    // User can only support a creator once
-    await queryInterface.addIndex('Pledges', {
+    // User can only follow a creator once
+    await queryInterface.addIndex('Follows', {
       fields: [ 'creatorId', 'userId' ],
       unique: true
     });
 
     // Index creatorId and userId for faster lookup
-    await queryInterface.addIndex('Pledges', { fields: [ 'creatorId' ]});
-    await queryInterface.addIndex('Pledges', { fields: [ 'userId' ]});
+    await queryInterface.addIndex('Follows', { fields: [ 'creatorId' ]});
+    await queryInterface.addIndex('Follows', { fields: [ 'userId' ]});
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Pledges');
+    await queryInterface.dropTable('Follows');
   }
 };
