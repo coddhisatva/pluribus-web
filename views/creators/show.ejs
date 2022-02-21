@@ -4,5 +4,59 @@ _locals.nav = 'creators';
 %>
 <h1><%= creator.name %></h1>
 
+<%# Follow button %>
+<div class="my-2">
+	<button id="followBtn" data-following="<%= isFollowing %>" data-bs-toggle="dropdown" aria-expanded="false" class="btn <%= isFollowing ? 'btn-outline-secondary' : 'btn-secondary' %>">
+		<%= isFollowing ? 'Following' : 'Follow' %>
+	</button>
+	<ul class="dropdown-menu" aria-labelledby="followBtn" id="followBtnDropdown">
+		<li><a class="dropdown-item text-danger" href="#" id="unfollowDropdownItem">Unfollow <%= creator.name %></a></li>
+	</ul>
+</div>
+
 <p><%= creator.about %></p>
 <p>Email: <%= creator.User.email %></p>
+
+<script>
+	var followBtn = document.getElementById('followBtn');
+	followBtn.following = followBtn.dataset.following === 'true';
+	var followBtnDropdown = document.getElementById('followBtnDropdown');
+	var unfollowDropdownItem = document.getElementById('unfollowDropdownItem');
+
+	function updateFollowBtnState() {
+		if(followBtn.following) {
+			followBtn.classList.remove('btn-secondary');
+			followBtn.classList.add('btn-outline-secondary');
+			followBtn.innerHTML = 'Unfollow';
+			bootstrap.Dropdown.getOrCreateInstance(followBtn).hide();
+			followBtn.blur();
+
+		} else {
+			followBtn.classList.remove('btn-outline-secondary');
+			followBtn.classList.add('btn-secondary');
+			followBtn.innerHTML = 'Follow';
+		}
+	}
+
+	followBtn.addEventListener('click', function() {
+		if(!followBtn.following) {
+			followBtn.following = true;
+			updateFollowBtnState();
+
+			fetch('/creators/<%= creator.id %>/follow', { method: 'POST' })
+				.then(null, () => alert('Error!'));
+
+		} // otherwise, dropdown will be shown to unfollow
+	});
+
+	unfollowDropdownItem.addEventListener('click', function() {
+		if(followBtn.following) {
+			followBtn.following = false;
+			updateFollowBtnState();
+
+			fetch('/creators/<%= creator.id %>/unfollow', { method: 'POST' })
+				.then(null, () => alert('Error!'));
+		}
+	});
+
+</script>
