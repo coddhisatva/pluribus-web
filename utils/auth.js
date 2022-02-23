@@ -59,6 +59,17 @@ var auth = {
 		}
 
 		return true;
+	},
+
+	oneTimeCode: function(length) {
+		var chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+		var result = '';
+		for(var i = 0; i < length; i++) {
+			result += chars[Math.floor(Math.random() * chars.length)];
+		}
+
+		return result;
 	}
 }
 

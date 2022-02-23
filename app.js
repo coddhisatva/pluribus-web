@@ -53,4 +53,10 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+app.locals.validationMessage = function(paramName, locals) {
+  if(locals.errors && locals.errors[paramName]) {
+    return '<div class="text-danger">' + locals.errors[paramName].msg + '</div>';
+  }
+}
+
 module.exports = app;

@@ -1,6 +1,7 @@
 /* CSS Variables */
 :root {
   --primary: #159345;
+  --primary-highlight: #9cca50;
 }
 
 /* Fonts */
@@ -44,9 +45,19 @@ h1, h2, h3, h4, h5, h6 {
 /* Bootstrap overrides */
 a { color: var(--primary) }
 
-a:hover { color: #9cca50; }
+a:hover { color: var(--primary-highlight); }
 
 .btn-primary {
   background-color: var(--primary);
   border-color: var(--primary);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+  background-color: var(--primary-highlight);
+  border-color: var(--primary-highlight);
+}
+
+.form-control:focus, .btn:focus {
+  border-color: var(--primary-highlight);
+  box-shadow: 0 0 0 0.25rem rgb(156 202 80 / 25%);
 }

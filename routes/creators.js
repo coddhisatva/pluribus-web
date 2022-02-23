@@ -18,7 +18,7 @@ router.get('/:id', async function(req, res, next) {
 			isFollowing = true;
 		} 
 	}
-	res.render('creators/show', { title: creator.name, creator, isFollowing });
+	res.render('creators/show', { creator, isFollowing });
 });
 
 /**
