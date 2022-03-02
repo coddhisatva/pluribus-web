@@ -33,6 +33,12 @@ app.use(auth.inject);
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Save posted values to view state
+app.use((req, res, next) => {
+  res.locals.postedValues = req.body;
+  next();
+});
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/creators', creatorsRouter);
@@ -53,9 +59,19 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.locals.validationMessage = function(paramName, locals) {
-  if(locals.errors && locals.errors[paramName]) {
-    return '<div class="text-danger">' + locals.errors[paramName].msg + '</div>';
+app.locals.validationMessage = function(paramName) {
+  var locals = this;
+  if(locals.errors) {
+    var errors = locals.errors;
+
+    // Check whether the raw express-validator Result was used, and convert it to a mapped object if so
+    if(errors.constructor.name == 'Result') {
+      errors = errors.mapped();
+    }
+
+    if(errors[paramName]) {
+      return '<div class="text-danger">' + errors[paramName].msg + '</div>';
+    }
   }
 }
 

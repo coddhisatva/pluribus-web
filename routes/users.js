@@ -24,7 +24,9 @@ router.post('/login', [
 		var user;
 		if(errors.length == 0) {
 			user = await User.findOne({ where: { email: req.body.email }});
-			if(!auth.verifyPassword(req.body.password, user.password)) {
+			if(!user) {
+				errors.push({ msg: 'Unknown user', param: 'email' });
+			} else if(!auth.verifyPassword(req.body.password, user.password)) {
 				errors.push({ msg: 'Invalid password', param: 'password' });
 			}
 		}
@@ -180,5 +182,51 @@ async function(req, res, next) {
 
 	res.redirect('/users/login');
 });
+
+/**
+ * GET /users/register
+ */
+router.get('/register', function(req, res, next) {
+	res.render('users/register', { });
+});
+
+/**
+ * POST /users/register(email:string,password:string)
+ */
+ router.post('/register',
+ 	body('email')
+	 	.trim().isLength({ min: 1}).withMessage('Please enter your email address').bail()
+		.isEmail().withMessage('Invalid email address')
+		.custom(value => {
+			return User.findOne({where: { email: value }}).then(user => {
+				if(user) {
+					return Promise.reject('E-mail already in use');
+				}
+			});
+		}),
+	body('password')
+		.trim().isLength({ min: 6}).withMessage('Password must be at least 6 characters long'),
+	async function(req, res, next) {
+		var errors = validationResult(req);
+
+		if(!errors.isEmpty()) {
+			res.render('users/register', { errors });
+			return;
+		}
+
+		var email = req.body.email;
+		var password = req.body.password;
+		var user = await User.create({ email, password: auth.hashPassword(password) });
+
+		// TODO: verify email
+
+		// Save authentication cookie
+		req.session.authUser = { id: user.id, email: user.email };
+		
+		req.flash.notice = 'Welcome to Pluribus!';
+
+		return res.redirect('/users/home');
+	}
+);
 
 module.exports = router;

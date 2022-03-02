@@ -1,10 +1,12 @@
 <h1>Home</h1>
 
-<% if(following) { %>
+<% if(following && following.length) { %>
 	<h3>Following</h3>
 	<ul>
 	<% following.forEach(follow => { %>
 		<li><a href="/creators/<%= follow.creatorId %>"><%= follow.Creator.name %></a></li>
 	<% }); %>
 	</ul>
+<% } else { %>
+	<p>You're not following anyone yet. Followed creators will show up here once you do.</p>
 <% } %>

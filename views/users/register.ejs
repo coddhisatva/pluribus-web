@@ -1,0 +1,29 @@
+<% 
+_locals.title = 'Register';
+_locals.nav = 'register';
+console.log(locals);
+%>
+
+<h1 class="text-center">Register</h1>
+
+
+<div class="row justify-content-center mt-4">
+	<div class="col-md-6">
+		<form method="post">
+			<div class="mb-3">
+				<label class="form-label" for="email">Your email</label>
+				<input class="form-control" type="text" name="email" value="<%= postedValues.email %>" />
+				<%- validationMessage('email') %>
+			</div>
+			<div class="mb-3">
+				<label class="form-label" for="email">Choose a password</label>
+				<input class="form-control" type="password" name="password" autocomplete="new-password" />
+				<%- validationMessage('password') %>
+			</div>
+			<div>
+				<button class="btn btn-primary">Register</button>
+			</div>
+		</form>
+	</div>
+</div>
+
