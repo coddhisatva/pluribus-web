@@ -44,21 +44,18 @@ var auth = {
 		if(req.session && req.session.authUser) {
 			req.authUser = res.locals.authUser = req.session.authUser;
 		}
-		req.authorize = () => {
-			return auth.authorize(req, res);
-		}
 		next();
 	},
 
-	authorize: function(req, res) {
+	authorize: function(req, res, next) {
 		var authorized = res.locals.authUser != null;
 		if(!authorized) {
 			req.flash.alert = 'Please log in to continue.';
 			res.status(401).redirect('/users/login?redirect=' + encodeURIComponent(req.originalUrl));
-			return false;
+			return;
 		}
 
-		return true;
+		next();
 	},
 
 	oneTimeCode: function(length) {

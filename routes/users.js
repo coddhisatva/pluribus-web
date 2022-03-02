@@ -60,9 +60,7 @@ router.get('/logout', async function(req, res, next) {
 /**
  * GET /home
  */
-router.get('/home', async function(req, res, next) {
-	if(!req.authorize()) return;
-
+router.get('/home', auth.authorize, async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var following = await Follow.findAll({ where: { userId: user.id }, include: Creator });
 	console.log(following);

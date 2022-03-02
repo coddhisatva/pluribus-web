@@ -25,9 +25,7 @@ router.get('/:id', async function(req, res, next) {
  * POST /:id/follow
  * Sets the authenticated user to follow the creator specified by :id.
  */
-router.post('/:id/follow', async function(req, res, next) {
-	if(!req.authorize()) { return; }
-
+router.post('/:id/follow', auth.authorize, async function(req, res, next) {
 	var creatorId = req.params.id;
 	var userId = res.locals.authUser.id;
 	await Follow.create({ creatorId,  userId });
@@ -39,9 +37,7 @@ router.post('/:id/follow', async function(req, res, next) {
  * POST /:id/unfollow
  * Sets the authenticated user to NOT follow the creator specified by :id.
  */
- router.post('/:id/unfollow', async function(req, res, next) {
-	if(!req.authorize()) { return; }
-
+ router.post('/:id/unfollow', auth.authorize, async function(req, res, next) {
 	var creatorId = req.params.id;
 	var userId = res.locals.authUser.id;
 	var follow = await Follow.findOne({ where: { creatorId, userId }});
