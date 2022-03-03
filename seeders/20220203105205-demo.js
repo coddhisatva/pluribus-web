@@ -72,7 +72,7 @@ module.exports = {
 
 
 		console.log('Getting user ids');
-		var [userIds,] = await queryInterface.sequelize.query("select id from users where email in ('joerogan@jre.com.invalid','harrybergeron@substack.com.invalid','graymirror@substack.com.invalid','eugyppius@substack.com.invalid','bap@bap.com.invalid') order by id", { type: QueryTypes.select });
+		var [userIds,] = await queryInterface.sequelize.query("select id from Users where email in ('joerogan@jre.com.invalid','harrybergeron@substack.com.invalid','graymirror@substack.com.invalid','eugyppius@substack.com.invalid','bap@bap.com.invalid') order by id", { type: QueryTypes.select });
 
 		//console.log(userIds);
 		var creators = [
@@ -88,10 +88,10 @@ module.exports = {
 		await queryInterface.bulkInsert('Creators', creators);
 
 		// Test user follows first 2 creators
-		var [creatorIds,] = await queryInterface.sequelize.query("select id from creators limit 2", { type: QueryTypes.select });
+		var [creatorIds,] = await queryInterface.sequelize.query("select id from Creators limit 2", { type: QueryTypes.select });
 
 		console.log('Getting test user id');
-		var testUserId = await queryInterface.sequelize.query("select id from users where email = 'test@pluribus.com'", {
+		var testUserId = await queryInterface.sequelize.query("select id from Users where email = 'test@pluribus.com'", {
 				plain: true, // gets a single row
 		type: QueryTypes.select
 		});
@@ -116,8 +116,9 @@ module.exports = {
 		 * await queryInterface.bulkDelete('People', null, {});
 		 */
 
-		await queryInterface.sequelize.query("delete from follows where userId = (select id from users where email = 'test@pluribus.com')");
-		await queryInterface.sequelize.query("delete from creators where userId in (select id from users where email = 'test@pluribus.com' or email like '%.invalid')");
-		await queryInterface.sequelize.query("delete from users where email like 'test@pluribus.com' or email like '%.invalid'");
+		await queryInterface.sequelize.query("delete from Follows where userId = (select id from users where email = 'test@pluribus.com')");
+		await queryInterface.sequelize.query("delete from Creators where userId in (select id from users where email = 'test@pluribus.com' or email like '%.invalid')");
+		await queryInterface.sequelize.query("delete from OneTimeCodes where userid in (select id from users where email like 'test@pluribus.com' or email like '%.invalid')");
+		await queryInterface.sequelize.query("delete from Users where email like 'test@pluribus.com' or email like '%.invalid'");
 	}
 };
