@@ -225,7 +225,12 @@ router.get('/register', function(req, res, next) {
 		
 		req.flash.notice = 'Welcome to Pluribus!';
 
-		return res.redirect('/users/home');
+		// If part of creator setup workflow, continue with tha
+		if(req.query.continue == 'creator') {
+			res.redirect('/creators/new');
+			return;
+		}
+		res.redirect('/users/home');
 	}
 );
 

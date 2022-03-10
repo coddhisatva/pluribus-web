@@ -1,12 +1,52 @@
-var express = require('express');
-var router = express.Router();
-var { Creator, User, Follow } = require('../models');
+const express = require('express');
+const router = express.Router();
+const { Creator, User, Follow } = require('../models');
+const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
 
 router.get('/', async function(req, res, next) {
 	var creators = await Creator.findAll();
 	res.render('creators/index', { creators });
 });
+
+router.get('/new', function(req, res, next) {
+	// If there's no logged in user, redirect to user registration
+	// with continue=creator
+	if(res.locals.authUser == null) {
+		res.redirect('/users/register?continue=creator');
+		return;
+	}
+
+	var creator = Creator.findOne({ where: { userId: res.locals.authUser.id }});
+	if(creator) {
+		req.flash.alert = 'You already have a creator profile.';
+		res.redirect('/users/home');
+		return;
+	}
+	res.render('creators/new', { });
+});
+
+router.post('/new',
+	body('name').trim().isLength({ min: 1 }).withMessage('Please enter your name'),
+	body('about').trim().isLength({ min: 20 }).withMessage('Please write a bit more about yourself'),
+	async function(req, res, next) {
+		var errors = validationResult(req);
+		if(!errors.isEmpty()) {
+			res.render('creators/new', { errors });
+			return;
+		}
+		
+		var name = req.body.name;
+		var about = req.body.about;
+		var userId = res.locals.authUser.id;
+
+		var creator = await Creator.create({ name, about, userId });
+
+		req.flash.notice = 'You\'re now set up as a creator.';
+
+		res.redirect('/users/home');
+	}
+);
 
 router.get('/:id', async function(req, res, next) {
 	var creator = await Creator.findByPk(req.params.id, { include: User });

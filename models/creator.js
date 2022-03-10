@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Creator.init({
+    userId: DataTypes.INTEGER,
     name: DataTypes.STRING,
     about: DataTypes.STRING
   }, {
