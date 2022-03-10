@@ -1,0 +1,20 @@
+<%
+_locals.title = 'Creator setup'
+%>
+
+<h1>Creator setup</h1>
+<form method="post">
+	<div class="mb-3">
+		<label class="form-label">Your name</label>
+		<input class="form-control" type="text" name="name" value="<%= postedValues.name %>" />
+		<small class="form-text text-muted">The name or moniker that your followers know you by</small>
+		<%- validationMessage('name') %>
+	</div>
+	<div class="mb-3">
+		<label class="form-label">About you</label>
+		<textarea class="form-control" name="about"><%= postedValues.about %></textarea>
+		<small class="form-text text-muted">Please describe what you do</small>
+		<%- validationMessage('about') %>
+	</div>
+	<button class="btn btn-primary">Continue</button>
+</form>

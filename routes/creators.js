@@ -9,7 +9,7 @@ router.get('/', async function(req, res, next) {
 	res.render('creators/index', { creators });
 });
 
-router.get('/new', function(req, res, next) {
+router.get('/new', async function(req, res, next) {
 	// If there's no logged in user, redirect to user registration
 	// with continue=creator
 	if(res.locals.authUser == null) {
@@ -17,7 +17,7 @@ router.get('/new', function(req, res, next) {
 		return;
 	}
 
-	var creator = Creator.findOne({ where: { userId: res.locals.authUser.id }});
+	var creator = await Creator.findOne({ where: { userId: res.locals.authUser.id }});
 	if(creator) {
 		req.flash.alert = 'You already have a creator profile.';
 		res.redirect('/users/home');
