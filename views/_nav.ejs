@@ -1,31 +1,32 @@
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
 	<div class="container">
 
-		<a class="navbar-brand" href="/">
-			<img src="/images/logo.svg" width="20.67" height="25.67" />
-			Pluribus
-		</a>
+		<a class="navbar-brand" href="/">Pluribus.</a>
 
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		  </button>
 
-		<div class="collapse navbar-collapse" id="mainNav">
+		<div class="collapse navbar-collapse" id="mainNav" style="flex-grow:1 /* Help, John! Added this to get this part of the nav to left align */">
 			<div class="navbar-nav me-auto">
+				<a href="/how-it-works" class="nav-link">How it works</a>
+				<a href="/about" class="nav-link">About</a>
+				<a href="/product" class="nav-link">Product</a>
+				<a href="/pricing" class="nav-link">Pricing</a>
 				<a href="/creators" class="nav-link <%= _locals.nav == 'creators' ? 'active' : '' %>">Browse Creators</a>
 			</div>
 			<div class="navbar-nav">
-			<% if(locals.authUser) { %>
-				<%# User menu %>
-				<div class="nav-bar-item dropdown">
-					<a class="nav-link dropdown-toggle" href="#" id="userMenuDropdownLink" role="button" data-bs-toggle="dropdown" ><%= locals.authUser.email %></a>
-					<ul class="dropdown-menu"  aria-labelledby="userMenuDropdownLink">
-						<li><a class="dropdown-item" href="/users/logout">Log out</a></li>
+				<% if(locals.authUser) { %>
+					<%# User menu %>
+					<div class="nav-bar-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" id="userMenuDropdownLink" role="button" data-bs-toggle="dropdown" ><%= locals.authUser.email %></a>
+						<ul class="dropdown-menu"  aria-labelledby="userMenuDropdownLink">
+							<li><a class="dropdown-item" href="/users/logout">Log out</a></li>
+						</div>
 					</div>
-				</div>
 				<% } else { %>
-					<a href="/users/login" class="nav-link <%= _locals.nav == 'login' ? 'active' : ''%>">Login</a>
-					<a href="/users/register" class="nav-link <%= _locals.nav == 'register' ? 'active' : ''%>">Register</a>
+					<a href="/users/login" class="nav-link me-2 <%= _locals.nav == 'login' ? 'active' : ''%>">Log In</a>
+					<a href="/users/signup" class="btn btn-light">Sign Up</a>
 				<% } %>
 			</div>
 		</div>

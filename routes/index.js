@@ -4,16 +4,19 @@ var router = express.Router();
 var { Creator } = require('../models');
 
 
-/* GET home page. */
+/**
+ * GET /
+ * Shows the home page, or redirects the logged-in user to their dashboard
+ */ 
 router.get('/', async function(req, res, next) {
 
-  // If the user is logged in, take them to their home screen
+  // If the user is logged in, take them to their dashboard
   if(req.authUser != null) {
-    res.redirect('/users/home');
+    res.redirect('/users/dashboard');
     return;
   }
 
-  // Generic home page
+  // Home page
   creatorCount = await Creator.count();
   res.render('index', { creatorCount });
 });

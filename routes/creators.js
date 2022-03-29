@@ -13,17 +13,17 @@ router.get('/new', async function(req, res, next) {
 	// If there's no logged in user, redirect to user registration
 	// with continue=creator
 	if(res.locals.authUser == null) {
-		res.redirect('/users/register?continue=creator');
+		res.redirect('/users/signup?continue=creator');
 		return;
 	}
 
 	var creator = await Creator.findOne({ where: { userId: res.locals.authUser.id }});
 	if(creator) {
 		req.flash.alert = 'You already have a creator profile.';
-		res.redirect('/users/home');
+		res.redirect('/users/dashboard');
 		return;
 	}
-	res.render('creators/new', { });
+	res.render('creators/dashboard', { });
 });
 
 router.post('/new',

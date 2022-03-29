@@ -1,0 +1,28 @@
+<%
+_locals.title = "Activate your account";
+var email = locals.email;
+%>
+
+<div class="row justify-content-center">
+	<div class="col-md-6">
+
+		<div class="rounded border p-5 mt-5 bg-white">
+			<h1 class="mb-4">Activate your new Pluribus account.</h1>
+
+			<form method="post">
+				<input type="text" name="email" value="<%= email %>" style="display:none;" />
+
+				<div class="form-floating mb-3">
+					<input class="form-control" type="password" name="password" placeholder="secret" value="<%= postedValues.password %>" autocomplete="new-password" />
+					<label class="form-label" for="password">Choose a password</label>
+					<%- validationMessage('password') %>
+				</div>
+
+				<div>
+					<button class="btn btn-primary w-100 py-3">Activate your account</button>
+				</div>
+			</form>
+		</div>
+
+	</div>
+</div>

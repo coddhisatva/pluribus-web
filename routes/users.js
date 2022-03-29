@@ -60,14 +60,14 @@ router.get('/logout', async function(req, res, next) {
 });
 
 /**
- * GET /home
+ * GET /dashboard
  */
-router.get('/home', auth.authorize, async function(req, res, next) {
+router.get('/dashboard', auth.authorize, async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var following = await Follow.findAll({ where: { userId: user.id }, include: Creator });
 	console.log(following);
 
-	res.render('users/home', { user, following });
+	res.render('users/dashboard', { user, following });
 });
 
 /**
@@ -127,30 +127,32 @@ router.get('/password-reset-sent', async function(req, res, next) {
 	res.render('users/password-reset-sent');
 });
 
-async function getValidPasswordReset(req, res, next) {
-	var code = req.params.code;
-	var passwordReset = await OneTimeCode.findOne({ where: { code: code }});
+function getValidOneTimeCode(redirect) {
+	return async function(req, res, next) {
+		var code = req.params.code;
+		var oneTimeCode = await OneTimeCode.findOne({ where: { code: code }});
 
-	if(!passwordReset) {
-		req.flash.alert = 'Invalid link. Please try again.';
-		res.redirect('/users/password');
-		return;
-	} else if(passwordReset.expires < new Date()) {
-		req.flash.alert = 'The link you followed has expired. Please try again.';
-		res.redirect('/users/password');
-		return;
+		if(!oneTimeCode) {
+			req.flash.alert = 'Invalid link. Please try again.';
+			res.redirect(redirect);
+			return;
+		} else if(oneTimeCode.expires < new Date()) {
+			req.flash.alert = 'The link you followed has expired. Please try again.';
+			res.redirect(redirect);
+			return;
+		}
+
+		res.locals.oneTimeCode = oneTimeCode;
+		next();
 	}
-
-	res.locals.passwordReset = passwordReset;
-	next();
 }
 
 /**
  * GET /users/reset-password/:code
  * Shows the form for a user to reset their password.
  */
-router.get('/reset-password/:code', getValidPasswordReset, async function(req, res, next) {
-	var passwordReset = res.locals.passwordReset;
+router.get('/reset-password/:code', getValidOneTimeCode('/users/password'), async function(req, res, next) {
+	var passwordReset = res.locals.oneTimeCode;
 
 	res.render('users/reset-password');
 });
@@ -160,7 +162,7 @@ router.get('/reset-password/:code', getValidPasswordReset, async function(req, r
  * Resets the user's password.
  */
 router.post('/reset-password/:code',
-getValidPasswordReset,
+getValidOneTimeCode('/users/password'),
 body('password').trim().isLength({ min: 4 }).withMessage('Password must be 4 characters or longer.'),
 async function(req, res, next) {
 	const errors = validationResult(req);
@@ -169,7 +171,7 @@ async function(req, res, next) {
 		return;
 	}
 
-	var passwordReset = res.locals.passwordReset;
+	var passwordReset = res.locals.oneTimeCode;
 	
 	var user = await User.findByPk(passwordReset.userId);
 
@@ -184,16 +186,56 @@ async function(req, res, next) {
 });
 
 /**
- * GET /users/register
+ * GET /users/signup
+ * 
+ * Displays the sign up page.
  */
-router.get('/register', function(req, res, next) {
-	res.render('users/register', { });
+router.get('/signup', function(req, res, next) {
+	res.render('users/signup', { });
 });
 
 /**
- * POST /users/register(email:string,password:string)
+ * Send an activation email to the supplied email address
+ * @param {Request} req - The HTTP request
+ * @param {string} email - The email address to send the activation message to.
  */
- router.post('/register',
+async function sendActivationEmail(req, email) {
+	var user = await User.findOne({where: { email }});
+	if(user && user.password != null) return; // user already active
+
+	if(!user) {
+		user = await User.create({ email });
+	}
+
+	// Send activation email, including req.query.continue if necessary
+	var code = auth.oneTimeCode(10);
+	const expireInDays = 3;
+	var expires = new Date((new Date()).getTime() + expireInDays * 24 * 60 * 60 * 1000);
+	await OneTimeCode.create({ userId: user.id, email, code, expires });
+
+	var emailer = nodemailer.createTransport(emailConfig[req.app.get('env')]);
+
+	var link = `${req.protocol}://${req.headers.host}/users/activate/${code}`
+	// Check for a continue parameter that's expected, rather than just
+	// allow whatever was in the querystring
+	if(req.query.continue == 'creator') {
+		link += '?continue=creator';
+	}
+	var info = await emailer.sendMail({
+		from: 'noreply@pluribusworkspace',
+		to: user.email,
+		subject: 'Pluribus Sign Up',
+		text: `Please click the following link to activate your Pluribus account:\r\n
+${link}`
+	});
+}
+
+/**
+ * POST /users/signup(email:string,agree:boolean)
+ * 
+ * Creates an inactive user account and sends an activation email to the email address supplied.
+ */
+ router.post('/signup',
  	body('email')
 	 	.trim().isLength({ min: 1}).withMessage('Please enter your email address').bail()
 		.isEmail().withMessage('Invalid email address')
@@ -204,34 +246,86 @@ router.get('/register', function(req, res, next) {
 				}
 			});
 		}),
-	body('password')
-		.trim().isLength({ min: 6}).withMessage('Password must be at least 6 characters long'),
+	body('agree')
+		.equals('yes').withMessage('You must agree to the terms and conditions'),
 	async function(req, res, next) {
 		var errors = validationResult(req);
 
 		if(!errors.isEmpty()) {
-			res.render('users/register', { errors });
+			res.render('users/signup', { errors });
 			return;
 		}
 
 		var email = req.body.email;
-		var password = req.body.password;
-		var user = await User.create({ email, password: auth.hashPassword(password) });
+		await sendActivationEmail(req, email);
 
-		// TODO: verify email
-
-		// Save authentication cookie
-		req.session.authUser = { id: user.id, email: user.email };
-		
-		req.flash.notice = 'Welcome to Pluribus!';
-
-		// If part of creator setup workflow, continue with tha
-		if(req.query.continue == 'creator') {
-			res.redirect('/creators/new');
-			return;
-		}
-		res.redirect('/users/home');
+		req.session.signupEmail = email;
+		res.redirect('/users/activate-sent');
 	}
 );
+
+/**
+ * GET /users/activate-sent
+ * Shows the screen after a user submits the sign up form.
+ */
+router.get('/activate-sent', function(req, res, next) {
+	var email = req.session.signupEmail;
+	res.render('users/activate-sent', { email });
+});
+
+/**
+ * POST /users/resend-activate
+ * Resends the activation email.
+ * TODO: rate-limit requests (e.g. one per minute, increasing for each email sent) to make sure this isn't abused.
+ */
+router.post('/resend-activate', async function(req, res, next) {
+	var email = req.session.signupEmail;
+	await sendActivationEmail(req, email);
+	res.json({ });
+});
+
+/**
+ * GET /users/activate/:code
+ * Shows the page for when a user clicks the activation link in their sign up email.
+ */
+router.get('/activate/:code', getValidOneTimeCode('/users/signup'), async function(req, res, next) {
+	var activationCode = res.locals.oneTimeCode;
+	var email = activationCode.email;
+
+	res.render('users/activate', { email });
+});
+
+/**
+ * POST /users/activate/:code(password:string)
+ * Activates the user account using the POSTed password.
+ */
+router.post('/activate/:code',
+getValidOneTimeCode('/users/signup'),
+body('password').trim().isLength({ min: 4 }).withMessage('Password must be 4 characters or longer.'),
+async function(req, res, next) {
+	const errors = validationResult(req);
+	if(!errors.isEmpty()) {
+		res.render('users/activate', { errors: errors.mapped() });
+		return;
+	}
+
+	var activationCode = res.locals.oneTimeCode;
+	
+	var user = await User.findByPk(activationCode.userId);
+
+	var password = req.body.password;
+
+	user.set({ password: auth.hashPassword(password)});
+	await user.save();
+
+	req.flash.notice = "You have successfully activated your account. Welcome to Pluribus!";
+
+	// Save authentication cookie
+	req.session.authUser = { id: user.id, email: user.email };
+
+
+	res.redirect('/users/dashboard');
+});
+	
 
 module.exports = router;
