@@ -2,31 +2,47 @@
 _locals.title = 'Log in';
 _locals.nav = 'login';
 %>
-<h1 class="text-center">Log in to Pluribus</h1>
+    <h1 class="visually-hidden">Log in to Pluribus</h1>
+    <div class="wrapper-half">
+    <form class="form-credentials card" method="post">
+        <fieldset class="card-body">
+            <legend>Log in to Pluribus</legend>
 
-<div class="row justify-content-center mt-4">
-	<div class="col col-md-4">
-		<form class="login-form" method="post">
-			<div class="mb-3">
-				<label class="form-label" for="email">Email</label>
-				<input class="form-control" name="email" type="text" value="<%= postedValues.email %>" />
-			</div>
+            <div class="flow">
 
-			<div class="mb-3">
-				<label class="form-label" for="password">Password</label>
-				<input class="form-control" name="password" type="password" />
-			</div>
 
-			<% if(locals.errors) { %>
-				<div class="text-danger fw-bold my-2">Please check your email address and password.</div>
-			<% } %>
+								<% if(locals.errors) { %>
+          				<div class="alert alert-danger" data-state="warning">
+									<p>Please check your email address and password.</p></div>
+								<% } %>
 
-			<button class="btn btn-primary">Log in</button>
 
-		</form>
+                <div class="form-floating">
+                    <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" value="<%= postedValues.email %>" />
+                    <label for="floatingInput">Your email</label>
+                </div>
 
-		<div class="my-4">
-			<a href="/users/password">Forget your password?</a>
-		</div>
-	</div>
-</div>
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+                    <label for="floatingPassword">Password</label>
+                </div>
+
+                <p class="pw-link">
+                    <a href="/users/password">Forget your password?</a>
+                </p>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                    <label class="form-check-label" for="flexCheckDefault">
+                        Remember me on this device
+                    </label>
+                </div>
+
+                <button class="btn btn-primary btn-lg btn-block">Sign in</button>
+
+                <p>Don't have an account? <a href="#">Sign Up</a></p>
+
+            </div>
+        </fieldset>
+    </form>
+    </div>
