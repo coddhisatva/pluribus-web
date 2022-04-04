@@ -1,6 +1,9 @@
 <%
 _locals.title = 'Pluribus';
 %>
+
+<link rel="stylesheet" href="/css/pages/<%= (req.app.get('env') == "development") ? "prelaunch.css" : "prelaunch.min.css" %>" />
+
     <header>
         <figure class="logo">
             <img src="images/ui/logo-white.svg" alt="Pluribus. Logo">
@@ -8,8 +11,8 @@ _locals.title = 'Pluribus';
     </header>
 
     <div class="wrapper flow">
-        <h1 class="display-2">Crowdfunding safety nets before they’re needed</h1>
-        <p class="h1">You can’t control whether or not someone is canceled. <br>
+        <h1 class="display-2">Crowdfunding safety nets before they&rsquo;re needed</h1>
+        <p class="h1">You can&rsquo;t control whether or not someone is canceled. <br>
             You can control how much damage it does. </p>
         <form action="" class="flow form-credential">
 
@@ -17,23 +20,19 @@ _locals.title = 'Pluribus';
             <div class="alert alert-danger" data-state="warning">
                 <p>Please enter a valid email address</p>
             </div>
-      <% } %>
+        <% } %>
 
             <div class="email-grid">
                 <div class="form-floating">
 
-                    /*  is-invalid class added only on error  */
+                    <% /*  is-invalid class added only on error  */ %>
                     <input type="email" class="form-control is-invalid" id="floatingInput" placeholder="name@example.com"
                     value="<%= postedValues.email %>" >
 
                     <label for="floatingInput">Enter email address</label>
                 </div>
                 <div class="btn-holder">
-
-
                     <button class="btn btn-primary btn-lg">Get notified</button>
-
-
                 </div>
             </div>
         </form>

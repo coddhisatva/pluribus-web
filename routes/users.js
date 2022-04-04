@@ -12,7 +12,7 @@ router.get('/login', function(req, res, next) {
 	res.render('users/login');
 });
 
-/* POST /login (email:string, password:string) */
+/* POST /login (email:string, password:string, remember:1) */
 router.post('/login', [
 	body('email').trim().isLength({min:1}).withMessage('Email is required').bail()
 		.isEmail().withMessage('Invalid email address'),
@@ -36,8 +36,13 @@ router.post('/login', [
 			return;
 		}
 
+		var remember = req.body.remember == '1';
+
 		// Save authentication cookie
 		req.session.authUser = { id: user.id, email: user.email };
+		if(remember) {
+			req.sessionOptions.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
+		}
 
 		req.flash.notice = "Welcome back!";
 

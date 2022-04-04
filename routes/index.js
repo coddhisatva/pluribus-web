@@ -21,4 +21,8 @@ router.get('/', async function(req, res, next) {
   res.render('index', { creatorCount });
 });
 
+router.get('/prelaunch', function(req, res, next) {
+  res.render('prelaunch');
+});
+
 module.exports = router;

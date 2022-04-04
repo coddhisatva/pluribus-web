@@ -34,8 +34,10 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Save posted values to view state
+// Also include res, so we can do res.app.get('env')
 app.use((req, res, next) => {
   res.locals.postedValues = req.body;
+  res.locals.req = req;
   next();
 });
 
