@@ -1,0 +1,10 @@
+/* These are CSS tweaks that (probably) need to be integrated back into the master CSS */
+.inverse .alert-success {
+	background: #017b00;
+	color: #fff;
+}
+
+.success-msg h1::before {
+	background: url("../../images/content/single-planet.svg") no-repeat;
+	background-size: contain;
+}

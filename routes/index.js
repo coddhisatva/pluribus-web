@@ -1,8 +1,8 @@
 var express = require('express');
 const { redirect } = require('express/lib/response');
+const { body, validationResult } = require('express-validator');
 var router = express.Router();
 var { Creator } = require('../models');
-
 
 /**
  * GET /
@@ -10,19 +10,15 @@ var { Creator } = require('../models');
  */ 
 router.get('/', async function(req, res, next) {
 
-  // If the user is logged in, take them to their dashboard
-  if(req.authUser != null) {
-    res.redirect('/users/dashboard');
-    return;
-  }
+	// If the user is logged in, take them to their dashboard
+	if(req.authUser != null) {
+		res.redirect('/users/dashboard');
+		return;
+	}
 
-  // Home page
-  creatorCount = await Creator.count();
-  res.render('index', { creatorCount });
-});
-
-router.get('/prelaunch', function(req, res, next) {
-  res.render('prelaunch');
+	// Home page
+	creatorCount = await Creator.count();
+	res.render('index', { creatorCount });
 });
 
 module.exports = router;

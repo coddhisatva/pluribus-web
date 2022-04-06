@@ -5,7 +5,9 @@
 		<link rel="stylesheet" href="/css/main.css" />
 	</head>
 	<body class="<%= _locals.bodyClass %>">
+		<% if(!_locals.noNav) { %>
 		<%- include('_nav') %>
+		<% } %>
 		<div class="container mt-4">
 			<%- include('_flash') %>
 			<%- body %>

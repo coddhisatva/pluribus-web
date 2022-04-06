@@ -1,0 +1,50 @@
+<%
+_locals.title = 'Pluribus';
+_locals.bodyClass = 'inverse';
+_locals.noNav = true;
+%>
+
+<link rel="stylesheet" href="/css/pages/<%= (req.app.get('env') == "development") ? "prelaunch.css" : "prelaunch.min.css" %>" />
+<% /* CSS tweaks that need to be integrated back into master CSS */ %>
+<link rel="stylesheet" href="/css/todo.css" />
+
+	<header>
+		<figure class="logo">
+			<img src="/images/ui/logo-white.svg" alt="Pluribus. Logo">
+		</figure>
+	</header>
+
+	<div class="wrapper flow">
+		<h1 class="display-2">Crowdfunding safety nets before they&rsquo;re needed</h1>
+		<p class="h1">You can&rsquo;t control whether or not someone is canceled. <br>
+			You can control how much damage it does. </p>
+		<form  class="flow form-credential" method="post">
+			 <% /*  For any error, we assume it is an email error  */ %>
+			<% if(locals.errors) { %>
+				<div class="alert alert-danger" data-state="warning">
+					<p>Please enter a valid email address</p>
+				</div>
+			<% } else if(locals.alreadySubscribed) { %>
+				<div class="alert alert-success" data-state="warning">
+					<p>You're already on the list!</p>
+				</div>
+			<% } %>
+
+			<div class="email-grid">
+				<div class="form-floating">
+					<input type="text" class="form-control <%= locals.invalid ? 'is-invalid' : '' %>" id="email" name="email" placeholder="name@example.com" value="<%= postedValues.email %>" >
+
+					<label for="email">Enter email address</label>
+				</div>
+				<div class="btn-holder">
+					<button class="btn btn-primary btn-lg">Get notified</button>
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<footer>
+		<div class="wrapper">
+			<p class="h2 tagline">The tyranny of the <br> minority ends now</p>
+		</div>
+	</footer>
