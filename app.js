@@ -1,6 +1,3 @@
-// TODO: remove after launch
-const PRELAUNCH = true;
-
 const createError = require('http-errors');
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
@@ -14,7 +11,6 @@ const flash = require('./utils/flash');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var creatorsRouter = require('./routes/creators');
-var prelaunchRouter = require('./routes/prelaunch');
 
 var app = express();
 
@@ -45,15 +41,9 @@ app.use((req, res, next) => {
   next();
 });
 
-if(PRELAUNCH && app.get('env') == 'production') {
-  // TODO: remove this code block after launch
-  app.use('/', prelaunchRouter);
-} else {
-  app.use('/', indexRouter);
-  app.use('/users', usersRouter);
-  app.use('/creators', creatorsRouter);
-  app.use('/prelaunch', prelaunchRouter); // TODO: remove after launch
-}
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+app.use('/creators', creatorsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
