@@ -3,27 +3,104 @@ _locals.title = "Activate your account";
 var email = locals.email;
 %>
 
+<style>
+	.validation-feedback {
+		margin-top: 8px;
+		margin-right: 24px;
+		font-weight: normal;
+		display: inline-block;
+		color: #717171;
+	}
+	.avlidation-feedback img {
+		color: red;
+	}
+	.validation-feedback:before {
+		content: '';
+		display: inline-block;
+		width: 15px;
+		height: 15px;
+		background-image: url('/images/ui/check-o-muted.svg');
+		background-repeat: no-repeat;
+		background-size: contain;
+		vertical-align: middle;
+		margin-right: 5px;
+	}
+	.validation-feedback.text-success:before {
+		background-image: url('/images/ui/check-o-success.svg');
+	}
+</style>
+
 <div class="row justify-content-center">
 	<div class="col-md-6">
 
 		<div class="rounded border p-5 mt-5 bg-white">
-			<h1 class="mb-4">Activate your new Pluribus account.</h1>
+			<h1 class="mb-2">Welcome</h1>
+			<div class="mb-3">
+				Set a secure password for signing in to Pluribus
+			</div>
 
-			<form method="post">
+			<form method="post" id="activateForm" novalidate>
 				<%/* Include email as a hidden text input so that password manager knows which login email to link to. */%>
 				<input type="text" name="email" value="<%= email %>" style="display:none;" />
 
 				<div class="form-floating mb-3">
-					<input class="form-control" type="password" name="password" placeholder="secret" value="<%= postedValues.password %>" autocomplete="new-password" />
+					<input class="form-control" type="password" name="password" id="password" placeholder="secret" value="<%= postedValues.password %>" autocomplete="new-password" required/>
 					<label class="form-label" for="password">Choose a password</label>
+					<div class="invalid-feedback" id="passwordDynamicFeedback">
+						Please enter a stronger password
+					</div>
 					<%- validationMessage('password') %>
+
+					<div class="validation-feedback small" id="feedbackLowercase">One lowercase</div>
+					<div class="validation-feedback small" id="feedbackUppercase">One uppercase</div>
+					<div class="validation-feedback small" id="feedback8Chars">8 characters min.</div>
+				</div>
+
+				<div class="mb-3">
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" value="yes" id="accept" name="accept" <%- postedValues.agree ? 'checked' : '' %> required>
+						<label class="form-check-label" for="agree">I accept the <a href="#">terms of service</a></label>
+						<div class="invalid-feedback">
+							Please accept our terms of service
+						</div>
+					</div>
+					<%- validationMessage('agree') %>
 				</div>
 
 				<div>
-					<button class="btn btn-primary w-100 py-3">Activate your account</button>
+					<button class="btn btn-primary w-100 py-3">Activate account</button>
 				</div>
 			</form>
 		</div>
-
 	</div>
 </div>
+
+<script>
+	var activateForm = document.getElementById('activateForm');
+	var password = document.getElementById('password');
+	var passwordDynamicFeedback = document.getElementById('passwordDynamicFeedback');
+	var feedbackLowercase = document.getElementById('feedbackLowercase');
+	var feedbackUppercase = document.getElementById('feedbackUppercase');
+	var feedback8Chars = document.getElementById('feedback8Chars');
+	var passwordValid = false;
+
+	password.addEventListener('input', function() {
+		var value = password.value;
+
+		passwordValid = feedbackLowercase.classList.toggle('text-success', /[[a-z]/.test(value));
+		passwordValid &&= feedbackUppercase.classList.toggle('text-success', /[[A-Z]/.test(value));
+		passwordValid &&= feedback8Chars.classList.toggle('text-success', value.length >= 8);
+
+		password.classList.toggle('is-invalid', !passwordValid);
+		password.classList.toggle('is-valid', passwordValid);
+	});
+
+	activateForm.addEventListener('submit', function(e) {
+		if(!activateForm.checkValidity()) {
+			e.stopPropagation();
+			e.preventDefault();
+		}
+		activateForm.classList.add('was-validated');
+	})
+
+</script>

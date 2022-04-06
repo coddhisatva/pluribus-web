@@ -301,36 +301,37 @@ router.get('/activate/:code', getValidOneTimeCode('/users/signup'), async functi
 });
 
 /**
- * POST /users/activate/:code(password:string)
+ * POST /users/activate/:code(password:string,accept:boolean)
  * Activates the user account using the POSTed password.
  */
 router.post('/activate/:code',
-getValidOneTimeCode('/users/signup'),
-body('password').trim().isLength({ min: 4 }).withMessage('Password must be 4 characters or longer.'),
-async function(req, res, next) {
-	const errors = validationResult(req);
-	if(!errors.isEmpty()) {
-		res.render('users/activate', { errors: errors.mapped() });
-		return;
-	}
+	getValidOneTimeCode('/users/signup'),
+	body('password').trim().isLength({ min: 8 }).withMessage('Password must be 8 characters or longer'),
+	body('accept').equals('yes').withMessage('Please accept our terms of service'),
+	async function(req, res, next) {
+		const errors = validationResult(req);
+		if(!errors.isEmpty()) {
+			res.render('users/activate', { errors: errors.mapped() });
+			return;
+		}
 
-	var activationCode = res.locals.oneTimeCode;
-	
-	var user = await User.findByPk(activationCode.userId);
+		var activationCode = res.locals.oneTimeCode;
+		
+		var user = await User.findByPk(activationCode.userId);
 
-	var password = req.body.password;
+		var password = req.body.password;
 
-	user.set({ password: auth.hashPassword(password)});
-	await user.save();
+		user.set({ password: auth.hashPassword(password)});
+		await user.save();
 
-	req.flash.notice = "You have successfully activated your account. Welcome to Pluribus!";
+		req.flash.notice = "You have successfully activated your account. Welcome to Pluribus!";
 
-	// Save authentication cookie
-	req.session.authUser = { id: user.id, email: user.email };
+		// Save authentication cookie
+		req.session.authUser = { id: user.id, email: user.email };
 
 
-	res.redirect('/users/dashboard');
-});
+		res.redirect('/users/dashboard');
+	});
 	
 
 module.exports = router;
