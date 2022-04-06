@@ -5,8 +5,8 @@
   "scripts": {
     "start": "node ./bin/www",
     "devstart": "nodemon ./bin/www",
-    "prodstart": "DEBUG=pluribus:* NODE_ENV=production nodemon ./bin/www",
-    "serverstart_forever": "DEBUG=pluribus:* NODE_ENV=production forever start ./bin/www",
+    "prodstart": "DEBUG=pluribus:* NODE_ENV=production start ./bin/www",
+    "serverstart": "DEBUG=pluribus:* NODE_ENV=production forever start ./bin/www",
     "test": "mocha"
   },
   "dependencies": {
