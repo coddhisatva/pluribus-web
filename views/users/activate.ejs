@@ -87,9 +87,15 @@ var email = locals.email;
 	password.addEventListener('input', function() {
 		var value = password.value;
 
-		passwordValid = feedbackLowercase.classList.toggle('text-success', /[[a-z]/.test(value));
-		passwordValid &&= feedbackUppercase.classList.toggle('text-success', /[[A-Z]/.test(value));
-		passwordValid &&= feedback8Chars.classList.toggle('text-success', value.length >= 8);
+		var hasLower = /[[a-z]/.test(value);
+		var hasUpper = /[[A-Z]/.test(value);
+		var has8Chars = value.length >= 8;
+
+		feedbackLowercase.classList.toggle('text-success', hasLower);
+		feedbackUppercase.classList.toggle('text-success', hasUpper);
+		feedback8Chars.classList.toggle('text-success', has8Chars);
+
+		passwordValid = hasLower && hasUpper && has8Chars;
 
 		password.classList.toggle('is-invalid', !passwordValid);
 		password.classList.toggle('is-valid', passwordValid);

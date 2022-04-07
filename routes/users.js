@@ -329,7 +329,6 @@ router.post('/activate/:code',
 		// Save authentication cookie
 		req.session.authUser = { id: user.id, email: user.email };
 
-
 		res.redirect('/users/dashboard');
 	});
 	
