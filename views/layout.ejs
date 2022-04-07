@@ -3,10 +3,13 @@
 	<head>
 		<title><%= _locals.title ? (_locals.title != 'Pluribus' ? _locals.title + ' - Pluribus' : _locals.title) : 'Pluribus' %></title>
 		<link rel="stylesheet" href="/css/main.css" />
+		<link rel="stylesheet" href="/css/todo.css" />
 	</head>
 	<body class="<%= _locals.bodyClass %>">
 		<% if(!_locals.noNav) { %>
-		<%- include('_nav') %>
+			<%- include('_nav') %>
+		<% } else { %>
+			<%- include('_nonav') %>
 		<% } %>
 		<div class="container mt-4">
 			<%- include('_flash') %>

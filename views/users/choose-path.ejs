@@ -1,0 +1,40 @@
+<%
+_locals.title = 'Choose a path';
+_locals.noNav = true;
+_locals.bodyClass = 'bg-light';
+%>
+
+<style>
+	svg {
+		max-width: 100%;
+		height: 95px;
+	}
+	a.selection:hover {
+		box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.12) !important;
+	}
+</style>
+
+<div class="row justify-content-center">
+	<div class="col-md-6">
+		<h1 class="text-center my-4 display-xxs">I'm here because...</h1>
+		<a class="selection d-block rounded border bg-white p-4 mb-4 text-decoration-none text-strong" href="/creators/new">
+			<div class="row">
+				<div class="col-md-3" ><svg><use href="/images/ui/choose-path.svg#creator"></use></svg></div>
+				<div class="col-md-9">
+					<h2 class="heading-xl-medium">I am a creator</h2>
+					<div class="text-medium">Molestie mauris ullamcorper purus viverra. In nunc urna.</div>
+				</div>
+			</div>
+		</a>
+
+		<a class="selection d-block rounded border bg-white p-4 text-decoration-none text-strong" href="#">
+			<div class="row">
+				<div class="col-md-3"><svg><use href="/images/ui/choose-path.svg#supporter"></use></svg></div>
+				<div class="col-md-9">
+					<h2 class="heading-xl-medium">I want to support</h2>
+					<div class="text-medium">Molestie mauris ullamcorper purus viverra. In nunc urna.</div>
+				</div>
+			</div>
+		</a>
+	</div>
+</div>

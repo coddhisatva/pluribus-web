@@ -8,3 +8,21 @@
 	background: url("../../images/content/single-planet.svg") no-repeat;
 	background-size: contain;
 }
+
+header.nonav {
+	padding: .75rem 24px;
+}
+
+header.nonav .logo {
+	max-width: 110px;
+	margin: 0 auto;
+}
+
+input.form-check-input[type=checkbox] {
+	width: 24px;
+	height: 24px;
+}
+label.form-check-label {
+	padding-left: 12px;
+	vertical-align: sub;
+}

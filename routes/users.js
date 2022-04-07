@@ -329,8 +329,12 @@ router.post('/activate/:code',
 		// Save authentication cookie
 		req.session.authUser = { id: user.id, email: user.email };
 
-		res.redirect('/users/dashboard');
+		res.redirect('/users/choose-path');
 	});
+
+router.get('/choose-path', async function(req, res, next) {
+	res.render('users/choose-path');
+});
 	
 
 module.exports = router;

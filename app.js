@@ -7,6 +7,7 @@ const cookieSession = require('cookie-session');
 const logger = require('morgan');
 const auth = require('./utils/auth');
 const flash = require('./utils/flash');
+const viewUtils = require('./utils/viewUtils');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -32,6 +33,7 @@ app.use(flash);
 app.use(auth.inject);
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(viewUtils);
 
 // Save posted values to view state
 // Also include res, so we can do res.app.get('env')

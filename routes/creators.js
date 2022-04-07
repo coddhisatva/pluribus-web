@@ -9,7 +9,7 @@ router.get('/', async function(req, res, next) {
 	res.render('creators/index', { creators });
 });
 
-router.get('/new', async function(req, res, next) {
+async function ensureNoCreatorAccount(req, res, next) {
 	// If there's no logged in user, redirect to user registration
 	// with continue=creator
 	if(res.locals.authUser == null) {
@@ -23,10 +23,32 @@ router.get('/new', async function(req, res, next) {
 		res.redirect('/users/dashboard');
 		return;
 	}
-	res.render('creators/dashboard', { });
+
+	next();
+}
+
+router.get('/new', ensureNoCreatorAccount, async function(req, res, next) {
+	res.redirect('/creators/new/categories');
 });
 
-router.post('/new',
+router.get('/new/categories', ensureNoCreatorAccount, async function(req, res, next) {
+	res.render('creators/new-categories');
+});
+
+router.post('/new/categories',
+	ensureNoCreatorAccount,
+	body('categories').trim(),
+	async function(req, res, next) {
+		res.render('creators/new-categories');
+	}
+);
+
+router.get('/new/details', ensureNoCreatorAccount, async function(req, res, next) {
+	res.render('creators/new-details', { });
+});
+
+router.post('/new/details',
+	ensureNoCreatorAccount,
 	body('name').trim().isLength({ min: 1 }).withMessage('Please enter your name'),
 	body('about').trim().isLength({ min: 20 }).withMessage('Please write a bit more about yourself'),
 	async function(req, res, next) {
