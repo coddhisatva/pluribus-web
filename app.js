@@ -22,8 +22,12 @@ app.use(expressLayouts);
 app.set('layout extractScripts', true);
 
 app.use(logger('dev'));
+
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
 app.use(cookieSession({
   name: '_auth',
   secret: '!@)ktElMh;;SO2Fr)gCQdsc\'',
@@ -32,7 +36,6 @@ app.use(cookieSession({
 app.use(flash);
 app.use(auth.inject);
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(viewUtils);
 
 // Save posted values to view state

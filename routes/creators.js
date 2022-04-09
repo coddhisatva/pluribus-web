@@ -37,7 +37,6 @@ router.get('/new/categories', ensureNoCreatorAccount, async function(req, res, n
 
 router.post('/new/categories',
 	ensureNoCreatorAccount,
-	body('categories').trim(),
 	async function(req, res, next) {
 		res.render('creators/new-categories');
 	}
