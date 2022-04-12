@@ -332,7 +332,7 @@ router.post('/activate/:code',
 		res.redirect('/users/choose-path');
 	});
 
-router.get('/choose-path', async function(req, res, next) {
+router.get('/choose-path', auth.authorize, async function(req, res, next) {
 	res.render('users/choose-path');
 });
 	
