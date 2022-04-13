@@ -20,7 +20,7 @@ async function ensureNoCreatorAccount(req, res, next) {
 	var creator = await Creator.findOne({ where: { userId: res.locals.authUser.id }});
 	if(creator) {
 		req.flash.alert = 'You already have a creator profile.';
-		res.redirect('/users/dashboard');
+		res.redirect('/dashboard');
 		return;
 	}
 

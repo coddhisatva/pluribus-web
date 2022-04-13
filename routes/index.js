@@ -12,7 +12,7 @@ router.get('/', async function(req, res, next) {
 
 	// If the user is logged in, take them to their dashboard
 	if(req.authUser != null) {
-		res.redirect('/users/dashboard');
+		res.redirect('/dashboard');
 		return;
 	}
 

@@ -12,6 +12,7 @@ const viewUtils = require('./utils/viewUtils');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var creatorsRouter = require('./routes/creators');
+var dashboardRouter = require('./routes/dashboard');
 
 var app = express();
 
@@ -46,9 +47,18 @@ app.use((req, res, next) => {
   next();
 });
 
+// Use a different layout for /dashboar
+app.use((req, res, next) => {
+  if(req.path.startsWith('/dashboard')) {
+    res.locals.layout = 'dashboard/layout';
+  }
+  next();
+});
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/creators', creatorsRouter);
+app.use('/dashboard', dashboardRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

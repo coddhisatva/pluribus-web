@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title><%= _locals.title ? (_locals.title != 'Pluribus' ? _locals.title + ' - Pluribus' : _locals.title) : 'Pluribus' %></title>
+		<link rel="stylesheet" href="/css/main.css" />
+		<link rel="stylesheet" href="/css/todo.css" />
+
+		<style>
+			.sidebar {
+				display: flex;
+				flex-direction: column;
+				min-height: 100vh;
+			}
+
+			.sidebar nav {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.sidebar nav a {
+				text-decoration: none;
+				color: var(--text-strong);
+				padding: 17.5px 32px 17.5px 72px;
+				position: relative;
+			}
+
+			.sidebar nav a:hover,
+			.sidebar nav a.active {
+				background-color: #f0f3f3;
+				color: var(--bs-primary);
+			}
+
+			.sidebar a svg {
+				position: absolute;
+				width: 24px;
+				height: 24px;
+				left: 32px;
+			}
+		</style>
+	</head>
+	<body class="<%= _locals.bodyClass %>">
+		<div class="container-fluid">
+			<div class="row flex-nowrap">
+				<% /* Side menu */ %>
+				<div class="col-md-2 col-auto g-0">
+
+					<div class="sidebar">
+						<a class="navbar-brand text-black" href="/">Pluribus.</a>
+						<nav class="flex-column border-top mt-5">
+							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#key"></use></svg>Supporters</a>
+							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#heart"></use></svg>Creators I follow</a>
+						</nav>
+						Creator dashboard
+						<nav class="flex-column">
+							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#insights"></use></svg>Insights</a>
+							<a href="#" class="active"><svg><use href="/images/ui/sidebar-icons.svg#profile"></use></svg>Profile</a>
+							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#lock"></use></svg>Login &amp; security</a>
+							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#credit-card"></use></svg>Payments</a>
+							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#globe-alt"></use></svg>Settings</a>
+							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#stack"></use></svg>Referral program</a>
+							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#website"></use></svg>Policy</a>
+						</nav>
+
+						<nav style="margin-top:auto;">
+							<a href="/users/logout"><svg><use href="/images/ui/sidebar-icons.svg#log-out"></use></svg>Log out</a>
+						</nav>
+					</div>
+					
+				</div>
+
+				<% /* Content area*/ %>
+				<div class="col bg-light p-5">
+					<%- include('../_flash') %>
+					<%- body %>
+				</div>				
+			</div>
+		</div>
+
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+		<%- script %>
+	</body>
+</html>

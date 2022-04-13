@@ -65,17 +65,6 @@ router.get('/logout', async function(req, res, next) {
 });
 
 /**
- * GET /dashboard
- */
-router.get('/dashboard', auth.authorize, async function(req, res, next) {
-	var user = await User.findByPk(req.authUser.id);
-	var following = await Follow.findAll({ where: { userId: user.id }, include: Creator });
-	console.log(following);
-
-	res.render('users/dashboard', { user, following });
-});
-
-/**
  * GET /password
  * Shows a form for a user to request a password reset ('Forgot password?' page).
  */
