@@ -74,7 +74,7 @@ var email = locals.email;
 		</div>
 	</div>
 </div>
-
+<script src="/js/forms.js"></script>
 <script>
 	var activateForm = document.getElementById('activateForm');
 	var password = document.getElementById('password');
@@ -107,6 +107,8 @@ var email = locals.email;
 			e.preventDefault();
 		}
 		activateForm.classList.add('was-validated');
-	})
+	});
+
+	forms.addPasswordVisibilityToggle(password);
 
 </script>

@@ -36,6 +36,14 @@
 				height: 24px;
 				left: 32px;
 			}
+
+			.sidebar-text {
+				padding: 32px;
+			}
+
+			.sidebar .nav-heading {
+				padding: 24px;
+			}
 		</style>
 	</head>
 	<body class="<%= _locals.bodyClass %>">
@@ -45,12 +53,16 @@
 				<div class="col-md-2 col-auto g-0">
 
 					<div class="sidebar">
-						<a class="navbar-brand text-black" href="/">Pluribus.</a>
+						<div class="sidebar-text">
+							<a class="navbar-brand text-black" href="/">Pluribus.</a>
+						</div>
+						
 						<nav class="flex-column border-top mt-5">
 							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#key"></use></svg>Supporters</a>
 							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#heart"></use></svg>Creators I follow</a>
 						</nav>
-						Creator dashboard
+
+						<div class="nav-heading heading-sm-weak text-medium">Creator dashboard</div>
 						<nav class="flex-column">
 							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#insights"></use></svg>Insights</a>
 							<a href="#" class="active"><svg><use href="/images/ui/sidebar-icons.svg#profile"></use></svg>Profile</a>

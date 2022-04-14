@@ -22,7 +22,7 @@ _locals.nav = 'login';
                 </div>
 
                 <div class="form-floating">
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Password" autocomplete="current-password">
                     <label for="password">Password</label>
                 </div>
 
@@ -45,3 +45,8 @@ _locals.nav = 'login';
         </fieldset>
     </form>
     </div><!-- .wrapper-half -->
+
+    <script src="/js/forms.js"></script>
+    <script>
+        forms.addPasswordVisibilityToggle(document.getElementById('password'));
+    </script>
