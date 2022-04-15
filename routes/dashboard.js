@@ -18,7 +18,7 @@ router.get('/profile', auth.authorize, async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userId: user.id }});
 	if(!creator) {
-		res.status(404);
+		res.status(404).send("Creator not found.");
 		return;
 	}
 
@@ -32,7 +32,7 @@ router.post('/profile', auth.authorize, upload.none(), async function(req, res, 
 	var update = { };
 	['name', 'about'].forEach(prop => {
 		var value = req.body[prop];
-		if(value) {
+		if(value !== undefined) {
 			update[prop] = value;
 		}
 	});

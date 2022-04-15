@@ -192,7 +192,8 @@ const up = {
 	eval: function(model, code) {
 		// Convert all identifiers to model.identifier for security
 		const allowedKeywords = [ 'if', 'else', 'var', 'let', 'const' ];
-		const reIdentifier = /(?<=^|\s)[\w$_][^\s\.\[\()]*/g;
+		// Note: Safari can't do positive lookbehind assertions
+		const reIdentifier = /(^|\s)([\w$_][^\s\.\[\()]*)/g;
 
 		var blocks = up.lex(code);
 		var safeCode = '';
@@ -201,9 +202,9 @@ const up = {
 			var text = block[1];
 
 			if(type == 'code') {
-				safeCode += text.replace(reIdentifier, function(identifier) {
-					if(allowedKeywords.indexOf(identifier) != -1) { return identifier }
-					return 'model.' + identifier;
+				safeCode += text.replace(reIdentifier, function(match, g1, g2) {
+					if(allowedKeywords.indexOf(g2) != -1) { return g1 + g2 }
+					return g1 + 'model.' + g2;
 				});
 			} else {
 				safeCode += text;
