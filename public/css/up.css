@@ -1,0 +1,8 @@
+/*
+Styles related to up.js: multi-section forms with inline editing.
+*/
+
+*[edit] {
+	display: none;
+	position: relative;
+}

@@ -1,0 +1,95 @@
+<%
+_locals.title = "Profile";
+_locals.nav = 'profile';
+%>
+
+<link rel="stylesheet" href="/css/up.css" />
+
+<h1 class="mb-3">Profile Information</h1>
+
+<div class="row">
+	<div class="col-md-8">
+		<div id="profileForm" class="card p-4">
+
+			<!-- Name -->
+			<div class="mb-4">
+				<div view>
+					<div class="heading-sm-weak mb-2">
+						Full name
+						<a edit-btn href="#" bind="name ? 'Update' : 'Add'" class="float-end text-black"></a>
+					</div>
+					<div class="body-xs-weak text-medium">
+						<div bind="name" if="name"></div>
+						<div else>Not provided</div>
+					</div>
+				</div>
+				<div edit>
+					<div class="row">
+						<div class="col">
+							<label for="name" class="form-label">Full name</label>
+							<div class="form-floating mb-3">
+								<input type="text" name="name" id="name" class="form-control" placeholder="Your name" />
+								<label for="name" class="form-label">Full name</label>
+							</div>
+
+							<button save-btn class="btn bg-black text-white saving">Save</button>
+						</div>
+						<div class="col-md-2">
+							<a href="#" cancel-btn class="float-end text-black">Cancel</a>
+						</div>
+					</div>			
+				</div>
+			</div>
+
+			<!-- About me -->
+			<div class="mb-4">
+				<div view>
+					<div class="heading-sm-weak mb-2">
+						About me
+						<a edit-btn href="#" bind="about ? 'Update' : 'Add'" class="float-end text-black"></a>
+					</div>
+					<div class="body-xs-weak text-medium">
+						<div bind="about" if="about"></div>
+						<div else>Not provided</div>
+					</div>
+				</div>
+				<div edit>
+					<div class="row">
+						<div class="col">
+							<label for="about" class="form-label">About me</label>
+							<div class="form-floating mb-3">
+								<textarea type="text" name="about" id="about" class="form-control" placeholder="Write your message here" style="height:120px"></textarea>
+								<label for="about" class="form-label">Write your message here</label>
+							</div>
+
+							<button save-btn class="btn bg-black text-white">Save</button>
+						</div>
+						<div class="col-md-2">
+							<a href="#" cancel-btn class="float-end text-black">Cancel</a>
+						</div>
+					</div>					
+				</div>
+			</div>
+		</div>
+	</div><!-- .col -->
+	<div class="col">
+		<div class="rounded border bg-white p-4">
+			<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path fill-rule="evenodd" clip-rule="evenodd" d="M14 28C16.2091 28 18 26.2091 18 24C18 21.7909 16.2091 20 14 20C11.7909 20 10 21.7909 10 24C10 26.2091 11.7909 28 14 28ZM20.9297 20C19.5465 17.6088 16.9611 16 14 16C10.2723 16 7.14012 18.5495 6.25204 22H4C2.89543 22 2 22.8954 2 24C2 25.1046 2.89543 26 4 26H6.25204C7.14012 29.4505 10.2723 32 14 32C18.4183 32 22 28.4183 22 24H26C26 28.4183 29.5817 32 34 32C37.7277 32 40.8599 29.4505 41.748 26H44C45.1046 26 46 25.1046 46 24C46 22.8954 45.1046 22 44 22H41.748C40.8599 18.5495 37.7277 16 34 16C31.0389 16 28.4535 17.6088 27.0703 20H20.9297ZM30 24C30 26.2091 31.7909 28 34 28C36.2091 28 38 26.2091 38 24C38 21.7909 36.2091 20 34 20C31.7909 20 30 21.7909 30 24Z" fill="#1D1D23"/>
+			</svg>
+				
+			<h3 class="heading-lg-medium text-strong">What do we do with your information?</h3>
+			<p class="body-sm-weak text-medium">Gravida ut varius feugiat viverra. Ipsum, dis aenean quisque vel amet eget. Faucibus potenti consectetur duis id habitant nunc, elementum, fringilla vitae.</p>
+		</div>
+	</div>
+</div><!-- .row -->
+
+
+<script src="/js/up.js"></script>
+<script>
+	var model = <%- JSON.stringify({ name: creator.name, about: creator.about } ) %>;
+
+	var profileForm = document.getElementById('profileForm');
+	up.wire(profileForm, model, '/dashboard/profile');
+	
+</script>
