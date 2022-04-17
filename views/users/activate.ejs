@@ -2,33 +2,7 @@
 _locals.title = "Activate your account";
 var email = locals.email;
 %>
-
-<style>
-	.validation-feedback {
-		margin-top: 8px;
-		margin-right: 24px;
-		font-weight: normal;
-		display: inline-block;
-		color: #717171;
-	}
-	.avlidation-feedback img {
-		color: red;
-	}
-	.validation-feedback:before {
-		content: '';
-		display: inline-block;
-		width: 15px;
-		height: 15px;
-		background-image: url('/images/ui/check-o-muted.svg');
-		background-repeat: no-repeat;
-		background-size: contain;
-		vertical-align: middle;
-		margin-right: 5px;
-	}
-	.validation-feedback.text-success:before {
-		background-image: url('/images/ui/check-o-success.svg');
-	}
-</style>
+<link rel="stylesheet" href="/css/dynamic-password-validation.css"/>
 
 <div class="row justify-content-center">
 	<div class="col-md-6">
@@ -77,38 +51,7 @@ var email = locals.email;
 <script src="/js/forms.js"></script>
 <script>
 	var activateForm = document.getElementById('activateForm');
-	var password = document.getElementById('password');
-	var passwordDynamicFeedback = document.getElementById('passwordDynamicFeedback');
-	var feedbackLowercase = document.getElementById('feedbackLowercase');
-	var feedbackUppercase = document.getElementById('feedbackUppercase');
-	var feedback8Chars = document.getElementById('feedback8Chars');
-	var passwordValid = false;
-
-	password.addEventListener('input', function() {
-		var value = password.value;
-
-		var hasLower = /[[a-z]/.test(value);
-		var hasUpper = /[[A-Z]/.test(value);
-		var has8Chars = value.length >= 8;
-
-		feedbackLowercase.classList.toggle('text-success', hasLower);
-		feedbackUppercase.classList.toggle('text-success', hasUpper);
-		feedback8Chars.classList.toggle('text-success', has8Chars);
-
-		passwordValid = hasLower && hasUpper && has8Chars;
-
-		password.classList.toggle('is-invalid', !passwordValid);
-		password.classList.toggle('is-valid', passwordValid);
-	});
-
-	activateForm.addEventListener('submit', function(e) {
-		if(!activateForm.checkValidity()) {
-			e.stopPropagation();
-			e.preventDefault();
-		}
-		activateForm.classList.add('was-validated');
-	});
-
+	forms.addDynamicPasswordValidation(activateForm);
 	forms.addPasswordVisibilityToggle(password);
 
 </script>

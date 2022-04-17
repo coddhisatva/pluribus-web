@@ -83,7 +83,6 @@ router.post('/password', [
 		.isEmail().withMessage('Invalid email address'),
 
 	async function(req, res, next) {
-		const expireInMinutes = 30;
 
 		const errors = validationResult(req).array();
 
@@ -95,18 +94,7 @@ router.post('/password', [
 		var email = req.body.email;
 		var user = await User.findOne({where: { email }});
 		if(user) {
-			var code = auth.oneTimeCode(10);
-			var expires = new Date((new Date()).getTime() + expireInMinutes * 60000);
-			await OneTimeCode.create({ userId: user.id, email, code, expires });
-
-			var emailer = nodemailer.createTransport(emailConfig[req.app.get('env')]);
-			var info = await emailer.sendMail({
-				from: 'noreply@pluribusworkspace',
-				to: user.email,
-				subject: 'Reset your Pluribus password',
-				text: `Please click the following link to reset your Pluribus password:\n
-${req.protocol}://${req.headers.host}/users/reset-password/${code}`
-			})
+			sendForgotPasswordEmail(req, user)
 		}
 
 		res.redirect('password-reset-sent');
@@ -157,7 +145,9 @@ router.get('/reset-password/:code', getValidOneTimeCode('/users/password'), asyn
  */
 router.post('/reset-password/:code',
 getValidOneTimeCode('/users/password'),
-body('password').trim().isLength({ min: 4 }).withMessage('Password must be 4 characters or longer.'),
+body('password').trim().isLength({ min: 8 }).withMessage('Password must be 8 characters or longer')
+	.custom((value) => /[A-Z]/.test(value)).withMessage('Password must contain at least one uppercase letter')
+	.custom((value) => /[a-z]/.test(value)).withMessage('Password must contain at least one lowercase letter'),
 async function(req, res, next) {
 	const errors = validationResult(req);
 	if(!errors.isEmpty()) {
@@ -193,13 +183,7 @@ router.get('/signup', function(req, res, next) {
  * @param {Request} req - The HTTP request
  * @param {string} email - The email address to send the activation message to.
  */
-async function sendActivationEmail(req, email) {
-	var user = await User.findOne({where: { email }});
-	if(user && user.password != null) return; // user already active
-
-	if(!user) {
-		user = await User.create({ email });
-	}
+async function sendActivationEmail(req, user) {
 
 	// Send activation email, including req.query.continue if necessary
 	var code = auth.oneTimeCode(10);
@@ -225,6 +209,35 @@ ${link}`
 }
 
 /**
+ * Sends a password reset email.
+ * The link expires in 30 minutes.
+ */
+async function sendForgotPasswordEmail(req, user) {
+	// Note: this may be sent from the forgotten password page OR when
+	// someone tries to sign up using an email address for an existing user account.
+	// So we try to cover these two cases in the wording of th email, noting that
+	// the request may have originated with someone else probing email addresses (hopefully rarely).
+	var code = auth.oneTimeCode(10);
+	const expireInMinutes = 30;
+	var expires = new Date((new Date()).getTime() + expireInMinutes * 60000);
+	await OneTimeCode.create({ userId: user.id, email: user.email, code, expires });
+
+	var emailer = nodemailer.createTransport(emailConfig[req.app.get('env')]);
+	var info = await emailer.sendMail({
+		from: 'noreply@pluribusworkspace',
+		to: user.email,
+		subject: 'Reset your Pluribus password',
+		text: `It looks like you've been having trouble accessing your Pluribus account.
+
+Please click the following link to reset your Pluribus password:
+
+${req.protocol}://${req.headers.host}/users/reset-password/${code}
+
+If you did not make this request, please disregard this email.`
+	});
+}
+
+/**
  * POST /users/signup(email:string,agree:boolean)
  * 
  * Creates an inactive user account and sends an activation email to the email address supplied.
@@ -232,14 +245,7 @@ ${link}`
  router.post('/signup',
  	body('email')
 	 	.trim().isLength({ min: 1}).withMessage('Please enter your email address').bail()
-		.isEmail().withMessage('Invalid email address')
-		.custom(value => {
-			return User.findOne({where: { email: value }}).then(user => {
-				if(user) {
-					return Promise.reject('E-mail already in use');
-				}
-			});
-		}),
+		.isEmail().withMessage('Invalid email address'),
 	body('agree')
 		.equals('yes').withMessage('You must agree to the terms and conditions'),
 	async function(req, res, next) {
@@ -251,7 +257,16 @@ ${link}`
 		}
 
 		var email = req.body.email;
-		await sendActivationEmail(req, email);
+
+		var existingUser = await User.findOne({where: { email }});
+
+		if(existingUser) {
+			// Perhaps they forgot that they already have an account
+			await sendForgotPasswordEmail(req, existingUser);
+		} else {
+			var user = await User.create({ email });
+			await sendActivationEmail(req, user);
+		}
 
 		req.session.signupEmail = email;
 		res.redirect('/users/activate-sent');

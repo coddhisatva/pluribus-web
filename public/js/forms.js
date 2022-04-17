@@ -26,6 +26,40 @@ var forms = {
 			e.stopPropagation();
 			input.type = input.type == 'password' ? 'text' : 'password';
 		});
+	},
+
+	addDynamicPasswordValidation: function(form, passwordInput) {
+		var passwordInput = document.getElementById('password');
+		var passwordDynamicFeedback = document.getElementById('passwordDynamicFeedback');
+		var feedbackLowercase = document.getElementById('feedbackLowercase');
+		var feedbackUppercase = document.getElementById('feedbackUppercase');
+		var feedback8Chars = document.getElementById('feedback8Chars');
+		var passwordValid = false;
+
+		passwordInput.addEventListener('input', function() {
+			var value = passwordInput.value;
+
+			var hasLower = /[[a-z]/.test(value);
+			var hasUpper = /[[A-Z]/.test(value);
+			var has8Chars = value.length >= 8;
+
+			feedbackLowercase.classList.toggle('text-success', hasLower);
+			feedbackUppercase.classList.toggle('text-success', hasUpper);
+			feedback8Chars.classList.toggle('text-success', has8Chars);
+
+			passwordValid = hasLower && hasUpper && has8Chars;
+
+			passwordInput.classList.toggle('is-invalid', !passwordValid);
+			passwordInput.classList.toggle('is-valid', passwordInputValid);
+		});
+
+		form.addEventListener('submit', function(e) {
+			if(!form.checkValidity()) {
+				e.stopPropagation();
+				e.preventDefault();
+			}
+			form.classList.add('was-validated');
+		});
 	}
 };
 

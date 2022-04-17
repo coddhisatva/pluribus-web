@@ -2,51 +2,51 @@
 _locals.title = 'Log in';
 _locals.nav = 'login';
 %>
-    <h1 class="visually-hidden">Log in to Pluribus</h1>
-    <div class="wrapper-half">
-    <form class="form-credentials card" method="post">
-        <fieldset class="card-body">
-            <legend>Log in to Pluribus</legend>
+<h1 class="visually-hidden">Log in to Pluribus</h1>
+<div class="wrapper-half">
+<form class="form-credentials card" method="post">
+	<fieldset class="card-body">
+		<legend>Log in to Pluribus</legend>
 
-            <div class="flow">
+		<div class="flow">
 
-				<% if(locals.errors) { %>
-          			<div class="alert alert-danger" data-state="warning">
-						<p>Please check your email address and password.</p>
-                    </div>
-				<% } %>
+			<% if(locals.errors) { %>
+				<div class="alert alert-danger" data-state="warning">
+					<p>Please check your email address and password.</p>
+				</div>
+			<% } %>
 
-                <div class="form-floating">
-                    <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" value="<%= postedValues.email %>" />
-                    <label for="email">Your email</label>
-                </div>
+			<div class="form-floating">
+				<input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" value="<%= postedValues.email %>" />
+				<label for="email">Your email</label>
+			</div>
 
-                <div class="form-floating">
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Password" autocomplete="current-password">
-                    <label for="password">Password</label>
-                </div>
+			<div class="form-floating">
+				<input type="password" class="form-control" id="password" name="password" placeholder="Password" autocomplete="current-password">
+				<label for="password">Password</label>
+			</div>
 
-                <p class="pw-link">
-                    <a href="/users/password">Forget your password?</a>
-                </p>
+			<p class="pw-link">
+				<a href="/users/password">Forget your password?</a>
+			</p>
 
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="1" id="flexCheckDefault" name="remember">
-                    <label class="form-check-label" for="flexCheckDefault">
-                        Remember me on this device
-                    </label>
-                </div>
+			<div class="form-check">
+				<input class="form-check-input" type="checkbox" value="1" id="flexCheckDefault" name="remember">
+				<label class="form-check-label" for="flexCheckDefault">
+					Remember me on this device
+				</label>
+			</div>
 
-                <button class="btn btn-primary btn-lg btn-block">Sign in</button>
+			<button class="btn btn-primary btn-lg btn-block">Sign in</button>
 
-                <p>Don't have an account? <a href="/users/signup">Sign Up</a></p>
+			<p>Don't have an account? <a href="/users/signup">Sign Up</a></p>
 
-            </div>
-        </fieldset>
-    </form>
-    </div><!-- .wrapper-half -->
+		</div>
+	</fieldset>
+</form>
+</div><!-- .wrapper-half -->
 
-    <script src="/js/forms.js"></script>
-    <script>
-        forms.addPasswordVisibilityToggle(document.getElementById('password'));
-    </script>
+<script src="/js/forms.js"></script>
+<script>
+	forms.addPasswordVisibilityToggle(document.getElementById('password'));
+</script>
