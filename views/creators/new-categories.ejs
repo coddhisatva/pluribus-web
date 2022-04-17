@@ -2,6 +2,11 @@
 _locals.title = "What do you do?";
 _locals.noNav = true;
 _locals.bodyClass = "bg-light";
+
+var savedCategories = [];
+if(req.session && req.session.creatorSignup && req.session.creatorSignup.categories) {
+	savedCategories = req.session.creatorSignup.categories;
+}
 %>
 
 <div class="row justify-content-center">
@@ -16,7 +21,7 @@ _locals.bodyClass = "bg-light";
 			<% for(var category of ['Art','Podcasts','Writing','Videographer','Journalist']) { %>
 				<% var id = 'check' + camelize(category); %>
 				<div class="form-check my-3">
-					<input class="form-check-input input-lg" type="checkbox" value="<%= category %>" name="categories" id="<%= id %>">
+					<input class="form-check-input input-lg" type="checkbox" value="<%= category %>" name="categories" id="<%= id %>" <%= savedCategories.indexOf(category) != -1 ? 'checked': '' %>>
 					<label class="form-check-label" for="<%= id %>">
 						<%= category %>
 					</label>
@@ -56,4 +61,7 @@ _locals.bodyClass = "bg-light";
 	categoryInputs.forEach(function(input) {
 		input.addEventListener('change', inputChange);
 	});
+
+	// In case the user went back, check if any boxes were previously selected
+	inputChange();
 </script>

@@ -37,9 +37,10 @@ router.post('/login', [
 		}
 
 		var remember = req.body.remember == '1';
+		var creator = await Creator.findOne({ where: { userId: user.id }});
 
 		// Save authentication cookie
-		req.session.authUser = { id: user.id, email: user.email };
+		req.session.authUser = { id: user.id, email: user.email, isCreator: creator != null };
 		if(remember) {
 			req.sessionOptions.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
 		}
@@ -331,7 +332,7 @@ router.post('/activate/:code',
 		req.flash.notice = "You have successfully activated your account. Welcome to Pluribus!";
 
 		// Save authentication cookie
-		req.session.authUser = { id: user.id, email: user.email };
+		req.session.authUser = { id: user.id, email: user.email, isCreator: false };
 
 		res.redirect('/users/choose-path');
 	});

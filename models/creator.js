@@ -17,8 +17,13 @@ module.exports = (sequelize, DataTypes) => {
   }
   Creator.init({
     userId: DataTypes.INTEGER,
+    hasPhoto: DataTypes.BOOLEAN,
     name: DataTypes.STRING,
-    about: DataTypes.STRING
+    about: DataTypes.STRING,
+    website: DataTypes.STRING,
+    socialProfiles: DataTypes.STRING,
+    displaySupporterCount: DataTypes.BOOLEAN,
+    profilePublic: DataTypes.BOOLEAN,
   }, {
     sequelize,
     modelName: 'Creator',

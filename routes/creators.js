@@ -38,7 +38,11 @@ router.get('/new/categories', ensureNoCreatorAccount, async function(req, res, n
 router.post('/new/categories',
 	ensureNoCreatorAccount,
 	async function(req, res, next) {
-		res.render('creators/new-categories');
+		if(!req.session.creatorSignup) {
+			req.session.creatorSignup = { };
+		}
+		req.session.creatorSignup.categories = req.body.categories;
+		res.redirect('/creators/new/details');
 	}
 );
 
@@ -53,7 +57,7 @@ router.post('/new/details',
 	async function(req, res, next) {
 		var errors = validationResult(req);
 		if(!errors.isEmpty()) {
-			res.render('creators/new', { errors });
+			res.render('creators/new-details', { errors });
 			return;
 		}
 		
@@ -65,7 +69,9 @@ router.post('/new/details',
 
 		req.flash.notice = 'You\'re now set up as a creator.';
 
-		res.redirect('/users/home');
+		req.session.authUser.isCreator = true;
+
+		res.redirect('/dashboard/profile');
 	}
 );
 
