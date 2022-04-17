@@ -27,6 +27,12 @@ label.form-check-label {
 	vertical-align: sub;
 }
 
+/* Fixes close button for flash messages sitting outside the message border */
+.alert-dismissible .btn-close {
+	padding: .6125rem;
+}
+
+
 
 /*****************************************
 / Password visibility toggle for forms.
