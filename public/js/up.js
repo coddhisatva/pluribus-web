@@ -269,9 +269,16 @@ const up = {
 
 		savingCb();
 		fetch(saveUrl, { method: 'post', body: data })
-			.then(response => {
+			.then(function(response) {
+				if(response.ok) {
+					return response.json();
+				}
+			}).then(function(sync) {
 				for(var prop in updated) {
 					model[prop] = updated[prop];
+				}
+				for(var prop in sync) {
+					model[prop] = sync[prop];
 				}
 				savedCb();
 			});

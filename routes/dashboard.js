@@ -8,6 +8,7 @@ const upload = multer({ dest: 'uploads/tmp' });
 const fs = require('fs/promises');
 const path = require('path');
 const util = require('../utils/util');
+const sharp = require('sharp');
 
 router.get('/', auth.authorize, async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
@@ -32,6 +33,10 @@ router.post('/profile', auth.authorize, upload.single('newPhoto'), async functio
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userId: user.id }});
 
+	// These are value we need to send back to the client. Only send
+	// values that the client wouldn't otherwise know about.
+	var sync = { };
+
 	var update = { };
 	['name', 'about', 'website', 'displaySupporterCount', 'publicProfile' ].forEach(prop => {
 		var value = req.body[prop];
@@ -55,8 +60,14 @@ router.post('/profile', auth.authorize, upload.single('newPhoto'), async functio
 		}
 		filename += ext;
 		await fs.mkdir(dir, { recursive: true });
-		await fs.rename(req.file.path, dir + '/' + filename);
+		await sharp(req.file.path)
+			.resize({ width: 200, height: 200})
+			.toFile(dir + '/' + filename);
+
+		await fs.rm(req.file.path);
 		update.photo = filename;
+		sync.photo = filename;
+		sync.newPhoto = ''; // a little hacky, but tell the view to reset the newPhoto file input
 	}
 
 	if(req.body.removeExistingPhoto && creator.photo) {
@@ -67,7 +78,7 @@ router.post('/profile', auth.authorize, upload.single('newPhoto'), async functio
 	
 	await Creator.update(update, { where: { id: creator.id }});
 
-	res.send('OK');
+	res.send(sync);
 });
 
 module.exports = router;
