@@ -134,6 +134,33 @@ _locals.nav = 'profile';
 				</div>
 			</div>
 
+			<!-- Social profiles -->
+			<div class="mb-4">
+				<div view>
+					<div class="heading-sm-weak mb-2">
+						Social profiles
+						<a edit-btn href="#" bind="socialProfiles ? 'Update' : 'Add'" class="float-end text-black"></a>
+					</div>
+					<div class="body-xs-weak text-medium">
+						<div foreach="profile in socialProfiles.split('|)" if="socialProfiles" bind="profile"></div>
+						<div else>Not provided</div>
+					</div>
+				</div>
+				<div edit>
+					<div class="row">
+						<div class="col">
+							<label class="form-label">Social profiles</label>
+							TODO
+
+							<button save-btn class="btn bg-black text-white">Save</button>
+						</div>
+						<div class="col-md-2">
+							<a href="#" cancel-btn class="float-end text-black">Cancel</a>
+						</div>
+					</div>					
+				</div>
+			</div>
+
 			<!-- Supporter count toggle -->
 			<div class="mb-4 row">
 				<div class="col">
@@ -196,6 +223,8 @@ Note: only include data that up.js will use.
 }) %>"></data>
 <script>
 	var model = JSON.parse(document.getElementById('creatorData').value);
+	// Hard wire initial social profiles for testing
+	model.socialProfiles = 'https://twitter.com/Tysenberg|https://www.youtube.com/user/donnybenet|https://harrybergeron.substack.com/';
 
 	var profileForm = document.getElementById('profileForm');
 	up.wire(profileForm, model, '/dashboard/profile');
