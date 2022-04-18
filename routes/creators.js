@@ -84,6 +84,10 @@ router.post('/new/details',
 
 router.get('/:id', async function(req, res, next) {
 	var creator = await Creator.findByPk(req.params.id, { include: User });
+	if(!creator) {
+		res.status(404).send('Creator not found.');
+		return;
+	}
 
 	var isFollowing = false;
 	if(req.authUser) {
