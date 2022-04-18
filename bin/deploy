@@ -1,0 +1,27 @@
+#!/bin/zsh
+
+GITGUD_CREDS=`echo 'host=gitgud.io\n\n' | git credential-osxkeychain get`
+GITGUD_USERNAME=`echo $GITGUD_CREDS | sed -ne 's/username=//p'`
+GITGUD_PASSWORD=`echo $GITGUD_CREDS | sed -ne 's/password=//p'`
+
+ssh -tt root@206.81.100.148 "export GITGUD_USERNAME='$GITGUD_USERNAME'; export GITGUD_PASSWORD=$GITGUD_PASSWORD; bash" << 'ENDSSH'
+cd web
+
+echo https://$GITGUD_USERNAME:$GITGUD_PASSWORD@gitgud.io >> ~/.git-credentials
+git pull 'https://gitgud.io/pluribus/web.git'
+rm ~/.git-credentials
+npx sequelize db:migrate
+
+# Restart the server
+pkill -f /root/web/bin/www
+screen -S dev -X stuff 'node /root/web/bin/www\n'
+
+exit
+ENDSSH
+
+# Note to restart server:
+# screen -r dev
+# (Press Ctrl-C) or run `pkill -f /root/web/bin/www`
+# node /root/web/sbin/www
+# (To detach from screen press Ctrl-A then Ctrl-D)
+# (If dev screen not there, you can start one with screen -r dev)

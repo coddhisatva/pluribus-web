@@ -47,7 +47,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Use a different layout for /dashboar
+// Use a different layout for /dashboard
 app.use((req, res, next) => {
   if(req.path.startsWith('/dashboard')) {
     res.locals.layout = 'dashboard/layout';
