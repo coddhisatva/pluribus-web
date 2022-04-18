@@ -10,6 +10,9 @@ cd web
 echo https://$GITGUD_USERNAME:$GITGUD_PASSWORD@gitgud.io >> ~/.git-credentials
 git pull 'https://gitgud.io/pluribus/web.git'
 rm ~/.git-credentials
+
+npm install
+
 npx sequelize db:migrate
 
 # Restart the server
