@@ -8,6 +8,9 @@
 		<style>
 			.navbar {
 				box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.12);
+				position: fixed;
+				top: 0;
+				width: 100%;
 			}
 			.sidebar {
 				display: flex;
@@ -49,7 +52,7 @@
 	<body class="<%= _locals.bodyClass %>">
 		<div class="navbar navbar-expand-lg navbar-light bg-white">
 			<div class="container-fluid">
-				<a class="navbar-brand text-black" href="/">Pluribus.</a>
+				<a class="navbar-brand text-black ms-3" href="/">Pluribus.</a>
 			</div>
 		</div>
 		<div class="container-fluid">
@@ -57,7 +60,7 @@
 				<% /* Side menu */ %>
 				<div class="col-md-2 col-auto g-0">
 
-					<div class="sidebar">
+					<div class="sidebar pt-5">
 						<div class="sidebar-text">
 							<div class="heading-md-medium">Hi</div>
 							<div class="heading-xs-weak text-medium">Creator</div>
@@ -80,7 +83,7 @@
 				</div>
 
 				<% /* Content area*/ %>
-				<div class="col bg-light p-5">
+				<div class="col bg-light p-5 mt-5">
 					<%- include('../_flash') %>
 					<%- body %>
 				</div>				

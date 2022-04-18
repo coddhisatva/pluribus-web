@@ -40,7 +40,6 @@ router.post('/profile', auth.authorize, upload.none(), async function(req, res, 
 			} else {
 				update[prop] = value;
 			}
-			
 		}
 	});
 	
