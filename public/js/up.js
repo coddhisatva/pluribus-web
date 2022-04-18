@@ -12,7 +12,7 @@ const up = {
 
 		views.forEach(function(view) {
 			var edit = view.nextElementSibling;
-			if(edit.getAttribute('edit') == null) {
+			if(!edit || edit.getAttribute('edit') == null) {
 				edit = null; // No edit view
 			}
 
@@ -31,24 +31,26 @@ const up = {
 				function showView() {
 					edit.style.display = 'none';
 					view.style.display = 'block';
+					return view;
 				}
+				edit.showView = showView;
 
 				var saveBtn = edit.querySelector('[save-btn]');
 				if(saveBtn) {
+					saveBtn.originalInnerText = saveBtn.innerText;
 					saveBtn.addEventListener('click', function(e) {
 						e.preventDefault();
 						up.saveFormValues(edit, model, saveUrl,
 							function() {
 								// Start saving
 								// TODO: UI to show saving.
-								saveBtn.dataset.text = saveBtn.innerText;
 								saveBtn.innerText = 'Saving...';
 								saveBtn.disabled = true;
 								cancelBtn.style.display = 'none';
 							},
 							function(data, err) {
 								// Finish saving
-								saveBtn.innerText = saveBtn.dataset.text;
+								saveBtn.innerText = saveBtn.originalInnerText;
 								saveBtn.disabled = false;
 								cancelBtn.style.display = '';
 								if(err) {
@@ -75,9 +77,15 @@ const up = {
 
 			// Model bindings
 			var boundElements = view.querySelectorAll('[bind]');
+			const reBindAttribute = /^(\w+):/;
 			view.bind = function() {
 				boundElements.forEach(function(boundElement) {
 					var bind = boundElement.getAttribute('bind');
+					var bindAttribute = reBindAttribute.exec(bind);
+					if(bindAttribute) {
+						bindAttribute = bindAttribute[1];
+						bind = bind.replace(reBindAttribute, '');
+					}
 					var result;
 					try {
 						result = up.eval(model, bind);
@@ -85,7 +93,12 @@ const up = {
 						throw 'Error evaluating bind="' + bind + '": ' + e;
 					}
 					
-					boundElement.innerHTML = result;
+					if(bindAttribute) {
+						boundElement.setAttribute(bindAttribute, result);
+					} else {
+						boundElement.innerHTML = result;
+					}
+					
 				});
 			};
 
@@ -244,7 +257,12 @@ const up = {
 		inputs.forEach(function(input) {
 			if(input.hasAttribute('name')) {
 				var name = input.getAttribute('name');
-				data.append(name, input.value);
+				if(input.type == 'file') {
+					data.append(name, input.files[0]);
+				} else {
+					data.append(name, input.value);
+				}
+				
 				updated[name] = input.value; // Save for updating the model if request succeeds
 			}
 		});

@@ -11,6 +11,39 @@ _locals.nav = 'profile';
 	<div class="col-md-8">
 		<div id="profileForm" class="card p-4">
 
+			<!-- Photo -->
+			<div class="mb-4">
+				<div view>
+					<div class="heading-sm-weak mb-2">
+						Photo
+						<a edit-btn href="#" bind="photo ? 'Update' : 'Add'" class="float-end text-black"></a>
+					</div>
+					<div class="body-xs-weak text-medium">
+						<img bind="src:photo ? '/images/uploads/creators/<%= creator.id %>/' + photo : ''" if="photo" class="rounded-circle" style="max-width:80px;max-height:80px" />
+						<div else>Not provided</div>
+					</div>
+				</div>
+				<div edit>
+					<div class="row">
+						<div class="col">
+							<div class="mb-3">
+								<label for="newPhoto" class="form-label">Upload a new photo</label>
+								<input type="file" name="newPhoto" id="newPhoto" class="form-control" placeholder="Choose a photo" />
+							</div>
+
+							<div class="mb-2">
+								<a id="removeExistingPhoto" href="#">Remove existing photo</a>
+							</div>
+
+							<button save-btn class="btn bg-black text-white saving">Save</button>
+						</div>
+						<div class="col-md-2">
+							<a href="#" cancel-btn class="float-end text-black">Cancel</a>
+						</div>
+					</div>			
+				</div>
+			</div>
+
 			<!-- Name -->
 			<div class="mb-4">
 				<div view>
@@ -155,7 +188,12 @@ _locals.nav = 'profile';
 <% /*
 Note: only include data that up.js will use.
 */ %>
-<data id="creatorData" value="<%= JSON.stringify({ name: creator.name, about: creator.about, website: creator.website }) %>"></data>
+<data id="creatorData" value="<%= JSON.stringify({
+	name: creator.name,
+	about: creator.about,
+	website: creator.website,
+	photo: creator.photo
+}) %>"></data>
 <script>
 	var model = JSON.parse(document.getElementById('creatorData').value);
 
@@ -173,6 +211,20 @@ Note: only include data that up.js will use.
 		});
 	});
 
-	
+	// Remove existing photo
+	var removeExistingPhoto = document.getElementById('removeExistingPhoto');
+	removeExistingPhoto.addEventListener('click', function(e) {
+		e.preventDefault();
+		if(!confirm('Really remove your existing photo?')) {
+			return;
+		}
+
+		var data = new FormData();
+		data.append('removeExistingPhoto', true);
+		fetch('/dashboard/profile', { method: 'post', body: data });
+		model.photo = null;
+		var edit = removeExistingPhoto.closest('[edit]');
+		edit.showView().update();
+	})	
 	
 </script>

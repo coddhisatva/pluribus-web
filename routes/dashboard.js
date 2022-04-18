@@ -4,7 +4,10 @@ const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
 const { User, Creator, Follow } = require('../models');
 const multer = require('multer');
-const upload = multer();
+const upload = multer({ dest: 'uploads/tmp' });
+const fs = require('fs/promises');
+const path = require('path');
+const util = require('../utils/util');
 
 router.get('/', auth.authorize, async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
@@ -25,7 +28,7 @@ router.get('/profile', auth.authorize, async function(req, res, next) {
 	res.render('dashboard/profile', { user, creator });
 });
 
-router.post('/profile', auth.authorize, upload.none(), async function(req, res, next) {
+router.post('/profile', auth.authorize, upload.single('newPhoto'), async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userId: user.id }});
 
@@ -42,6 +45,25 @@ router.post('/profile', auth.authorize, upload.none(), async function(req, res, 
 			}
 		}
 	});
+
+	if(req.file) {
+		var dir = 'public/images/uploads/creators/' + creator.id;
+		var filename = path.basename(req.file.path);
+		var ext = util.mimeTypeExtensions[req.file.mimetype];
+		if(!ext) {
+			throw 'Mime type not implemented: ' + req.file.mimetype;
+		}
+		filename += ext;
+		await fs.mkdir(dir, { recursive: true });
+		await fs.rename(req.file.path, dir + '/' + filename);
+		update.photo = filename;
+	}
+
+	if(req.body.removeExistingPhoto && creator.photo) {
+		var photoPath = 'public/images/uploads/creators/' + creator.id + '/' + creator.photo;
+		await fs.rm(photoPath);
+		update.photo = null;
+	}
 	
 	await Creator.update(update, { where: { id: creator.id }});
 

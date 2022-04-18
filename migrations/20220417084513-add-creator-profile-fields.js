@@ -10,9 +10,9 @@ module.exports = {
 		 */
 		await queryInterface.sequelize.transaction(t => {
 			return Promise.all([
-				queryInterface.addColumn('Creators', 'hasPhoto', {
-					type: Sequelize.BOOLEAN,
-					allowNull: false
+				queryInterface.addColumn('Creators', 'photo', {
+					type: Sequelize.STRING,
+					allowNull: true
 				}, { transaction: t }),
 				queryInterface.addColumn('Creators', 'website', {
 					type: Sequelize.STRING,
@@ -69,7 +69,7 @@ module.exports = {
 		 */
 		return queryInterface.sequelize.transaction(t => {
 			return Promise.all([
-				queryInterface.removeColumn('Creators', 'hasPhoto', { transaction: t }),
+				queryInterface.removeColumn('Creators', 'photo', { transaction: t }),
 				queryInterface.removeColumn('Creators', 'website', { transaction: t }),
 				queryInterface.removeColumn('Creators', 'socialProfiles', { transaction: t }),
 				queryInterface.removeColumn('Creators', 'displaySupporterCount', { transaction: t }),

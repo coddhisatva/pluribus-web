@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Creator.init({
     userId: DataTypes.INTEGER,
-    hasPhoto: DataTypes.BOOLEAN,
+    photo: DataTypes.STRING,
     name: DataTypes.STRING,
     about: DataTypes.STRING,
     website: DataTypes.STRING,
