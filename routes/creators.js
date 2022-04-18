@@ -64,9 +64,15 @@ router.post('/new/details',
 		var name = req.body.name;
 		var about = req.body.about;
 		var userId = res.locals.authUser.id;
-		var displaySupporterCount = true; // default
 
-		var creator = await Creator.create({ name, about, userId, displaySupporterCount });
+		var creator = await Creator.create({
+			name,
+			about,
+			userId,
+			displaySupporterCount: true,
+			publicProfile: false,
+			hasPhoto: false
+		});
 
 		req.flash.notice = 'You\'re now set up as a creator.';
 

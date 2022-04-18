@@ -152,8 +152,12 @@ _locals.nav = 'profile';
 
 
 <script src="/js/up.js"></script>
+<% /*
+Note: only include data that up.js will use.
+*/ %>
+<data id="creatorData" value="<%= JSON.stringify({ name: creator.name, about: creator.about, website: creator.website }) %>"></data>
 <script>
-	var model = <%- JSON.stringify({ name: creator.name, about: creator.about } ) %>;
+	var model = JSON.parse(document.getElementById('creatorData').value);
 
 	var profileForm = document.getElementById('profileForm');
 	up.wire(profileForm, model, '/dashboard/profile');
