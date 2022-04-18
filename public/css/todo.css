@@ -26,6 +26,9 @@ label.form-check-label {
 	padding-left: 12px;
 	vertical-align: sub;
 }
+.form-switch input.form-check-input[type=checkbox] {
+	width: 40px;
+}
 
 /* Fixes close button for flash messages sitting outside the message border */
 .alert-dismissible .btn-close {

@@ -30,10 +30,17 @@ router.post('/profile', auth.authorize, upload.none(), async function(req, res, 
 	var creator = await Creator.findOne({ where: { userId: user.id }});
 
 	var update = { };
-	['name', 'about'].forEach(prop => {
+	['name', 'about', 'website', 'displaySupporterCount', 'publicProfile' ].forEach(prop => {
 		var value = req.body[prop];
+
 		if(value !== undefined) {
-			update[prop] = value;
+			if(Creator.tableAttributes[prop].type.key == 'BOOLEAN') {
+				// For check boxes, any string equals true
+				update[prop] = !!value;
+			} else {
+				update[prop] = value;
+			}
+			
 		}
 	});
 	

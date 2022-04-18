@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     website: DataTypes.STRING,
     socialProfiles: DataTypes.STRING,
     displaySupporterCount: DataTypes.BOOLEAN,
-    profilePublic: DataTypes.BOOLEAN,
+    publicProfile: DataTypes.BOOLEAN,
   }, {
     sequelize,
     modelName: 'Creator',

@@ -50,7 +50,7 @@ const up = {
 								// Finish saving
 								saveBtn.innerText = saveBtn.dataset.text;
 								saveBtn.disabled = false;
-								delete cancelBtn.style.display;
+								cancelBtn.style.display = '';
 								if(err) {
 									alert('Error saving form!' + err);
 								} else {

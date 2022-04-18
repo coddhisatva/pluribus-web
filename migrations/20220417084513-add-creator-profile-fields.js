@@ -12,6 +12,7 @@ module.exports = {
 			return Promise.all([
 				queryInterface.addColumn('Creators', 'hasPhoto', {
 					type: Sequelize.BOOLEAN,
+					allowNull: false
 				}, { transaction: t }),
 				queryInterface.addColumn('Creators', 'website', {
 					type: Sequelize.STRING,
@@ -21,9 +22,11 @@ module.exports = {
 				}, { transaction: t }),
 				queryInterface.addColumn('Creators', 'displaySupporterCount', {
 					type: Sequelize.BOOLEAN,
+					allowNull: false
 				}, { transaction: t }),
-				queryInterface.addColumn('Creators', 'profilePublic', {
+				queryInterface.addColumn('Creators', 'publicProfile', {
 					type: Sequelize.BOOLEAN,
+					allowNull: false
 				}, { transaction: t }),
 
 				queryInterface.createTable('CreatorCategories', {
@@ -64,16 +67,16 @@ module.exports = {
 		 * Example:
 		 * await queryInterface.dropTable('users');
 		 */
-		 return queryInterface.sequelize.transaction(t => {
-      return Promise.all([
+		return queryInterface.sequelize.transaction(t => {
+			return Promise.all([
 				queryInterface.removeColumn('Creators', 'hasPhoto', { transaction: t }),
-        queryInterface.removeColumn('Creators', 'website', { transaction: t }),
-        queryInterface.removeColumn('Creators', 'socialProfiles', { transaction: t }),
+				queryInterface.removeColumn('Creators', 'website', { transaction: t }),
+				queryInterface.removeColumn('Creators', 'socialProfiles', { transaction: t }),
 				queryInterface.removeColumn('Creators', 'displaySupporterCount', { transaction: t }),
-				queryInterface.removeColumn('Creators', 'profilePublic', { transaction: t }),
+				queryInterface.removeColumn('Creators', 'publicProfile', { transaction: t }),
 
 				queryInterface.dropTable('CreatorCategories')
-      ]);
-    });
+			]);
+		});
 	}
 };

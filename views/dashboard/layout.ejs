@@ -6,6 +6,9 @@
 		<link rel="stylesheet" href="/css/todo.css" />
 
 		<style>
+			.navbar {
+				box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.12);
+			}
 			.sidebar {
 				display: flex;
 				flex-direction: column;
@@ -41,12 +44,14 @@
 				padding: 32px;
 			}
 
-			.sidebar .nav-heading {
-				padding: 24px;
-			}
 		</style>
 	</head>
 	<body class="<%= _locals.bodyClass %>">
+		<div class="navbar navbar-expand-lg navbar-light bg-white">
+			<div class="container-fluid">
+				<a class="navbar-brand text-black" href="/">Pluribus.</a>
+			</div>
+		</div>
 		<div class="container-fluid">
 			<div class="row flex-nowrap">
 				<% /* Side menu */ %>
@@ -54,17 +59,11 @@
 
 					<div class="sidebar">
 						<div class="sidebar-text">
-							<a class="navbar-brand text-black" href="/">Pluribus.</a>
-						</div>
-						
-						<nav class="flex-column border-top mt-5">
-							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#key"></use></svg>Supporters</a>
-							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#heart"></use></svg>Creators I follow</a>
-						</nav>
-
-						<div class="nav-heading heading-sm-weak text-medium">Creator dashboard</div>
+							<div class="heading-md-medium">Hi</div>
+							<div class="heading-xs-weak text-medium">Creator</div>
+						</div>			
 						<nav class="flex-column">
-							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#insights"></use></svg>Insights</a>
+							<a href="/dashboard" class="<%= _locals.nav == 'home' ? 'active' : '' %>"><svg><use href="/images/ui/sidebar-icons.svg#home"></use></svg>Home</a>
 							<a href="/dashboard/profile" class="<%= _locals.nav == 'profile' ? 'active' : '' %>"><svg><use href="/images/ui/sidebar-icons.svg#profile"></use></svg>Profile</a>
 							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#lock"></use></svg>Login &amp; security</a>
 							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#credit-card"></use></svg>Payments</a>

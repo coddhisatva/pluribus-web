@@ -58,7 +58,7 @@ _locals.nav = 'profile';
 						<div class="col">
 							<label for="about" class="form-label">About me</label>
 							<div class="form-floating mb-3">
-								<textarea type="text" name="about" id="about" class="form-control" placeholder="Write your message here" style="height:120px"></textarea>
+								<textarea name="about" id="about" class="form-control" placeholder="Write your message here" style="height:120px"></textarea>
 								<label for="about" class="form-label">Write your message here</label>
 							</div>
 
@@ -70,8 +70,74 @@ _locals.nav = 'profile';
 					</div>					
 				</div>
 			</div>
+
+			<!-- Website -->
+			<div class="mb-4">
+				<div view>
+					<div class="heading-sm-weak mb-2">
+						Website
+						<a edit-btn href="#" bind="website ? 'Update' : 'Add'" class="float-end text-black"></a>
+					</div>
+					<div class="body-xs-weak text-medium">
+						<div bind="website" if="website"></div>
+						<div else>Not provided</div>
+					</div>
+				</div>
+				<div edit>
+					<div class="row">
+						<div class="col">
+							<label for="website" class="form-label">Website</label>
+							<div class="form-floating mb-3">
+								<input type="text" name="website" id="website" class="form-control" placeholder="www.example.com" />
+								<label for="website" class="form-label">Your website address</label>
+							</div>
+
+							<button save-btn class="btn bg-black text-white">Save</button>
+						</div>
+						<div class="col-md-2">
+							<a href="#" cancel-btn class="float-end text-black">Cancel</a>
+						</div>
+					</div>					
+				</div>
+			</div>
+
+			<!-- Supporter count toggle -->
+			<div class="mb-4 row">
+				<div class="col">
+					<label class="heading-sm-weak mb-2" for="displaySupporterCount">
+						Display supporter count
+					</label>
+					<div class="body-xs-weak text-medium">
+						Credibility is key for supporters. Display your supporter count to inspire more support from your audience.
+					</div>
+				</div>
+				<div class="col-md-2 d-flex justify-content-end">
+					<div class="form-check form-switch">
+						<input class="form-check-input" type="checkbox" id="displaySupporterCount" value="yes" <%= creator.displaySupporterCount ? 'checked': ''%>>
+					</div>
+				</div>
+			</div>
+
+			<!-- Public profile toggle -->
+			<div class="mb-4 row">
+				<div class="col">
+					<label class="heading-sm-weak mb-2" for="publicProfile">
+						Make my profile public
+					</label>
+					<div class="body-xs-weak text-medium">
+						Feugiat sit ullamcorper a neque, sit. Dictumst est lectus ut elementum magna amet. Egestas tempus nulla.
+					</div>
+				</div>
+				<div class="col-md-2 d-flex justify-content-end">
+					<div class="form-check form-switch">
+						<input class="form-check-input" type="checkbox" id="publicProfile" value="yes" <%= creator.publicProfile ? 'checked': ''%>>
+					</div>
+				</div>
+			</div>
 		</div>
-	</div><!-- .col -->
+	</div><!-- end main .col -->
+
+	<!-- right sidebar -->
 	<div class="col">
 		<div class="rounded border bg-white p-4">
 			<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -91,5 +157,18 @@ _locals.nav = 'profile';
 
 	var profileForm = document.getElementById('profileForm');
 	up.wire(profileForm, model, '/dashboard/profile');
+
+	// Toggle switches
+	var toggleIds = [ 'displaySupporterCount', 'publicProfile' ];
+	toggleIds.forEach(function(toggleId) {
+		var toggle = document.getElementById(toggleId);
+		toggle.addEventListener('change', function() {
+			var data = new FormData();
+			data.append(toggleId, toggle.checked ? toggle.value : '');
+			fetch('/dashboard/profile', { method: 'post', body: data });
+		});
+	});
+
+	
 	
 </script>
