@@ -17,7 +17,7 @@ npx sequelize db:migrate
 
 # Restart the server
 pkill -f /root/web/bin/www
-screen -S dev -X stuff 'cd /root/web'
+screen -S dev -X stuff 'cd /root/web\n'
 screen -S dev -X stuff 'node /root/web/bin/www\n'
 
 exit
