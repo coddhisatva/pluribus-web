@@ -75,6 +75,67 @@ router.post('/profile', auth.authorize, upload.single('newPhoto'), async functio
 		await fs.rm(photoPath);
 		update.photo = null;
 	}
+
+	// Social profiles are passed in using pseudo properties from client and need to
+	// be recombined into the .socialProfiles property.
+	const socialProfileFns = {
+		twitter: {
+			parse: (value) => {
+				var m = /^\s*(?:https?:\/\/)?twitter.com\/([a-z0-9_]+)/i.exec(value);
+				if(m) return m[1];
+				m = /^\s*([a-z0-9_]+)\s*$/i.exec(value);
+				if(m) return m[1];
+				return null;
+			},
+			format: value => 'https://twitter.com/' + value
+		},
+		youtube: {
+			parse: (value) => {
+				var m = /^\s*(?:https?:\/\/)?youtube.com\/user\/(\w+)/i.exec(value);
+				if(m) return m[1];
+				m = /^\s*(\w+)\s*$/i.exec(value);
+				if(m) return m[1];
+				return null;
+			},
+			format: (value) => 'https://youtube.com/user/' + value
+		},
+		instagram: {
+			parse: (value) => {
+				var m = /^\s*(?:https?:\/\/)?instagram.com\/([a-z0-9_]+)/i.exec(value);
+				if(m) return m[1];
+				m = /^\s*([a-z0-9_]+)\s*$/i.exec(value);
+				if(m) return m[1];
+				return null;
+			},
+			format: value => 'https://instagram.com/' + value
+		},
+		substack: {
+			parse: (value) => {
+				var m = /^\s*(?:https?:\/\/)?([a-z0-9\-_]+.substack.com)/i.exec(value);
+				if(m) return m[1];
+				return null;
+			},
+			format: (value) => 'https://' + value
+		}
+	};
+	var socialProfiles = [];
+	var hasSocialProfilesUpdates = false;
+
+	for(var key in socialProfileFns) {
+		var value = req.body['socialProfiles_' + key];
+		if(value !== undefined) {
+			hasSocialProfilesUpdates = true;
+			var fns = socialProfileFns[key];
+			var parsed = fns.parse(value);
+			if(parsed) {
+				socialProfiles.push(fns.format(parsed));
+			}
+		}
+	}
+	if(hasSocialProfilesUpdates) {
+		update.socialProfiles = socialProfiles.join('||');
+		sync.socialProfiles = update.socialProfiles;
+	}
 	
 	await Creator.update(update, { where: { id: creator.id }});
 

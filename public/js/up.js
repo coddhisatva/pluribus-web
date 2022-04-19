@@ -7,7 +7,7 @@ on each section and partial updates via server API calls.
 */
 
 const up = {
-	wire: function(container, model, saveUrl) {
+	wire: function(container, model, saveUrl, functions) {
 		var views = container.querySelectorAll('[view]');
 
 		views.forEach(function(view) {
@@ -88,7 +88,16 @@ const up = {
 					if(foreachElement.getAttribute('if')) {
 						throw "It's an error to use 'if' attribute on an element with a 'foreach' attribute; you should use the 'if' on a wrapper element instead: " + foreachElement.outerHTML;
 					}
+
+					// Remove previously generated elements
+					if(foreachElement.generated) {
+						foreachElement.generated.forEach(function(itemElement) {
+							itemElement.remove();
+						});
+					}
+
 					var foreach = foreachElement.getAttribute('foreach');
+					var generated = [];
 
 					var match = reForeach.exec(foreach);
 					if(!match) {
@@ -98,7 +107,7 @@ const up = {
 					var itemModelName = match[1];
 					var iterateExpression = match[2];
 
-					var iterateResult = up.eval(model, iterateExpression);
+					var iterateResult = up.eval(model, functions, iterateExpression);
 					// Assumes an array, might need to handle iterable or iterator protocol
 					for(var i = 0; i < iterateResult.length; i++) {
 						// When iterating we need the named item available as well as the original model
@@ -117,21 +126,33 @@ const up = {
 							itemElement.removeAttribute('style');
 						}
 
-						// TODO: modify child elements itemElement too, e.g. they may have bind and conditionals that
-						// should use the itemModel instead of main model
-
 						itemElement.itemModel = itemModel;
+
+						// Modify child elements itemElement too, e.g. they may have bind and conditionals that
+						// should use the itemModel instead of main model
+						function traverseChildrenAndSetItemModel(parent) {
+							for(var j = 0; j < parent.children.length; j++) {
+								var itemChild = parent.children[j];
+								itemChild.itemModel = itemModel;
+								traverseChildrenAndSetItemModel(itemChild);
+							}
+						}
+						traverseChildrenAndSetItemModel(itemElement);
+						
 
 						// Insert each new item before the master element which
 						// makes it easier to put them in the right order if they were inserted
 						// after the master element.
 						foreachElement.insertAdjacentElement('beforebegin', itemElement);
+
+						generated.push(itemElement);
 					}
+
+					foreachElement.generated = generated;
 				});
 			};
 
 			// Model bindings
-			
 			const reBindAttribute = /^(\w+):/;
 			view.bind = function() {
 				// Elements may have been created by foreach, so we need to query for them again
@@ -140,34 +161,41 @@ const up = {
 				boundElements.forEach(function(boundElement) {
 					// Don't bind the master element with a 'foreach' attribute, each child will be bound instead.
 					if(boundElement.getAttribute('foreach')) return;
+					if(boundElement.closest('[foreach]')) return;
 
-					var bind = boundElement.getAttribute('bind');
+					// Can have multiple bindings, comma separated.
+					// E.g. <a bind="text,href:link"></a> will bind the innerText to text and the href to link.
+					var bindings = boundElement.getAttribute('bind').split(',');
 
-					// Bind is to innerText by default, but can also be to a specified attribute of the element
-					// e.b. bind="src:imagePath" will bind the src attribute
-					var bindAttribute = reBindAttribute.exec(bind);
-					if(bindAttribute) {
-						bindAttribute = bindAttribute[1];
-						bind = bind.replace(reBindAttribute, '');
-					}
+					bindings.forEach(function(bind) {
+						// Bind is to innerText by default, but can also be to a specified attribute of the element
+						// e.b. bind="src:imagePath" will bind the src attribute
+						var bindAttribute = reBindAttribute.exec(bind);
+						if(bindAttribute) {
+							bindAttribute = bindAttribute[1];
+							bind = bind.replace(reBindAttribute, '');
+						}
 
-					var bindModel = model; // Use the main model by default
-					if(boundElement.itemModel) { // If this is a foreach element.
-						bindModel = boundElement.itemModel;
-					}
+						var bindModel = model; // Use the main model by default
+						if(boundElement.itemModel) { // If this is a foreach element.
+							bindModel = boundElement.itemModel;
+						}
 
-					var result;
-					try {
-						result = up.eval(bindModel, bind);
-					} catch(e) {
-						throw 'Error evaluating bind="' + bind + '": ' + e;
-					}
+						var result;
+						try {
+							result = up.eval(bindModel, functions, bind);
+						} catch(e) {
+							throw 'Error evaluating bind="' + bind + '": ' + e;
+						}
+						
+						if(bindAttribute) {
+							boundElement.setAttribute(bindAttribute, result);
+						} else {
+							boundElement.innerHTML = result;
+						}
+					});
+
 					
-					if(bindAttribute) {
-						boundElement.setAttribute(bindAttribute, result);
-					} else {
-						boundElement.innerHTML = result;
-					}
 					
 				});
 			};
@@ -179,7 +207,7 @@ const up = {
 				// Elements may have been created by a foreach since declaration, so we need to query for
 				// them again.
 				var conditionalElements = view.querySelectorAll(conditionalSelector);
-				
+
 				conditionalElements.forEach(function(conditionalElement) {
 					var conditionType = null;
 					var condition = null;
@@ -193,7 +221,7 @@ const up = {
 					
 					var visible;
 					if(conditionType == 'if') {
-						visible = up.evalCondition(model, condition, conditionType);
+						visible = up.evalCondition(model, functions, condition, conditionType);
 					} else if(conditionType == 'else-if') {
 						var prevElement = conditionalElement.previousElementSibling;
 						if(!prevElement.hasAttribute('if')) {
@@ -213,6 +241,8 @@ const up = {
 			};
 
 			view.update = function() {
+				view.dispatchEvent(new Event('beforeupdate'));
+
 				view.doForeach();
 				view.bind();
 				view.doConditionals();
@@ -220,6 +250,8 @@ const up = {
 		});
 
 		container.update = function() {
+			container.dispatchEvent(new Event('beforeupdate'));
+
 			views.forEach(function(view) {
 				view.update();
 			});
@@ -276,11 +308,11 @@ const up = {
 		return blocks;
 	},
 
-	eval: function(model, code) {
+	eval: function(model, functions, code) {
 		// Convert all identifiers to model.identifier for security
-		const allowedKeywords = [ 'if', 'else', 'var', 'let', 'const' ];
+		const allowedKeywords = [ 'if', 'else', 'var', 'let', 'const', 'undefined', 'null' ];
 		// Note: Safari can't do positive lookbehind assertions
-		const reIdentifier = /(^|\s)([\w$_][^\s\.\[\()]*)/g;
+		const reIdentifier = /(^|[\s\(])([\w$_][^\s\.\[\()]*)/g;
 
 		var blocks = up.lex(code);
 		var safeCode = '';
@@ -289,8 +321,12 @@ const up = {
 			var text = block[1];
 
 			if(type == 'code') {
-				safeCode += text.replace(reIdentifier, function(match, g1, g2) {
+				safeCode += text.replace(reIdentifier, function(match, g1, g2, offset) {
 					if(allowedKeywords.indexOf(g2) != -1) { return g1 + g2 }
+					var functionCall = text.substring(offset + match.length, offset + match.length + 1) == '(';
+					if(functionCall) { 
+						return g1 + 'functions.' + g2;
+					}
 					return g1 + 'model.' + g2;
 				});
 			} else {
@@ -298,13 +334,13 @@ const up = {
 			}
 		})
 		
-		return Function('model', 'return ' + safeCode)(model);
+		return Function('model', 'functions', 'return ' + safeCode)(model, functions);
 	},
 
 	// Helper functions
-	evalCondition: function(model, condition, conditionType) {
+	evalCondition: function(model, functions, condition, conditionType) {
 		try {
-			return up.eval(model, condition);
+			return up.eval(model, functions, condition);
 		} catch(e) {
 			throw 'Error evaluating ' + conditionType + '="' + condition + '": ' + e;
 		}

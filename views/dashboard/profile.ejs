@@ -4,6 +4,14 @@ _locals.nav = 'profile';
 %>
 
 <link rel="stylesheet" href="/css/up.css" />
+<style>
+	.profile-link svg {
+		width: 24px;
+		height: 24px;
+		margin: 0 10px 5px 0;
+		color: #ccc;
+	}
+</style>
 
 <h1 class="mb-3">Profile Information</h1>
 
@@ -136,14 +144,16 @@ _locals.nav = 'profile';
 
 			<!-- Social profiles -->
 			<div class="mb-4">
-				<div view>
+				<div view id="socialProfilesView">
 					<div class="heading-sm-weak mb-2">
 						Social profiles
 						<a edit-btn href="#" bind="socialProfiles ? 'Update' : 'Add'" class="float-end text-black"></a>
 					</div>
 					<div class="body-xs-weak text-medium">
 						<div if="socialProfiles">
-							<div foreach="profile in socialProfiles.split('|')" bind="profile"></div>
+							<a foreach="profileUrl in socialProfiles.split('||')" bind="href:profileUrl,class:'d-block profile-link '+lookupSocialProfile(profileUrl)[0]" target="_blank">
+								<svg><use bind="href:'/images/ui/social-icons.svg#' + (lookupSocialProfile(profileUrl)[0] || 'twitter')"></use></svg><span bind="lookupSocialProfile(profileUrl)[1] || profileUrl"></span>
+							</a>
 						</div>
 						<div else>Not provided</div>
 					</div>
@@ -152,7 +162,30 @@ _locals.nav = 'profile';
 					<div class="row">
 						<div class="col">
 							<label class="form-label">Social profiles</label>
-							TODO
+							
+							<!-- Twitter -->
+							<div class="form-floating mb-3">
+								<input type="text" name="socialProfiles_twitter" id="socialProfiles_twitter" class="form-control" placeholder="Twitter" />
+								<label for="socialProfiles_twitter">Twitter</label>
+							</div>
+
+							<!-- YouTube -->
+							<div class="form-floating mb-3">
+								<input type="text" name="socialProfiles_youtube" id="socialProfiles_youtube" class="form-control" placeholder="YouTube" />
+								<label for="socialProfiles_youtube">YouTube</label>
+							</div>
+
+							<!-- Instagram -->
+							<div class="form-floating mb-3">
+								<input type="text" name="socialProfiles_instagram" id="socialProfiles_instagram" class="form-control" placeholder="Instagram" />
+								<label for="socialProfiles_instagram">Instagram</label>
+							</div>
+
+							<!-- Substack -->
+							<div class="form-floating mb-3">
+								<input type="text" name="socialProfiles_substack" id="socialProfiles_substack" class="form-control" placeholder="Substack" />
+								<label for="socialProfiles_substack">Substack</label>
+							</div>
 
 							<button save-btn class="btn bg-black text-white">Save</button>
 						</div>
@@ -221,15 +254,52 @@ Note: only include data that up.js will use.
 	name: creator.name,
 	about: creator.about,
 	website: creator.website,
-	photo: creator.photo
+	photo: creator.photo,
+	socialProfiles: creator.socialProfiles
 }) %>"></data>
 <script>
 	var model = JSON.parse(document.getElementById('creatorData').value);
-	// Hard wire initial social profiles for testing
-	model.socialProfiles = 'https://twitter.com/Tysenberg|https://www.youtube.com/user/donnybenet|https://harrybergeron.substack.com/';
+
+	// Pre-parse social profiles and add them into socialProfiles_* pseudo properties
+	// for the edit view to use.
+	const profileLookups = {
+		twitter: /twitter.com\/(.*)/,
+		youtube: /youtube.com\/user\/(.*)/,
+		instagram: /instagram.com\/(.*)/,
+		substack: /(?:https?:\/\/)?([^\.]*.substack.com)/,
+	};
+	function lookupSocialProfile(url) {
+		for(var key in profileLookups) {
+			var match = url.match(profileLookups[key]);
+			if(match) {
+				return [key, match[1]];
+			}
+		}
+		return [null, null];
+	}
+	var socialProfilesView = document.getElementById('socialProfilesView');
+	socialProfilesView.addEventListener('beforeupdate', function() {
+		// Reset all pseudo properties
+		for(var key in profileLookups) {
+			model['socialProfiles_' + key] = '';
+		}
+
+		var socialProfileUrls = model.socialProfiles.split('||');
+		for(var i = 0; i < socialProfileUrls.length; i++) {
+			var socialProfileUrl = socialProfileUrls[i];
+
+			var match = lookupSocialProfile(socialProfileUrl);
+			if(match) {
+				model['socialProfiles_' + match[0]] = match[1];
+			}
+		}
+
+	});
+
+	var functions = { lookupSocialProfile };
 
 	var profileForm = document.getElementById('profileForm');
-	up.wire(profileForm, model, '/dashboard/profile');
+	up.wire(profileForm, model, '/dashboard/profile', functions);
 
 	// Toggle switches
 	var toggleIds = [ 'displaySupporterCount', 'publicProfile' ];
