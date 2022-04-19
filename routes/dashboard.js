@@ -59,10 +59,13 @@ router.post('/profile', auth.authorize, upload.single('newPhoto'), async functio
 			throw 'Mime type not implemented: ' + req.file.mimetype;
 		}
 		filename += ext;
-		await fs.mkdir(dir, { recursive: true });
-		await sharp(req.file.path)
+		console.log("UPLOAD PATH", req.file.path);
+		var madeDir = await fs.mkdir(dir, { recursive: true });
+		console.log('MADE DIR', madeDir);
+		var sharpResult = await sharp(req.file.path)
 			.resize({ width: 200, height: 200})
 			.toFile(dir + '/' + filename);
+		console.log("SHARP RESULT", sharpResult);
 
 		await fs.rm(req.file.path);
 		update.photo = filename;
