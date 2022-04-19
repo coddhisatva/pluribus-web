@@ -76,7 +76,7 @@ router.post('/profile', auth.authorize, upload.single('newPhoto'), async functio
 
 	if(req.body.removeExistingPhoto && creator.photo) {
 		var photoPath = 'public/images/uploads/creators/' + creator.id + '/' + creator.photo;
-		await fs.rm(photoPath);
+		await fs.rm(photoPath, { force: true }); // force ignores exceptions if file doesn't exist
 		update.photo = null;
 	}
 
