@@ -259,6 +259,9 @@ Note: only include data that up.js will use.
 }) %>"></data>
 <script>
 	var model = JSON.parse(document.getElementById('creatorData').value);
+	if(model.socialProfiles == null) {
+		model.socialProfiles = '';
+	}
 
 	// Pre-parse social profiles and add them into socialProfiles_* pseudo properties
 	// for the edit view to use.
