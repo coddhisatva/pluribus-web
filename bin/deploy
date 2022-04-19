@@ -8,7 +8,7 @@ ssh -tt root@206.81.100.148 "export GITGUD_USERNAME='$GITGUD_USERNAME'; export G
 cd web
 
 echo https://$GITGUD_USERNAME:$GITGUD_PASSWORD@gitgud.io >> ~/.git-credentials
-git pull 'https://gitgud.io/pluribus/web.git'
+git pull
 rm ~/.git-credentials
 
 npm install

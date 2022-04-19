@@ -60,8 +60,9 @@ router.post('/profile', auth.authorize, upload.single('newPhoto'), async functio
 		}
 		filename += ext;
 		console.log("UPLOAD PATH", req.file.path);
-		var madeDir = await fs.mkdir(dir, { recursive: true });
-		console.log('MADE DIR', madeDir);
+		console.log("CWD", process.cwd());
+		await fs.mkdir(dir, { recursive: true });
+		console.log('MADE DIR', dir, await fs.realpath(dir));
 		var sharpResult = await sharp(req.file.path)
 			.resize({ width: 200, height: 200})
 			.toFile(dir + '/' + filename);
