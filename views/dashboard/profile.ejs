@@ -142,7 +142,9 @@ _locals.nav = 'profile';
 						<a edit-btn href="#" bind="socialProfiles ? 'Update' : 'Add'" class="float-end text-black"></a>
 					</div>
 					<div class="body-xs-weak text-medium">
-						<div foreach="profile in socialProfiles.split('|)" if="socialProfiles" bind="profile"></div>
+						<div if="socialProfiles">
+							<div foreach="profile in socialProfiles.split('|')" bind="profile"></div>
+						</div>
 						<div else>Not provided</div>
 					</div>
 				</div>

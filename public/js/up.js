@@ -75,20 +75,90 @@ const up = {
 				}
 			}
 
+			// Foreach
+			var foreachElements = view.querySelectorAll('[foreach]');
+			const reForeach = /^([a-zA-Z0-9_]+)\s*in\s*(.*)/;
+			// Hide each master foreach element; only need to do this once.
+			foreachElements.forEach(function(foreachElement) {
+				foreachElement.originalStyle = foreachElement.getAttribute('style');
+				foreachElement.style.display = 'none';
+			});
+			view.doForeach = function() {
+				foreachElements.forEach(function(foreachElement) {
+					if(foreachElement.getAttribute('if')) {
+						throw "It's an error to use 'if' attribute on an element with a 'foreach' attribute; you should use the 'if' on a wrapper element instead: " + foreachElement.outerHTML;
+					}
+					var foreach = foreachElement.getAttribute('foreach');
+
+					var match = reForeach.exec(foreach);
+					if(!match) {
+						throw 'Invalid foreach expression: ' + foreach;
+					}
+
+					var itemModelName = match[1];
+					var iterateExpression = match[2];
+
+					var iterateResult = up.eval(model, iterateExpression);
+					// Assumes an array, might need to handle iterable or iterator protocol
+					for(var i = 0; i < iterateResult.length; i++) {
+						// When iterating we need the named item available as well as the original model
+						var itemModel = { model: model };
+						itemModel[itemModelName] = iterateResult[i]; // add the named iterable item
+
+						var itemElement = foreachElement.cloneNode(true); // deep clone
+						itemElement.removeAttribute('id'); // don't duplicate ids
+						itemElement.removeAttribute('foreach');
+
+						// itemElement will have copied display:none from foreachElement.
+						// Reset the styles to whatever the declared style was
+						if(foreachElement.originalStyle) {
+							itemElement.setAttribute('style', foreachElement.originalStyle);
+						} else {
+							itemElement.removeAttribute('style');
+						}
+
+						// TODO: modify child elements itemElement too, e.g. they may have bind and conditionals that
+						// should use the itemModel instead of main model
+
+						itemElement.itemModel = itemModel;
+
+						// Insert each new item before the master element which
+						// makes it easier to put them in the right order if they were inserted
+						// after the master element.
+						foreachElement.insertAdjacentElement('beforebegin', itemElement);
+					}
+				});
+			};
+
 			// Model bindings
-			var boundElements = view.querySelectorAll('[bind]');
+			
 			const reBindAttribute = /^(\w+):/;
 			view.bind = function() {
+				// Elements may have been created by foreach, so we need to query for them again
+				var boundElements = view.querySelectorAll('[bind]');
+
 				boundElements.forEach(function(boundElement) {
+					// Don't bind the master element with a 'foreach' attribute, each child will be bound instead.
+					if(boundElement.getAttribute('foreach')) return;
+
 					var bind = boundElement.getAttribute('bind');
+
+					// Bind is to innerText by default, but can also be to a specified attribute of the element
+					// e.b. bind="src:imagePath" will bind the src attribute
 					var bindAttribute = reBindAttribute.exec(bind);
 					if(bindAttribute) {
 						bindAttribute = bindAttribute[1];
 						bind = bind.replace(reBindAttribute, '');
 					}
+
+					var bindModel = model; // Use the main model by default
+					if(boundElement.itemModel) { // If this is a foreach element.
+						bindModel = boundElement.itemModel;
+					}
+
 					var result;
 					try {
-						result = up.eval(model, bind);
+						result = up.eval(bindModel, bind);
 					} catch(e) {
 						throw 'Error evaluating bind="' + bind + '": ' + e;
 					}
@@ -105,8 +175,11 @@ const up = {
 			// Conditionals
 			const conditionTypes = ['if','else-if','else'];
 			var conditionalSelector = '[' + conditionTypes.join('],[') + ']';
-			var conditionalElements = view.querySelectorAll(conditionalSelector);
 			view.doConditionals = function() {
+				// Elements may have been created by a foreach since declaration, so we need to query for
+				// them again.
+				var conditionalElements = view.querySelectorAll(conditionalSelector);
+				
 				conditionalElements.forEach(function(conditionalElement) {
 					var conditionType = null;
 					var condition = null;
@@ -140,6 +213,7 @@ const up = {
 			};
 
 			view.update = function() {
+				view.doForeach();
 				view.bind();
 				view.doConditionals();
 			};
@@ -190,7 +264,7 @@ const up = {
 		}
 
 		// remaining code block
-		if(blockStart < code.length - 1) {
+		if(blockStart < code.length) {
 			if(blockType != 'code') {
 				throw 'Unterminated string starting at position ' + blockStart + ': ' + code;
 			}
@@ -283,14 +357,4 @@ const up = {
 				savedCb();
 			});
 	},
-}
-
-
-// Polyfills (don't know if this is needed)
-if(!Array.prototype.forEach) {
-	Array.prototype.forEach = function(callback) {
-		for(var i = 0; i < this.length; i++) {
-			callback(this[i], i, this);
-		}
-	}
 }
