@@ -26,7 +26,7 @@ _locals.nav = 'profile';
 						Photo
 						<a edit-btn href="#" bind="photo ? 'Update' : 'Add'" class="float-end text-black"></a>
 					</div>
-					<div class="body-xs-weak text-medium">
+					<div class="body-sm-weak text-medium">
 						<img bind="src:photo ? '/images/uploads/creators/<%= creator.id %>/' + photo : ''" if="photo" class="rounded-circle" style="max-width:80px;max-height:80px" />
 						<div else>Not provided</div>
 					</div>
@@ -59,7 +59,7 @@ _locals.nav = 'profile';
 						Full name
 						<a edit-btn href="#" bind="name ? 'Update' : 'Add'" class="float-end text-black"></a>
 					</div>
-					<div class="body-xs-weak text-medium">
+					<div class="body-sm-weak text-medium">
 						<div bind="name" if="name"></div>
 						<div else>Not provided</div>
 					</div>
@@ -89,7 +89,7 @@ _locals.nav = 'profile';
 						About me
 						<a edit-btn href="#" bind="about ? 'Update' : 'Add'" class="float-end text-black"></a>
 					</div>
-					<div class="body-xs-weak text-medium">
+					<div class="body-sm-weak text-medium">
 						<div bind="about" if="about"></div>
 						<div else>Not provided</div>
 					</div>
@@ -119,7 +119,7 @@ _locals.nav = 'profile';
 						Website
 						<a edit-btn href="#" bind="website ? 'Update' : 'Add'" class="float-end text-black"></a>
 					</div>
-					<div class="body-xs-weak text-medium">
+					<div class="body-sm-weak text-medium">
 						<div bind="website" if="website"></div>
 						<div else>Not provided</div>
 					</div>
@@ -149,7 +149,7 @@ _locals.nav = 'profile';
 						Social profiles
 						<a edit-btn href="#" bind="socialProfiles ? 'Update' : 'Add'" class="float-end text-black"></a>
 					</div>
-					<div class="body-xs-weak text-medium">
+					<div class="body-sm-weak text-medium">
 						<div if="socialProfiles">
 							<a foreach="profileUrl in socialProfiles.split('||')" bind="href:profileUrl,class:'d-block profile-link '+lookupSocialProfile(profileUrl)[0]" target="_blank">
 								<svg><use bind="href:'/images/ui/social-icons.svg#' + (lookupSocialProfile(profileUrl)[0] || 'twitter')"></use></svg><span bind="lookupSocialProfile(profileUrl)[1] || profileUrl"></span>
@@ -187,7 +187,7 @@ _locals.nav = 'profile';
 								<label for="socialProfiles_substack">Substack</label>
 							</div>
 
-							<button save-btn class="btn bg-black text-white">Save</button>
+							<button save-btn class="btn bg-black text-white">Update social profiles</button>
 						</div>
 						<div class="col-md-2">
 							<a href="#" cancel-btn class="float-end text-black">Cancel</a>
@@ -202,7 +202,7 @@ _locals.nav = 'profile';
 					<label class="heading-sm-weak mb-2" for="displaySupporterCount">
 						Display supporter count
 					</label>
-					<div class="body-xs-weak text-medium">
+					<div class="body-sm-weak text-medium">
 						Credibility is key for supporters. Display your supporter count to inspire more support from your audience.
 					</div>
 				</div>
@@ -219,7 +219,7 @@ _locals.nav = 'profile';
 					<label class="heading-sm-weak mb-2" for="publicProfile">
 						Make my profile public
 					</label>
-					<div class="body-xs-weak text-medium">
+					<div class="body-sm-weak text-medium">
 						Feugiat sit ullamcorper a neque, sit. Dictumst est lectus ut elementum magna amet. Egestas tempus nulla.
 					</div>
 				</div>
