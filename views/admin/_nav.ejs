@@ -1,0 +1,31 @@
+<% if(locals.authUser) { %>
+<style>
+	.navbar-brand {
+		width: auto;
+	}
+</style>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	<div class="container">
+		<a class="navbar-brand" href="/admin">Pluribus Admin</a>
+
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<div class="navbar-nav me-auto">
+				<a href="/admin" class="nav-link">Admin Home</a>
+			</div>
+			<div class="navbar-nav">
+				<%# User menu %>
+				<div class="nav-bar-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="userMenuDropdownLink" role="button" data-bs-toggle="dropdown" ><%= locals.authUser.email %></a>
+					<ul class="dropdown-menu"  aria-labelledby="userMenuDropdownLink">
+						<li><a class="dropdown-item" href="/users/logout">Log out</a></li>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</nav>
+<% } %>

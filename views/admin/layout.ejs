@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title><%= _locals.title ? _locals.title + ' - ': '' %>Pluribus</title>
+	<link rel="stylesheet" href="/css/main.css" />
+</head>
+<body class="<%= _locals.bodyClass %>">
+	<%- include('_nav') %>
+		
+	<div class="container mt-4">
+		<%- body %>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+	<%- script %>
+</body>
+</html>

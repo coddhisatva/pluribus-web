@@ -1,5 +1,7 @@
 /node_modules
 /uploads
+/data
 /public/images/uploads
+/config/credentials.js
 
 .DS_Store

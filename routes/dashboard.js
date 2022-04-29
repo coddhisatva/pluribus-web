@@ -18,7 +18,7 @@ router.get('/', auth.authorize, async function(req, res, next) {
 	res.render('dashboard/index', { user, following });
 });
 
-router.get('/profile', auth.authorize, async function(req, res, next) {
+router.get('/profile', auth.authorizeRole('creator'), async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userId: user.id }});
 	if(!creator) {
@@ -29,7 +29,7 @@ router.get('/profile', auth.authorize, async function(req, res, next) {
 	res.render('dashboard/profile', { user, creator });
 });
 
-router.post('/profile', auth.authorize, upload.single('newPhoto'), async function(req, res, next) {
+router.post('/profile', auth.authorizeRole('creator'), upload.single('newPhoto'), async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userId: user.id }});
 
@@ -59,14 +59,10 @@ router.post('/profile', auth.authorize, upload.single('newPhoto'), async functio
 			throw 'Mime type not implemented: ' + req.file.mimetype;
 		}
 		filename += ext;
-		console.log("UPLOAD PATH", req.file.path);
-		console.log("CWD", process.cwd());
 		await fs.mkdir(dir, { recursive: true });
-		console.log('MADE DIR', dir, await fs.realpath(dir));
 		var sharpResult = await sharp(req.file.path)
 			.resize({ width: 200, height: 200})
 			.toFile(dir + '/' + filename);
-		console.log("SHARP RESULT", sharpResult);
 
 		await fs.rm(req.file.path);
 		update.photo = filename;

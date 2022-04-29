@@ -76,7 +76,7 @@ router.post('/new/details',
 
 		req.flash.notice = 'You\'re now set up as a creator.';
 
-		req.session.authUser.isCreator = true;
+		req.session.authUser.roles.push('creator');
 
 		res.redirect('/dashboard/profile');
 	}

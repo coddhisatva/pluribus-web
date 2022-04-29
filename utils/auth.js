@@ -25,6 +25,7 @@ var auth = {
 	 * @returns true if the password matches the stored hash; otherwise, false.
 	 */
 	verifyPassword: function(password, storedHash) {
+		if(storedHash == null) return false;
 		var [ iterations, salt, hash ] = storedHash.split(':');
 
 		iterations = parseInt(iterations);
@@ -48,14 +49,34 @@ var auth = {
 	},
 
 	authorize: function(req, res, next) {
-		var authorized = res.locals.authUser != null;
-		if(!authorized) {
-			req.flash.alert = 'Please log in to continue.';
-			res.status(401).redirect('/users/login?redirect=' + encodeURIComponent(req.originalUrl));
-			return;
+		return auth.authorizeRole()(req, res, next);
+	},
+	
+	authorizeRole: function(role, loginUrl) {
+		if(!loginUrl) {
+			loginUrl = '/users/login';
 		}
+		return function(req, res, next) {
+			var authorized = res.locals.authUser != null;
+			if(authorized) {
+				if(role) {
+					authorized = res.locals.authUser.roles && res.locals.authUser.roles.includes(role);
+				} else {
+					// Workaround for admin users not being real users (yet) - treat admins
+					// as unauthorized unless we're specifically checking for the 'admin' role.
+					if(res.locals.authUser.roles.includes('admin')) {
+						authorized = false;
+					}
+				}
+			}
+			if(!authorized) {
+				req.flash.alert = 'Please log in to continue.';
+				res.status(401).redirect(loginUrl + '?redirect=' + encodeURIComponent(req.originalUrl));
+				return;
+			}
 
-		next();
+			next();
+		}
 	},
 
 	oneTimeCode: function(length) {

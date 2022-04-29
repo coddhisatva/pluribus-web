@@ -253,7 +253,7 @@ samp {
 }
 
 pre {
-  display: block;
+  /* display: block; */
   margin-top: 0;
   margin-bottom: 1rem;
   overflow: auto;
@@ -11295,8 +11295,8 @@ b, strong {
 }
 
 .navbar-brand {
-  display: block;
-  width: 110px;
+  /* display: block; */
+  /* width: 110px; */
 }
 .navbar-brand img {
   max-width: 100%;

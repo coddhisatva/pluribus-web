@@ -3,9 +3,7 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
 const { User, Follow, Creator, OneTimeCode } = require('../models');
-const nodemailer = require('nodemailer');
-const emailConfig = require('../config/email');
-const { localsName } = require('ejs');
+const email = require('../utils/email');
 
 /* GET /login */
 router.get('/login', function(req, res, next) {
@@ -40,7 +38,11 @@ router.post('/login', [
 		var creator = await Creator.findOne({ where: { userId: user.id }});
 
 		// Save authentication cookie
-		req.session.authUser = { id: user.id, email: user.email, isCreator: creator != null };
+		var roles = [ ];
+		if(creator != null) {
+			roles.push('creator');
+		}
+		req.session.authUser = { id: user.id, email: user.email, roles };
 		if(remember) {
 			req.sessionOptions.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
 		}
@@ -136,8 +138,9 @@ function getValidOneTimeCode(redirect) {
  */
 router.get('/reset-password/:code', getValidOneTimeCode('/users/password'), async function(req, res, next) {
 	var passwordReset = res.locals.oneTimeCode;
+	var email = passwordReset.email;
 
-	res.render('users/reset-password');
+	res.render('users/reset-password', { email });
 });
 
 /**
@@ -190,9 +193,7 @@ async function sendActivationEmail(req, user) {
 	var code = auth.oneTimeCode(10);
 	const expireInDays = 3;
 	var expires = new Date((new Date()).getTime() + expireInDays * 24 * 60 * 60 * 1000);
-	await OneTimeCode.create({ userId: user.id, email, code, expires });
-
-	var emailer = nodemailer.createTransport(emailConfig[req.app.get('env')]);
+	await OneTimeCode.create({ userId: user.id, email: user.email, code, expires });
 
 	var link = `${req.protocol}://${req.headers.host}/users/activate/${code}`
 	// Check for a continue parameter that's expected, rather than just
@@ -200,7 +201,7 @@ async function sendActivationEmail(req, user) {
 	if(req.query.continue == 'creator') {
 		link += '?continue=creator';
 	}
-	var info = await emailer.sendMail({
+	await email.send(req.app.get('env'), {
 		from: 'noreply@pluribusworkspace',
 		to: user.email,
 		subject: 'Pluribus Sign Up',
@@ -223,8 +224,7 @@ async function sendForgotPasswordEmail(req, user) {
 	var expires = new Date((new Date()).getTime() + expireInMinutes * 60000);
 	await OneTimeCode.create({ userId: user.id, email: user.email, code, expires });
 
-	var emailer = nodemailer.createTransport(emailConfig[req.app.get('env')]);
-	var info = await emailer.sendMail({
+	var info = await email.send(req.app.get('env'), {
 		from: 'noreply@pluribusworkspace',
 		to: user.email,
 		subject: 'Reset your Pluribus password',
@@ -332,7 +332,7 @@ router.post('/activate/:code',
 		req.flash.notice = "You have successfully activated your account. Welcome to Pluribus!";
 
 		// Save authentication cookie
-		req.session.authUser = { id: user.id, email: user.email, isCreator: false };
+		req.session.authUser = { id: user.id, email: user.email, roles: [ ] };
 
 		res.redirect('/users/choose-path');
 	});

@@ -15,6 +15,6 @@
 	<p>You're not following anyone yet. Followed creators will show up here once you do.</p>
 <% } %>
 
-<% if(!authUser.isCreator) { %>
+<% if(!authUser.roles.includes('creator')) { %>
 	<a href="/creators/new" class="btn btn-primary">Set up creator profile</a>
 <% } %>

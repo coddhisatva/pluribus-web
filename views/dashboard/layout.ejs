@@ -64,7 +64,7 @@
 					<div class="sidebar pt-5">
 						<div class="sidebar-text">
 							<div class="heading-md-medium">Hi</div>
-							<div class="heading-xs-weak text-medium">Creator</div>
+							<div class="heading-xs-weak text-medium"><%= authUser.roles.includes('creator') ? 'Creator' : 'Supporter' %></div>
 						</div>			
 						<nav class="flex-column">
 							<a href="/dashboard" class="<%= _locals.nav == 'home' ? 'active' : '' %>"><svg><use href="/images/ui/sidebar-icons.svg#home"></use></svg>Home</a>

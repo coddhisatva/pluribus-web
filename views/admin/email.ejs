@@ -1,0 +1,60 @@
+<h1>Email</h1>
+
+<div class="row">
+
+	<div class="col-md-4 border-end">
+		<% for(var email of sentEmails.emails) { %>
+			<% var sent = new Date(Date.parse(email.sent)) %>
+		<div class="email-info p-2" data-email="<%= JSON.stringify(email) %>" onclick="showEmail(this)">
+			<div class="heading-sm"><%= email.subject %></div>
+
+			<div>
+				to: <%= Array.isArray(email.to) ? email.to.join(', ') : email.to %>
+				<div style="float:right"><%= sent.toISOString() %></div>
+			</div>
+			<pre style="display:none"><%- JSON.stringify(email) %></pre>
+		</div>
+		<% } %>
+	</div>
+
+	<div class="col" id="emailContent">
+	</div>
+
+</div>
+
+<style>
+	.email-info {
+		font-size: 14px;
+		transition: background-color .2s;
+		cursor: pointer;
+		border-left: 2px solid transparent;
+	}
+
+	.email-info.selected {
+		border-color: blue;
+	}
+
+	.email-info:hover {
+		background-color: #f1f6f6;
+	}
+
+	#emailContent {
+		font-family: monospace;
+		white-space: pre-wrap;
+		font-size: 14px;
+	}
+</style>
+
+<script>
+	var emailContent = document.getElementById('emailContent');
+
+	function showEmail(el) {
+		var selected = document.querySelector('.email-info.selected');
+		if(selected) {
+			selected.classList.remove('selected');
+		}
+		el.classList.add('selected');
+		var email = JSON.parse(el.dataset['email']);
+		emailContent.innerHTML = JSON.stringify(email, null, 4);
+	}
+</script>
