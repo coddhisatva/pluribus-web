@@ -142,4 +142,8 @@ router.post('/profile', auth.authorizeRole('creator'), upload.single('newPhoto')
 	res.send(sync);
 });
 
+router.get('/payments', async function(req, res, next) {
+	res.render('dashboard/payments', {});
+});
+
 module.exports = router;

@@ -67,17 +67,17 @@
 							<div class="heading-xs-weak text-medium"><%= authUser.roles.includes('creator') ? 'Creator' : 'Supporter' %></div>
 						</div>			
 						<nav class="flex-column">
-							<a href="/dashboard" class="<%= _locals.nav == 'home' ? 'active' : '' %>"><svg><use href="/images/ui/sidebar-icons.svg#home"></use></svg>Home</a>
-							<a href="/dashboard/profile" class="<%= _locals.nav == 'profile' ? 'active' : '' %>"><svg><use href="/images/ui/sidebar-icons.svg#profile"></use></svg>Profile</a>
-							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#lock"></use></svg>Login &amp; security</a>
-							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#credit-card"></use></svg>Payments</a>
-							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#globe-alt"></use></svg>Settings</a>
-							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#stack"></use></svg>Referral program</a>
-							<a href="#"><svg><use href="/images/ui/sidebar-icons.svg#website"></use></svg>Policy</a>
+							<a href="/dashboard" class="<%= _locals.nav == 'home' ? 'active' : '' %>"><svg><use href="/images/ui/icons.svg#home"></use></svg>Home</a>
+							<a href="/dashboard/profile" class="<%= _locals.nav == 'profile' ? 'active' : '' %>"><svg><use href="/images/ui/icons.svg#profile"></use></svg>Profile</a>
+							<a href="#"><svg><use href="/images/ui/icons.svg#lock"></use></svg>Login &amp; security</a>
+							<a href="/dashboard/payments" class="<%= _locals.nav == 'payments' ? 'active' : '' %>"><svg><use href="/images/ui/icons.svg#credit-card"></use></svg>Payments</a>
+							<a href="#"><svg><use href="/images/ui/icons.svg#globe-alt"></use></svg>Settings</a>
+							<a href="#"><svg><use href="/images/ui/icons.svg#stack"></use></svg>Referral program</a>
+							<a href="#"><svg><use href="/images/ui/icons.svg#website"></use></svg>Policy</a>
 						</nav>
 
 						<nav style="margin-top:auto;">
-							<a href="/users/logout"><svg><use href="/images/ui/sidebar-icons.svg#log-out"></use></svg>Log out</a>
+							<a href="/users/logout"><svg><use href="/images/ui/icons.svg#log-out"></use></svg>Log out</a>
 						</nav>
 					</div>
 					
