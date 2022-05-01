@@ -2,11 +2,11 @@
 _locals.title = "Check your email";
 %>
 
-<div class="row justify-content-center">
-	<div class="col-md-6">
-
-		<div class="rounded border p-5 mt-5 bg-white text-center">
-			<div class="mb-3">
+<h1 class="visually-hidden">Check Your Email</h1>
+<div class="wrapper-half">
+    <div class="form-credentials card">
+        <div class="card-body">
+            <div class="flow text-center">
 				<svg width="70" height="69" viewBox="0 0 70 69" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<path d="M51.7527 14.0246C54.689 13.7221 57.6315 13.3402 60.5803 12.8789C57.4403 9.1537 53.5237 6.16023 49.1049 4.10825C44.6861 2.05626 39.872 0.995406 35 1.00001C41.818 1.00001 47.8803 6.10355 51.7527 14.0246Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 					<path d="M34.9999 1.00001C30.1281 0.995547 25.3143 2.05647 20.8957 4.10845C16.4771 6.16042 12.5607 9.1538 9.4209 12.8788C12.3692 13.3415 15.3118 13.7234 18.2486 14.0245C22.1209 6.10354 28.1818 1.00001 34.9999 1.00001Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -37,22 +37,19 @@ _locals.title = "Check your email";
 					<path d="M43.6765 27.9036C43.4655 23.482 42.9528 19.08 42.1422 14.7283C37.3805 14.9365 32.6193 14.9365 27.8585 14.7283C27.0472 19.0799 26.5346 23.482 26.3242 27.9036C32.1088 27.9731 37.8928 27.9731 43.6765 27.9036Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 					<path d="M26.3242 41.0918C26.5344 45.515 27.0471 49.9186 27.8585 54.2718C32.6202 54.0635 37.3814 54.0635 42.1422 54.2718C42.953 49.9185 43.4656 45.5149 43.6765 41.0918C37.8906 41.0283 32.1065 41.0283 26.3242 41.0918Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 				</svg>
-			</div>
 
-			You should receive a link in a few moments. Please open
-			that link to continue with sign up.
+                <p>You should receive a link in a few moments. Please open that link to continue with sign up.</p>
 
-			<div class="fw-bold my-4"><%= locals.email %></div>
+								<div class="fw-bold my-4"><%= locals.email %></div>
 
-			<div class="my-4">
-				<span id="resendWrap">Didn't get the email? <a href="#" id="resendLink">Resend it</a></span>
-			</div>
-
-			<a href="/users/login" class="btn btn-primary w-100 py-3">Back to login</a>
-		</div>
-
-	</div>
+                <p>Didn't get the email? <a href="#" id="resendLink">Resend it</a></p>
+                                    
+                <a href="login.html" class="btn btn-primary btn-lg btn-block">Back to login</a>
+            </div>
+        </div>
+    </div>
 </div>
+
 
 <script>
 	var resendWrap = document.getElementById('resendWrap');
