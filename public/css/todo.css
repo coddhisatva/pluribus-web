@@ -9,15 +9,6 @@
 	background-size: contain;
 }
 
-header.nonav {
-	padding: .75rem 24px;
-}
-
-header.nonav .logo {
-	max-width: 110px;
-	margin: 0 auto;
-}
-
 input.form-check-input[type=checkbox] {
 	width: 24px;
 	height: 24px;
@@ -35,6 +26,10 @@ label.form-check-label {
 	padding: .6125rem;
 }
 
+/* Keep a bit of space between content and the footer. Needs child combinator to override 'auto' top margin in _page.scss */
+body > footer {
+	margin-top: 4rem; 
+}
 
 
 /*****************************************

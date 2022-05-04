@@ -338,6 +338,9 @@ router.post('/activate/:code',
 	});
 
 router.get('/choose-path', auth.authorize, async function(req, res, next) {
+	// Clear previous signup session
+	req.session.creatorSignup = null;
+
 	res.render('users/choose-path');
 });
 	
