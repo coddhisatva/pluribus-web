@@ -1,0 +1,15 @@
+<h1>Creators</h1>
+<table class="table">
+	<thead>
+		<tr>
+			<td>Name</td>
+			<td>Email</td>
+		</tr>
+	</thead>
+	<% for(creator of creators) { %>
+	<tr>
+		<td><a href="/admin/creators/<%= creator.id %>"><%= creator.name %></a></td>
+		<td><%= creator.User.email %></td>
+	</tr>
+	<% } %>
+</table>

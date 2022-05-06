@@ -18,25 +18,26 @@ if(req.session && req.session.creatorSignup && req.session.creatorSignup.categor
 			</div>
 			<form method="post">
 
-			<% for(var category of ['Art','Podcasts','Writing','Videographer','Journalist']) { %>
-				<% var id = 'check' + camelize(category); %>
+				<% for(var category of ['Art','Podcasts','Writing','Videographer','Journalist']) { %>
+					<% var id = 'check' + camelize(category); %>
+					<div class="form-check my-3">
+						<input class="form-check-input input-lg" type="checkbox" value="<%= category %>" name="categories" id="<%= id %>" <%= savedCategories.indexOf(category) != -1 ? 'checked': '' %>>
+						<label class="form-check-label" for="<%= id %>">
+							<%= category %>
+						</label>
+					</div>
+				<% } %>
 				<div class="form-check my-3">
-					<input class="form-check-input input-lg" type="checkbox" value="<%= category %>" name="categories" id="<%= id %>" <%= savedCategories.indexOf(category) != -1 ? 'checked': '' %>>
-					<label class="form-check-label" for="<%= id %>">
-						<%= category %>
+					<input class="form-check-input" type="checkbox" value="" name="categories" id="checkPreferNotToSay">
+					<label class="form-check-label" for="checkPreferNotToSay">
+						Prefer not to say
 					</label>
 				</div>
-			<% } %>
-			<div class="form-check my-3">
-				<input class="form-check-input" type="checkbox" value="" name="categories" id="checkPreferNotToSay">
-				<label class="form-check-label" for="checkPreferNotToSay">
-					Prefer not to say
-				</label>
-			</div>
 
-			<div class="mt-5">
-				<button class="btn btn-primary w-100 py-3" id="continueBtn" disabled>Continue</button>
-			</div>
+				<div class="mt-5">
+					<button class="btn btn-primary w-100 py-3" id="continueBtn" disabled>Continue</button>
+				</div>
+			</form>
 			
 		</div>
 		

@@ -1,0 +1,50 @@
+<%
+_locals.title = "About you";
+_locals.noNav = true;
+_locals.bodyClass = "bg-light";
+
+var about = '';
+if(req.session && req.session.creatorSignup && req.session.creatorSignup.about) {
+	about = req.session.creatorSignup.about;
+}
+if(postedValues.about) {
+	about = postedValues.about;
+}
+%>
+
+<div class="row justify-content-center">
+	<div class="col-md-6">
+		<div class="rounded border bg-white p-5 my-4">
+			<h1 class="display-xxs">A little about you</h1>
+			<div class="heading-sm-weak">
+				Tell us a little about your mission, your passion, and why people should support your work.
+			</div>
+			<form method="post">
+				<div class="mt-4">
+					<textarea name="about" id="about" class="form-control" size="4"><%= about %></textarea>
+					<%- validationMessage('about') %>
+				</div>
+
+				<div class="mt-5">
+					<button class="btn btn-primary w-100 py-3" id="continueBtn" disabled>Continue</button>
+				</div>
+			</form>
+			
+		</div>
+		
+	</div>
+</div>
+
+<script>
+	var about = document.getElementById('about');
+	var continueBtn = document.getElementById('continueBtn');
+
+	function inputChange(e) {
+		continueBtn.disabled = !about.value;
+	}
+
+	about.addEventListener('input', inputChange);
+
+	// In case the user went back, check if anything was previously entered
+	inputChange();
+</script>

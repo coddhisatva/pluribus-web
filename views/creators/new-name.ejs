@@ -1,0 +1,54 @@
+<%
+_locals.title = "Display name";
+_locals.noNav = true;
+_locals.bodyClass = "bg-light";
+
+var name = '';
+if(req.session && req.session.creatorSignup && req.session.creatorSignup.name) {
+	name = req.session.creatorSignup.name;
+}
+if(postedValues.name) {
+	name = postedValues.name;
+}
+%>
+
+<div class="row justify-content-center">
+	<div class="col-md-6">
+		<div class="rounded border bg-white p-5 my-4">
+			<h1 class="display-xxs">What should we call you?</h1>
+			<div class="heading-sm-weak">
+				This will help your supporters in finding you.
+			</div>
+			<form method="post">
+				<div class="form-floating mt-4">
+					<input type="text" name="name" id="name" class="form-control" size="4" value="<%= name %>" placeholder="Display name" />
+					<label for="name">Display name</label>
+					<%- validationMessage('name') %>
+				</div>
+
+				<div class="mt-5">
+					<button class="btn btn-primary w-100 py-3" id="continueBtn" disabled>Continue</button>
+				</div>
+			</form>
+			
+		</div>
+		
+	</div>
+</div>
+
+<script>
+	window.addEventListener('load', function() {
+		var name = document.getElementById('name');
+		var continueBtn = document.getElementById('continueBtn');
+
+		function inputChange(e) {
+			continueBtn.disabled = !name.value;
+		}
+
+		name.addEventListener('input', inputChange);
+
+		// In case the user went back, check if anything was previously entered
+		inputChange();
+	})
+	
+</script>

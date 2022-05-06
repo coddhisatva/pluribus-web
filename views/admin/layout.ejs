@@ -3,11 +3,13 @@
 <head>
 	<title><%= _locals.title ? _locals.title + ' - ': '' %>Pluribus</title>
 	<link rel="stylesheet" href="/css/main.css" />
+	<link rel="stylesheet" href="/css/todo.css" />
 </head>
 <body class="<%= _locals.bodyClass %>">
 	<%- include('_nav') %>
 		
 	<div class="container mt-4">
+		<%- include('../_flash') %>
 		<%- body %>
 	</div>
 

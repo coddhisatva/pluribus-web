@@ -1,0 +1,11 @@
+<div class="row">
+	<div class="col-md-8">
+		<h1><%= creator.name %></h1>
+		<p><%= creator.about %></p>
+	</div>
+	<div class="col">
+		<form method="post" action="/admin/creators/<%= creator.id %>/delete" onsubmit="return confirm('Really delete this creator?');">
+			<button class="btn btn-sm small btn-danger">Delete</button>
+		</form>
+	</div>
+</div>

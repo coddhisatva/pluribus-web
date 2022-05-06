@@ -3,6 +3,7 @@ const router = express.Router();
 const { Creator, User, Follow } = require('../models');
 const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
+const { ResultWithContext } = require('express-validator/src/chain');
 
 router.get('/', async function(req, res, next) {
 	var creators = await Creator.findAll();
@@ -42,10 +43,66 @@ router.post('/new/categories',
 			req.session.creatorSignup = { };
 		}
 		req.session.creatorSignup.categories = req.body.categories;
-		res.redirect('/creators/new/details');
+		res.redirect('/creators/new/about');
 	}
 );
 
+router.get('/new/about', ensureNoCreatorAccount, function(req, res, next) {
+	res.render('creators/new-about');
+});
+
+router.post('/new/about',
+	ensureNoCreatorAccount,
+	body('about').trim().isLength({ min: 20 }).withMessage('Please write a bit more about yourself'),
+
+	function(req, res, next) {
+		var errors = validationResult(req);
+		if(!errors.isEmpty()) {
+			res.render('creators/new-about', { errors });
+			return;
+		}
+
+		req.session.creatorSignup.about = req.body.about;
+		res.redirect('/creators/new/name');
+	}
+);
+
+router.get('/new/name', function(req, res) {
+	res.render('creators/new-name', { });
+});
+
+router.post('/new/name',
+	ensureNoCreatorAccount,
+	body('name').trim().isLength({ min: 1 }).withMessage('Please enter your name'),
+	async function(req, res, next) {
+		var errors = validationResult(req);
+		if(!errors.isEmpty()) {
+			res.render('creators/new-name', { errors });
+			return;
+		}
+
+		var name = req.body.name;
+		var about = req.session.creatorSignup.about;
+		var userId = res.locals.authUser.id;
+
+		await Creator.create({
+			name,
+			about,
+			userId,
+			displaySupporterCount: true,
+			publicProfile: false,
+			hasPhoto: false
+		});
+
+		req.flash.notice = 'You\'re now set up as a creator.';
+
+		req.session.authUser.roles.push('creator');
+
+		res.redirect('/dashboard/profile');
+	}
+)
+
+/*
 router.get('/new/details', ensureNoCreatorAccount, async function(req, res, next) {
 	res.render('creators/new-details', { });
 });
@@ -80,7 +137,7 @@ router.post('/new/details',
 
 		res.redirect('/dashboard/profile');
 	}
-);
+);*/
 
 router.get('/:id', async function(req, res, next) {
 	var creator = await Creator.findByPk(req.params.id, { include: User });

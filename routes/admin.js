@@ -3,6 +3,7 @@ const router = express.Router();
 const auth = require('../utils/auth');
 const credentials = require('../config/credentials');
 const email = require('../utils/email');
+const { Creator, User, sequelize } = require('../models');
 
 router.all('*', (req, res, next) => {
 	if(!/log(?:in|out)?/.test(req.path)) {
@@ -46,6 +47,37 @@ router.get('/email', async function(req, res, next) {
 	var sentEmails = await email.getSentEmails(page);
 
 	res.render('admin/email', { sentEmails });
+});
+
+router.get('/creators', async function(req, res, next) {
+	var creators = await Creator.findAll({ include: User });
+	res.render('admin/creators/index', { creators });
+});
+
+router.get('/creators/:id', async function(req, res, next) {
+	var creator = await Creator.findOne({ where: { id: req.params.id }});
+	if(!creator) {
+		res.status(404).send('Creator not found');
+		return;
+	}
+	res.render('admin/creators/show', { creator });
+});
+
+router.post('/creators/:id/delete', async function(req, res, next) {
+	var creator = await Creator.findOne({ where: { id: req.params.id }, include: User });
+	if(!creator) {
+		res.status(404).send('Creator not found');
+		return;
+	}
+	var codes = creator.User.OneTimeCodes;
+	await sequelize.transaction(async t => {
+		await creator.destroy({ transaction: t});
+		await sequelize.query('delete from OneTimeCodes where userid = :userid', { replacements: { userid: creator.userId } });
+		await creator.User.destroy({ transaction: t });
+	});
+	
+	req.flash.notice = `${creator.name} was deleted successfully.`;
+	res.redirect('/admin/creators');
 });
 
 //#########################################################################
