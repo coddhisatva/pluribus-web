@@ -32,10 +32,18 @@ var email = {
 		}
 
 		var files = await fs.readdir(email.dir);
+		files = await Promise.all(files.map(async f => {
+			return {
+				name: f,
+				created: (await fs.stat(email.dir + '/' + f)).ctimeMs
+			}
+		}));
+
+		files.sort((a, b) => a.created > b.created ? -1 : 1 );
 
 		// Filter .json files only
 		for(var i = 0; i < files.length; i++) {
-			if(!files[i].endsWith('.json')) {
+			if(!files[i].name.endsWith('.json')) {
 				files.splice(i, 1);
 				i--;
 			}
@@ -44,7 +52,7 @@ var email = {
 		var result = { emails: [], page, totalPages: Math.ceil(files.length / pageSize) }; 
 		var startI = (page-1) * pageSize;
 		for(var i = startI; i < files.length && i < startI + pageSize; i++) {
-			var file = files[i];
+			var file = files[i].name;
 
 			var json = await fs.readFile(email.dir + '/' + file, { encoding: 'utf8' });
 			var sentEmail = JSON.parse(json);
