@@ -1,10 +1,25 @@
 <%
 _locals.title = 'Pluribus';
+_locals.noContainer = true;
 %>
-<h1>Pluribus</h1>
-<p>Welcome to Pluribus</p>
-<p><a href="/creators">Browse <%= creatorCount %> creators</a></p>
+<div class="py-5 px-5 bg-dark text-white">
+	<div class="container pt-5">
+		<h1 class="display-xl mt-5">Crowdfund a safety net before you need it</h1>
+		<div class="heading-xl-medium text-neutral mb-5">
+			<div>You can't control whether or not you're cancelled.</div>
+			<div>You can control how much damage it does.</div>
+		</div>
+		<div>
+			<a href="/users/signup" class="btn btn-primary btn-lg">Get started</a>
+		</div>
+	</div>
+</div>
 
-<% if(!locals.authUser) { %>
-<p><a href="/users/login">Log In</a> or <a href="/users/signup">Sign Up</a></p>
-<% } %>
+<div class="container my-5">
+	<div>
+		TODO: landing page
+		<p>
+			<a href="/creators">Browse <%= creatorCount %> creators</a>
+		</p>
+	</div>
+</div>

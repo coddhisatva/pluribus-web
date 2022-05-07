@@ -11,7 +11,7 @@
 		<% } else { %>
 			<%- include('_nonav') %>
 		<% } %>
-		<div class="container mt-4">
+		<div class="<%= _locals.noContainer ? '' : 'container mt-4' %>">
 			<%- include('_flash') %>
 			<%- body %>
 		</div>
