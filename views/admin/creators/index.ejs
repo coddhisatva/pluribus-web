@@ -8,7 +8,7 @@
 	</thead>
 	<% for(creator of creators) { %>
 	<tr>
-		<td><a href="/admin/creators/<%= creator.id %>"><%= creator.name %></a></td>
+		<td><a href="/admin/creators/<%= creator.id %>"><%= creator.name || '(No name)' %></a></td>
 		<td><%= creator.User.email %></td>
 	</tr>
 	<% } %>

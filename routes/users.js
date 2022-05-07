@@ -290,8 +290,11 @@ router.get('/activate-sent', function(req, res, next) {
  */
 router.post('/resend-activate', async function(req, res, next) {
 	var email = req.session.signupEmail;
-	await sendActivationEmail(req, email);
-	res.json({ });
+	var user = await User.findOne({ where: { email } });
+	if(user) {
+		await sendActivationEmail(req, user);
+	}
+	res.send('Sent');
 });
 
 /**
