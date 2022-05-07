@@ -26,11 +26,6 @@ label.form-check-label {
 	padding: .6125rem;
 }
 
-/* Keep a bit of space between content and the footer. Needs child combinator to override 'auto' top margin in _page.scss */
-body > footer {
-	margin-top: 4rem; 
-}
-
 
 /*****************************************
 / Password visibility toggle for forms.
