@@ -25,8 +25,13 @@ if(postedValues.about) {
 					<%- validationMessage('about') %>
 				</div>
 
-				<div class="mt-5">
-					<button class="btn btn-primary w-100 py-3" id="continueBtn" disabled>Continue</button>
+				<div class="mt-5 row">
+					<div class="col">
+						<button class="btn btn-primary text-black bg-white w-100 py-3 heading-md-medium border-0" name="skip" value="1">Skip for now</button>
+					</div>
+					<div class="col">
+						<button class="btn btn-primary w-100 py-3 heading-md-medium" id="continueBtn" disabled>Continue</button>
+					</div>
 				</div>
 			</form>
 			

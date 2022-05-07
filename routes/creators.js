@@ -57,12 +57,15 @@ router.post('/new/about',
 
 	function(req, res, next) {
 		var errors = validationResult(req);
-		if(!errors.isEmpty()) {
-			res.render('creators/new-about', { errors });
-			return;
+		if(!req.body.skip) {
+			if(!errors.isEmpty()) {
+				res.render('creators/new-about', { errors });
+				return;
+			}
+	
+			req.session.creatorSignup.about = req.body.about;
 		}
-
-		req.session.creatorSignup.about = req.body.about;
+		
 		res.redirect('/creators/new/name');
 	}
 );
@@ -75,14 +78,17 @@ router.post('/new/name',
 	ensureNoCreatorAccount,
 	body('name').trim().isLength({ min: 1 }).withMessage('Please enter your name'),
 	async function(req, res, next) {
-		var errors = validationResult(req);
-		if(!errors.isEmpty()) {
-			res.render('creators/new-name', { errors });
-			return;
+		var name = '';
+		if(!req.body.skip) {
+			var errors = validationResult(req);
+			if(!errors.isEmpty()) {
+				res.render('creators/new-name', { errors });
+				return;
+			}
+			name = req.body.name;
 		}
 
-		var name = req.body.name;
-		var about = req.session.creatorSignup.about;
+		var about = req.session.creatorSignup.about || '';
 		var userId = res.locals.authUser.id;
 
 		await Creator.create({
