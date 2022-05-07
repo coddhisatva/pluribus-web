@@ -106,44 +106,7 @@ router.post('/new/name',
 
 		res.redirect('/dashboard/profile');
 	}
-)
-
-/*
-router.get('/new/details', ensureNoCreatorAccount, async function(req, res, next) {
-	res.render('creators/new-details', { });
-});
-
-router.post('/new/details',
-	ensureNoCreatorAccount,
-	body('name').trim().isLength({ min: 1 }).withMessage('Please enter your name'),
-	body('about').trim().isLength({ min: 20 }).withMessage('Please write a bit more about yourself'),
-	async function(req, res, next) {
-		var errors = validationResult(req);
-		if(!errors.isEmpty()) {
-			res.render('creators/new-details', { errors });
-			return;
-		}
-		
-		var name = req.body.name;
-		var about = req.body.about;
-		var userId = res.locals.authUser.id;
-
-		var creator = await Creator.create({
-			name,
-			about,
-			userId,
-			displaySupporterCount: true,
-			publicProfile: false,
-			hasPhoto: false
-		});
-
-		req.flash.notice = 'You\'re now set up as a creator.';
-
-		req.session.authUser.roles.push('creator');
-
-		res.redirect('/dashboard/profile');
-	}
-);*/
+);
 
 router.get('/:id', async function(req, res, next) {
 	var creator = await Creator.findByPk(req.params.id, { include: User });
