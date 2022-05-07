@@ -96,6 +96,8 @@ router.post('/password', [
 
 		var email = req.body.email;
 		var user = await User.findOne({where: { email }});
+
+		req.session.passwordResetEmail = email;
 		if(user) {
 			sendForgotPasswordEmail(req, user)
 		}
@@ -109,7 +111,21 @@ router.post('/password', [
  * The page shown after a password reset has been sent.
  */
 router.get('/password-reset-sent', async function(req, res, next) {
-	res.render('users/password-reset-sent');
+	res.render('users/password-reset-sent', { email: req.session.passwordResetEmail });
+});
+
+/**
+ * POST /users/resend-password-reset
+ * Resends the password reset email.
+ * TODO: rate-limit requests (e.g. one per minute, increasing for each email sent) to make sure this isn't abused.
+ */
+ router.post('/resend-password-reset', async function(req, res, next) {
+	var email = req.session.passwordResetEmail;
+	var user = await User.findOne({ where: { email } });
+	if(user) {
+		await sendForgotPasswordEmail(req, user);
+	}
+	res.send('Sent');
 });
 
 function getValidOneTimeCode(redirect) {
