@@ -3,36 +3,35 @@ _locals.title = 'Sign Up';
 _locals.noNav = true;
 %>
 
-<div class="row justify-content-center">
-	<div class="col-md-6">
-
-		<div class="rounded border p-5 mt-5 bg-white">
-			<h1 class="mb-4">Get started with Pluribus.</h1>
+<h1 class="visually-hidden">Get started with Pluribus.</h1>
+<div class="wrapper-half main-content" role="main">
 			
-			<form method="post">
-				<div class="form-floating mb-3">
+	<form class="form-credentials card"  method="post">
+		<fieldset class="card-body">
+			<legend>Get started with Pluribus.</legend>
+
+		<div class="flow">
 					<input class="form-control" type="text" name="email" placeholder="name@example.com" value="<%= postedValues.email %>" />
+
 					<label class="form-label" for="email">Your email</label>
 					<%- validationMessage('email') %>
 				</div>
-				<div class="mb-3">
+				<div>
 					<div class="form-check">
 						<input class="form-check-input" type="checkbox" value="yes" id="agree" name="agree" <%- postedValues.agree ? 'checked' : '' %>>
 						<label class="form-check-label" for="agree">I agree to the terms and conditions</label>
 					</div>
 					<%- validationMessage('agree') %>
 				</div>
+
 				<div>
 					<button class="btn btn-primary w-100 py-3">Create your free account</button>
 				</div>
 
-				<div class="mt-4">
+				<p>
 					Already have an account? <a href="/users/login">Log in</a>.
-				</div>
+				</p>
 			</form>
 
-		</div>
-
-	</div>
 </div>
 
