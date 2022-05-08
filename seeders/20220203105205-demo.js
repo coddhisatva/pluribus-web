@@ -116,9 +116,9 @@ module.exports = {
 		 * await queryInterface.bulkDelete('People', null, {});
 		 */
 
-		await queryInterface.sequelize.query("delete from Follows where userId = (select id from users where email = 'test@pluribus.com')");
-		await queryInterface.sequelize.query("delete from Creators where userId in (select id from users where email = 'test@pluribus.com' or email like '%.invalid')");
-		await queryInterface.sequelize.query("delete from OneTimeCodes where userid in (select id from users where email like 'test@pluribus.com' or email like '%.invalid')");
+		await queryInterface.sequelize.query("delete from Follows where userId = (select id from Users where email = 'test@pluribus.com')");
+		await queryInterface.sequelize.query("delete from Creators where userId in (select id from Users where email = 'test@pluribus.com' or email like '%.invalid')");
+		await queryInterface.sequelize.query("delete from OneTimeCodes where userid in (select id from Users where email like 'test@pluribus.com' or email like '%.invalid')");
 		await queryInterface.sequelize.query("delete from Users where email like 'test@pluribus.com' or email like '%.invalid'");
 	}
 };
