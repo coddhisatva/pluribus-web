@@ -114,7 +114,7 @@ body {
   color: #1d1d23;
 }
 
-.primary-bg {
+.how-grid .inner-content::after, .primary-bg {
   background-color: #555af7;
   color: #fff;
 }
@@ -260,102 +260,114 @@ h5, .h5, *[class~=heading-xs], .heading-xs-medium {
   background-color: pink;
 }
 
-h1 {
-  max-width: 900px;
-  margin: 0 auto;
+h1.display-1 {
+  max-width: 1000px;
+  margin-bottom: 3rem;
 }
 
-body {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+.promo-block {
+  padding-top: 2.25rem;
+  padding-bottom: 2.25rem;
 }
 
-header {
-  padding: 0.75rem 24px;
-}
-
-figure.logo {
-  margin: 0 auto;
-  text-align: center;
-  max-width: 110px;
-}
-
-.wrapper.flow > * + * {
-  margin-top: 3rem;
-}
-.wrapper.flow > h1, .wrapper.flow > p {
-  text-align: center;
-}
-
-.inverse .form-floating > label {
-  color: #000;
-}
-
-.form-credential {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.email-grid {
-  align-items: stretch;
-  display: flex;
-  gap: 12px;
-}
-.email-grid *:first-child {
-  flex: 1;
-}
-.email-grid .btn {
-  height: 100%;
-}
-
-@media only screen and (max-width: 575px) {
-  .email-grid {
-    flex-direction: column;
+@media only screen and (max-width: 767px) {
+  .jt-layout figure {
+    text-align: center;
   }
-  .email-grid .btn {
+  .jt-layout .btn {
     width: 100%;
   }
 }
-footer {
-  padding: 0.75rem 24px 3rem;
+.graphic-content {
+  display: flex;
+  flex-wrap: wrap;
+}
+.graphic-content > * {
+  flex: 1;
 }
 
-.tagline {
-  text-align: center;
+@media only screen and (max-width: 767px) {
+  .graphic-content {
+    flex-wrap: nowrap;
+    flex-direction: column;
+  }
+  .graphic-content > figure {
+    order: -1;
+  }
 }
-.tagline::before {
-  content: "";
-  display: block;
-  width: 140px;
-  height: 95px;
-  background-image: url("../../images/content/symbols/Join-Us.svg");
-  background-size: cover;
-  margin: 0 auto 0.75rem;
+.how-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: auto;
+  grid-template-areas: ". content";
+  padding: 6rem 0;
 }
-
-body.signup-success {
-  display: block;
-}
-
-.success-msg {
+.how-grid .inner-content {
+  border-radius: 17px 0 0 17px;
+  grid-area: content;
+  height: 400px;
+  padding: 1.5rem 15px 1.5rem 100px;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 48px);
   justify-content: center;
+  position: relative;
 }
-.success-msg h1 {
-  max-width: 1000px;
-  text-align: center;
+.how-grid .inner-content > * {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
 }
-.success-msg h1::before {
-  display: block;
+.how-grid .inner-content::after {
   content: "";
-  width: 185px;
-  height: 160px;
-  background: url("../../images/single-planet.svg") no-repeat;
+  height: 250px;
+  width: 250px;
+  position: absolute;
+  left: -200px;
+  border-radius: 17px;
+  background-image: url("/images/content/symbols/How.png");
   background-size: contain;
-  margin: 0 auto 3rem;
 }
-/*# sourceMappingURL=../../maps/pages/prelaunch.css.map */
+
+@media only screen and (max-width: 575px) {
+  .how-grid {
+    display: block;
+    padding: 0;
+  }
+  .how-grid .inner-content {
+    border-radius: 0;
+    padding: 3rem;
+  }
+  .how-grid .inner-content::after {
+    position: static;
+    margin: 1.5rem auto;
+  }
+}
+.networked {
+  padding: 3rem 0;
+}
+.networked .wrapper {
+  border-radius: 17px;
+  padding: 3rem 48px;
+}
+
+.cards-3 > * {
+  flex: 1;
+}
+
+.columns + .columns {
+  margin-top: 1.5rem;
+}
+
+.graphic-content {
+  gap: 24px;
+  align-items: stretch;
+}
+.graphic-content::after {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: url("../../images/content/symbols/networked.png") no-repeat center;
+  background-size: 100%;
+  content: "";
+}
+/*# sourceMappingURL=../../maps/pages/home.css.map */
