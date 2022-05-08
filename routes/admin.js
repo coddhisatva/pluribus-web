@@ -71,8 +71,10 @@ router.post('/creators/:id/delete', async function(req, res, next) {
 	}
 	var codes = creator.User.OneTimeCodes;
 	await sequelize.transaction(async t => {
+		await sequelize.query('delete from Follows where creatorid = :creatorid', { replacements: { creatorid: creator.id } });
 		await creator.destroy({ transaction: t});
 		await sequelize.query('delete from OneTimeCodes where userid = :userid', { replacements: { userid: creator.userId } });
+		await sequelize.query('delete from Follows where userid = :userid', { replacements: { userid: creator.userId } });
 		await creator.User.destroy({ transaction: t });
 	});
 	
