@@ -84,6 +84,12 @@ module.exports = {
 
 		addTimestamps(creators);
 
+		// Set defaults
+		creators.forEach(creator => {
+			creator.displaySupporterCount = true,
+			creator.publicProfile = false
+		});
+
 		console.log('Inserting creators');
 		await queryInterface.bulkInsert('Creators', creators);
 
