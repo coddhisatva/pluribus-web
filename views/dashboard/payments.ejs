@@ -1,6 +1,7 @@
 <%
 _locals.title = 'Payment information';
 _locals.nav = 'payments';
+_locals.headScripts = [ 'https://js.stripe.com/v3/' ];
 %> 
 
 <h1 class="mb-3">Payment information</h1>
@@ -15,19 +16,38 @@ _locals.nav = 'payments';
 			<p class="body-sm-weak text-medium">All the payments you've made and received.</p>
 
 			<h3 class="heading-sm-weak">Payment methods</h3>
+
+			<% if(primaryCardPaymentMethod) { %>
+			<div class="rounded border white-bg my-3 p-3">
+				<h3 class="body-sm-medium">Your primary payment method <a href="#" id="changePaymentMethodBtn" class="float-end">Change</a></h3>
+
+				<div class="my-3">
+					<div style="width:60px;text-align:center;padding:4.5px 0;border: 1px solid var(--border-neutral);border-radius:2px;float: left;margin-right: 8px;">
+						<svg viewbox="0 0 24 24" width="36"><use href="/images/ui/credit-card-icons.svg#<%= primaryCardPaymentMethod.cardType%>"></use></svg>
+					</div>
+
+					<h3 class="body-sm-medium mb-0"><%= primaryCardPaymentMethod.nickname || camelize(primaryCardPaymentMethod.cardType) %></h3>
+					<div class="body-xs-weak text-strong"><%= primaryCardPaymentMethod.last4 %></div>
+				</div>
+				<div style="clear:both" class="body-sm-weak text-strong">Expires <%= cardExpiryDisplay(primaryCardPaymentMethod.expMonth, primaryCardPaymentMethod.expYear) %></div>
+			</div>
+			<% } %>
+
 			<a href="#" class="btn bg-black text-white" id="addPaymentMethodBtn">Add payment method</a>
 		</div>
 	</div><!-- end main .col -->
 
 	<!-- Payment type modal -->
 	<div class="modal" id="paymentTypeModal" tabindex="-1" aria-labelledby="addPaymentMethodBtn">
-		<div class="modal-dialog modal-dialog-centered" style="max-width:588px">
+		<div class="modal-dialog modal-lg modal-dialog-centered">
 			<div class="modal-content">
-				<div class="modal-body p-5">
-					<h2 class="heading-xl-medium pb-4">How would you like to pay?</h2>
-
+				<div class="modal-header">
+					<h5 class="modal-title heading-xl-medium">Payment type</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body p-4 py-5">
 					<div class="d-flex">
-						<a class="selection rounded bg-white p-4 mb-2 text-decoration-none text-strong heading-sm-weak me-2" href="#">
+						<a class="selection rounded bg-white p-4 mb-2 text-decoration-none text-strong heading-sm-weak me-2" id="addCardBtn" href="#">
 							Credit/Debit card
 							<svg><use href="/images/ui/icons.svg#credit-card"></use></svg>
 						</a>
@@ -41,6 +61,86 @@ _locals.nav = 'payments';
 			</div>
 		</div>
 	</div>
+
+	<!-- Add card modal -->
+	<div class="modal" id="addCardModal" tabindex="-1">
+		<div class="modal-dialog modal-lg modal-dialog-centered">
+			<div class="modal-content">
+				<form id="addCardForm" class="needs-validation" novalidate>
+				<div class="modal-header">
+					<h5 class="modal-title heading-xl-medium">Credit card</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				  </div>
+				<div class="modal-body p-4">
+					<div class="form-floating mb-4">
+						<input type="text" id="cardNickname" class="form-control" placeholder="Nickname" />
+						<label for="cardNickname">Card nickname (optional)</label>
+					</div>
+					<div class="form-floating mb-4">
+						<input type="text" id="cardFirstName" class="form-control" placeholder="First name" required />
+						<label for="cardFirstName">First name</label>
+						<div class="invalid-feedback">
+							Please enter your first name.
+						</div>
+					</div>
+					<div class="form-floating mb-4">
+						<input type="text" id="cardLastName" class="form-control" placeholder="Last name" required />
+						<label for="cardLastName">Last name</label>
+						<div class="invalid-feedback">
+							Please enter your last name.
+						</div>
+					</div>
+					<div id="stripePaymentElement">
+						<!-- Stripe Elements will create form elements here -->
+					</div>
+					<div id="stripeErrorMessage" class="alert alert-danger visually-hidden mt-3">
+						<!-- Display error message to your customers here -->
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button id="cancelAddCardBtn" class="btn btn-outline-dark heading-md-medium">Cancel</button>
+					<button class="btn bg-black text-white heading-md-medium">Save payment method</button>
+				</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<!-- Change payment method modal -->
+	<div class="modal" id="changePaymentMethodModal" tabindex="-1">
+		<div class="modal-dialog modal-lg modal-dialog-centered">
+			<div class="modal-content">
+				<form method="post" action="/dashboard/payments/set-primary-method" id="changePaymentMethodForm">
+					<div class="modal-header">
+						<h5 class="modal-title heading-xl-medium">Your saved payment methods</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body p-4 py-5">
+						<% cardPaymentMethods.forEach(function(paymentMethod, i) { %>
+							<div class="payment-method-option form-check py-3">
+								<input type="radio" class="form-check-input" id="paymentMethod_<%= paymentMethod.id %>" name="id" value="<%= paymentMethod.id %>" <%= paymentMethod.id == primaryCardPaymentMethod.id ? 'checked' : ''%> />
+								<label class="form-check-label" for="paymentMethod_<%= paymentMethod.id %>">
+									<div class="d-inline-block rounded border position-relative" style="width:40px;height:24px;overflow:hidden;vertical-align:bottom;">
+										<svg width="24" height="24" style="position:absolute;top:-1px;left:8px;"><use href="/images/ui/credit-card-icons.svg#<%= paymentMethod.cardType %>"></use></svg>
+									</div>
+									<b class="body-sm-medium me-2"><%= paymentMethod.last4 %></b>
+									<span>Expires: <%= cardExpiryDisplay(paymentMethod.expMonth, paymentMethod.expYear) %></span>
+								</label>
+								<% if(paymentMethod.id != primaryCardPaymentMethod.id) { %>
+								<a href="#" class="float-end" data-remove-id="<%= paymentMethod.id %>">Remove</a>
+								<% } %>
+							</div>
+						<% }) %>
+					</div>
+					<div class="modal-footer">
+						<a class="btn btn-outline-dark heading-md-medium" href="javascript:;" data-bs-dismiss="modal">Cancel</a>
+						<button class="btn bg-black text-white heading-md-medium" id="savePrimaryPaymentMethodBtn">Use this method</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
 
 	<!-- right sidebar -->
 	<div class="col">
@@ -78,7 +178,187 @@ _locals.nav = 'payments';
 <script>
 	var addPaymentMethodBtn = document.getElementById('addPaymentMethodBtn');
 	var paymentTypeModal = new bootstrap.Modal(document.getElementById('paymentTypeModal'));
-	addPaymentMethodBtn.addEventListener('click', function() {
+	addPaymentMethodBtn.addEventListener('click', function(e) {
+		e.preventDefault();
 		paymentTypeModal.show();
+	});
+
+	var addCardBtn = document.getElementById('addCardBtn');
+	var addCardModal = new bootstrap.Modal(document.getElementById('addCardModal'));
+	var addCardForm = document.getElementById('addCardForm');
+	var stripeErrorMessage = document.getElementById('stripeErrorMessage');
+	var addCardModalShown = false;
+
+	// Prepare Stripe ahead of time
+	const stripe = Stripe('<%= stripePublicKey %>');
+	var stripeElements;
+	fetch('/dashboard/payments/beginAddCreditCard', { method: 'post' })
+		.then(function(response) {
+			response.json().then(function(json) {
+				var secret = json.clientSecret;
+
+				// Set up credit card form
+				const options = {
+					clientSecret: secret,
+					fonts: [
+						{ cssSrc: 'https://fonts.googleapis.com/css2?family=Rubik:wght@400' }
+					],
+					appearance: {
+						variables: {
+							fontFamily: 'Rubik, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
+							fontSizeBase: '16px',
+							colorPrimary: '#555af7',
+							colorText: '#212529',
+							spacingGridRow: '24px'
+						},
+						rules: {
+							'.Input': {
+								borderColor: '#ced4da',
+								lineHeight: '1.25',
+								padding: '8px',
+								boxShadow: 'none'
+							},
+							'.Input:focus': {
+								boxShadow: '0 0 0 0.25rem rgba(85,90,247,0.25)'
+							},
+							'.Label--resting': {
+								color: '#717171'
+							}
+						},
+						labels: 'floating',
+					}
+				};
+				
+				stripeElements = stripe.elements(options);
+				const paymentElement = stripeElements.create('payment', { business: { name: 'Pluribus' }});
+
+				// Stripe will not be able to compute styles for floating labels correctly when the modal is not displayed
+				// So we display it temporarily (while hidden) to allow Stripe to compute layout, then hide it again.
+				// We need to wait a while for Stripe to 'mount', so we wait 1s before resetting modal back to normal. 
+				addCardModal._element.style.visibility = 'hidden';
+				addCardModal._element.style.display = 'block';
+				
+				paymentElement.mount('#stripePaymentElement');
+				setTimeout(function() {
+					// We don't want to hide the modal if it has been opened in the time elapsed since we
+					// started waiting for stripe to mount.
+					if(!addCardModalShown) {
+						addCardModal._element.style.display = null;
+					}
+					addCardModal._element.style.visibility = null;
+				}, 1000);
+
+				paymentElement.on('change', () => stripeErrorMessage.classList.add('visually-hidden') );
+				
+			});
+		});
+
+	
+
+	addCardBtn.addEventListener('click', function(e) {
+		e.preventDefault();
+		paymentTypeModal.hide();
+		addCardModal.show();	
+		addCardModalShown = true;	
+	});
+
+	addCardForm.addEventListener('submit', async function(event) {
+		event.preventDefault();
+
+		var nickname = document.getElementById('cardNickname').value;
+		var firstName = document.getElementById('cardFirstName').value;
+		var lastName = document.getElementById('cardLastName').value;
+
+		// Validate our fields first
+		if(!addCardForm.checkValidity()) {
+			addCardForm.classList.add('was-validated');
+			return;
+		}
+
+		const {error} = await stripe.confirmSetup({
+			elements: stripeElements,
+			confirmParams: {
+				return_url: '<%= `${req.protocol}://${req.headers.host}/dashboard/payments/card-added` %>',
+				payment_method_data: {
+					metadata: {
+						nickname,
+						firstName,
+						lastName
+					}
+				}
+			}
+		})
+
+		if(error) { 
+			stripeErrorMessage.textContent = error.message;
+			stripeErrorMessage.classList.remove('visually-hidden');
+		}
+	});
+
+	// We need to do this rather than just use [data-bs-dismiss="modal"] because
+	// the button is inside a form and we need to prevent the form submitting.
+	var cancelAddCardBtn = document.getElementById('cancelAddCardBtn');
+	cancelAddCardBtn.addEventListener('click', e => {
+		e.preventDefault();
+		addCardModal.hide();
 	})
+
+	// Change payment method modal
+	var changePaymentMethodModal = new bootstrap.Modal(document.getElementById('changePaymentMethodModal'));
+	var changePaymentMethodBtn = document.getElementById('changePaymentMethodBtn');
+	var changePaymentMethodForm = document.getElementById('changePaymentMethodForm');
+	if(changePaymentMethodBtn) {
+		changePaymentMethodBtn.addEventListener('click', function(e) {
+			e.preventDefault();
+			changePaymentMethodForm.reset(); // in case modal has been shown, selection changed and then modal closed
+			changePaymentMethodModal.show();
+		});
+	}
+
+	// Remove payment method links
+	var removeCardLinks = document.querySelectorAll('[data-remove-id]');
+	removeCardLinks.forEach(function(removeCardLink) {
+		removeCardLink.addEventListener('click', function(e) {
+			e.preventDefault();
+			if(!confirm('Really remove this payment method?')) {
+				return;
+			}
+			var id = removeCardLink.dataset.removeId;
+			var container = removeCardLink.closest('div');
+			container.style.transition = 'opacity 200ms';
+			container.style.opacity = '0';
+			var abortRemove = false;
+			setTimeout(function() {
+				if(!abortRemove) {
+					container.style.display = 'none';
+				}
+			}, 200);
+			fetch('/dashboard/payments/delete-payment-method', {
+				method: 'post',
+				headers: { 'content-type': 'application/x-www-form-urlencoded'},
+				body: 'id=' + id 
+			})
+				.then(function(res) {
+					if(res.status == 400) {
+						abortRemove = true;
+						container.style.transition = '';
+						container.style.opacity = 1;
+						container.style.display = '';
+						res.json().then(function(json) {
+							alert(json.error);
+						});
+						return;
+					}
+					container.remove();
+				});
+		});
+	});
+
+
 </script>
+
+<style>
+	.payment-method-option:not(:last-of-type) {
+		border-bottom: 1px solid var(--bs-gray-300);
+	}
+</style>

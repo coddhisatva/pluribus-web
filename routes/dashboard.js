@@ -2,13 +2,15 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
-const { User, Creator, Follow } = require('../models');
+const { User, Creator, Follow, CardPaymentMethod } = require('../models');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/tmp' });
 const fs = require('fs/promises');
 const path = require('path');
 const util = require('../utils/util');
 const sharp = require('sharp');
+const { serialize } = require('v8');
+const credentials = require('../config/credentials');
 
 router.get('/', auth.authorize, async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
@@ -142,8 +144,105 @@ router.post('/profile', auth.authorizeRole('creator'), upload.single('newPhoto')
 	res.send(sync);
 });
 
-router.get('/payments', async function(req, res, next) {
-	res.render('dashboard/payments', {});
+router.get('/payments', auth.authorize, async function(req, res, next) {
+	var stripePublicKey = credentials.stripe.publicKey;
+
+	var user = await User.findByPk(req.authUser.id);
+	var cardPaymentMethods = await CardPaymentMethod.findAll({ where: { userId: req.authUser.id }});
+	var primaryCardPaymentMethod = cardPaymentMethods.find(method => method.id == user.primaryCardPaymentMethodId);
+
+	res.render('dashboard/payments', { stripePublicKey, cardPaymentMethods, primaryCardPaymentMethod });
+});
+
+/**
+ * POST /dashboard/payments/beginAddCreditCard
+ * Called before adding a credit card payment method for a user to setup Stripe custom integration.
+ * https://stripe.com/docs/payments/save-and-reuse?platform=web
+ */
+router.post('/payments/beginAddCreditCard', auth.authorize, async function(req, res, next) {
+	const stripe = require('stripe')(credentials.stripe.secretKey);
+	var user = await User.findByPk(req.authUser.id);
+
+	// Ensure we have a Stripe customer for this user.
+	if(!user.stripeCustomerId) {
+		const customer = await stripe.customers.create();
+		user.stripeCustomerId = customer.id;
+		await User.update({ stripeCustomerId: user.stripeCustomerId }, { where: { id: user.id } });
+	}
+
+	// Create a SetupIntent
+	const setupIntent = await stripe.setupIntents.create({
+		customer: user.stripeCustomerId,
+		payment_method_types: [ 'card' ]
+	});
+
+	res.json({ clientSecret: setupIntent.client_secret });
+
+});
+
+router.get('/payments/card-added', auth.authorize, async function(req, res, next) {
+	const stripe = require('stripe')(credentials.stripe.secretKey);
+
+	var setupIntentId = req.query.setup_intent;
+
+	var setupIntent = await stripe.setupIntents.retrieve(setupIntentId, {
+		expand: [ 'payment_method' ]
+	});
+
+	var user = await User.findByPk(req.authUser.id);
+
+	var cardPaymentMethod = await CardPaymentMethod.create({
+		userId: user.id,
+		stripePaymentMethodId: setupIntent.payment_method.id,
+		cardType: setupIntent.payment_method.card.brand,
+		last4: setupIntent.payment_method.card.last4,
+		expMonth: setupIntent.payment_method.card.exp_month,
+		expYear: setupIntent.payment_method.card.exp_year,
+		nickname: setupIntent.payment_method.metadata.nickname,
+		firstName: setupIntent.payment_method.metadata.firstName,
+		lastName: setupIntent.payment_method.metadata.lastName
+	});
+
+	// Select the payment method
+	await User.update({ primaryCardPaymentMethodId: cardPaymentMethod.id }, { where: { id: user.id } });
+	
+	req.flash.notice = "Card was added successfully";
+	res.redirect('/dashboard/payments');
+});
+
+router.post('/payments/set-primary-method', auth.authorize, async function(req, res, next) {
+	var user = await User.findByPk(req.authUser.id);
+
+	var methodId = req.body.id;
+	var cardPaymentMethod = await CardPaymentMethod.findOne({ where: { id: methodId, userId: user.id } });
+	if(cardPaymentMethod) {
+		var primaryCardPaymentMethodId = methodId;
+		await User.update({ primaryCardPaymentMethodId }, { where: { id : user.id }});
+		req.flash.notice = "Primary payment method was changed successfully";
+	} else {
+		req.flash.alert = "Invalid payment method selected";
+	}
+
+	res.redirect('/dashboard/payments');
+});
+
+router.post('/payments/delete-payment-method', auth.authorize, async function(req, res, next) {
+	var user = await User.findByPk(req.authUser.id);
+
+	var methodId = req.body.id;
+	if(methodId == user.primaryCardPaymentMethodId) {
+		res.status(400).json({ error: "Can't delete the primary payment method"});
+		return;
+	}
+
+	var cardPaymentMethod = await CardPaymentMethod.findOne({ where: { id: methodId, userId: user.id } });
+	if(!cardPaymentMethod) {
+		res.status(400).json({ error: "Payment method not found"});
+		return;	
+	}
+
+	await cardPaymentMethod.destroy();
+	res.status(200).json({ message: 'Card was removed successfully' });
 });
 
 module.exports = router;

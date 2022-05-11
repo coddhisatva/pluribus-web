@@ -29,6 +29,21 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+
+/** Start a HTTPS in development on port 3443 for testing */
+if(app.get('env') == 'development') {
+  const https = require('https');
+  const fs = require('fs');
+
+  var key  = fs.readFileSync(__dirname + '/../config/devssl/server.key', 'utf8');
+  var cert = fs.readFileSync(__dirname + '/../config/devssl/server.crt', 'utf8');
+
+  var httpsServer = https.createServer({ key, cert }, app);
+  httpsServer.listen(3443);
+  httpsServer.on('error', onError);
+  httpsServer.on('listening', onListening);
+}
+
 /**
  * Normalize a port into a number, string, or false.
  */

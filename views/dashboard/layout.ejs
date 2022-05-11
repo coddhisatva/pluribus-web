@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<title><%= _locals.title ? (_locals.title != 'Pluribus' ? _locals.title + ' - Pluribus' : _locals.title) : 'Pluribus' %></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" href="/css/main.css" />
 		<link rel="stylesheet" href="/css/todo.css" />
 
@@ -49,6 +50,11 @@
 			}
 
 		</style>
+		<% if(_locals.headScripts) { %>
+			<% _locals.headScripts.forEach(src => { %>
+		<script src="<%= src %>"></script>
+			<% }) %>
+		<% } %>
 	</head>
 	<body class="<%= _locals.bodyClass %>">
 		<div class="navbar navbar-expand-lg navbar-light bg-white">

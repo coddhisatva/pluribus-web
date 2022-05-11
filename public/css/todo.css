@@ -1,4 +1,9 @@
 /* These are CSS tweaks that (probably) need to be integrated back into the master CSS */
+:root {
+	--border-neutral: #e0e0e0;
+	--text-medium: #717171;
+}
+
 .inverse .alert-success {
 	background: #017b00;
 	color: #fff;
@@ -13,13 +18,18 @@ input.form-check-input[type=checkbox] {
 	width: 24px;
 	height: 24px;
 }
-label.form-check-label {
+input.form-check-input[type=checkbox] + label.form-check-label {
 	padding-left: 12px;
 	vertical-align: sub;
 }
 .form-switch input.form-check-input[type=checkbox] {
 	width: 40px;
 }
+
+.form-floating > label {
+	color: var(--text-medium);
+}
+
 
 /* Fixes close button for flash messages sitting outside the message border */
 .alert-dismissible .btn-close {

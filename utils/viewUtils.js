@@ -15,6 +15,15 @@ var globalFuncs = {
 
 		camel = (lcaseFirst ? camel[0].toLowerCase() : camel[0].toUpperCase()) + camel.substring(1);
 		return camel;
+	},
+	cardExpiryDisplay: function(expMonth, expYear) {
+		var result  = (expMonth < 10 ? '0' : '') + expMonth + '/';
+		if(expYear > 2000 && expYear < 2100) {
+			result += expYear % 100;
+		} else {
+			result += expYear;
+		}
+		return result;
 	}
 };
 
