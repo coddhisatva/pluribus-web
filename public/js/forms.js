@@ -50,7 +50,7 @@ var forms = {
 			passwordValid = hasLower && hasUpper && has8Chars;
 
 			passwordInput.classList.toggle('is-invalid', !passwordValid);
-			passwordInput.classList.toggle('is-valid', passwordInputValid);
+			passwordInput.classList.toggle('is-valid', passwordValid);
 		});
 
 		form.addEventListener('submit', function(e) {

@@ -69,7 +69,9 @@ input[type=text] + .password-visibility-toggle svg#icon-eye {
 }
 
 input.has-password-visibility.form-control.is-invalid,
-input.has-password-visibility.form-control.is-valid {
+input.has-password-visibility.form-control.is-valid,
+input.has-password-visibility.form-control:invalid,
+input.has-password-visibility.form-control:valid {
 	background-image: none;
 }
 
