@@ -1,6 +1,5 @@
 /* © Pluribus 2022. */
 
-
 var forms = {
 	/**
 	 * Add show/hide password functionality to a password input.
@@ -60,6 +59,20 @@ var forms = {
 			}
 			form.classList.add('was-validated');
 		});
+	},
+
+	hookUpServerValidationErrors: function() {
+		var errors = document.querySelectorAll('.server-validation-error');
+		errors.forEach(function(errorDiv, index) {
+			errorDiv.classList.add('invalid-feedback');
+			var inputId = errorDiv.getAttribute('for')
+			var input = document.getElementById(inputId);
+			input.classList.add('is-invalid');
+			if(index == 0) {
+				input.focus();
+			}
+		});
 	}
 };
 
+forms.hookUpServerValidationErrors();

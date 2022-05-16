@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Creator, User, Follow } = require('../models');
+const { Creator, CreatorCategory, User, Follow } = require('../models');
 const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
 const { ResultWithContext } = require('express-validator/src/chain');
@@ -70,7 +70,7 @@ router.post('/new/about',
 	}
 );
 
-router.get('/new/name', function(req, res) {
+router.get('/new/name', ensureNoCreatorAccount, function(req, res) {
 	res.render('creators/new-name', { });
 });
 
@@ -78,27 +78,56 @@ router.post('/new/name',
 	ensureNoCreatorAccount,
 	body('name').trim().isLength({ min: 1 }).withMessage('Please enter your name'),
 	async function(req, res, next) {
-		var name = '';
 		if(!req.body.skip) {
 			var errors = validationResult(req);
 			if(!errors.isEmpty()) {
 				res.render('creators/new-name', { errors });
 				return;
 			}
-			name = req.body.name;
+
+			req.session.creatorSignup.name = req.body.name;
 		}
 
+		res.redirect('/creators/new/policy');
+	}
+);
+
+router.get('/new/policy', ensureNoCreatorAccount, async function(req, res) {
+	res.render('creators/new-policy', { });
+});
+
+router.post('/new/policy',
+	ensureNoCreatorAccount,
+	body('policy').trim().isLength({ min: 20 }).withMessage('Please enter more text (20 character minimum)'),
+	async function(req, res, next) {
+
+		var errors = validationResult(req);
+		if(!errors.isEmpty()) {
+			res.render('creators/new-policy', { errors });
+			return;
+		}
+
+		var policy = req.body.policy;
+
 		var about = req.session.creatorSignup.about || '';
+		var name = req.session.creatorSignup.name || '';
 		var userId = res.locals.authUser.id;
 
-		await Creator.create({
+		var creator = await Creator.create({
 			name,
 			about,
+			policy,
 			userId,
 			displaySupporterCount: true,
 			publicProfile: false,
 			hasPhoto: false
 		});
+
+		// Categories
+		var categories = (req.session.creatorSignup.categories || []);
+		for(category of categories) {
+			await CreatorCategory.create({ creatorId: creator.id, category });
+		}
 
 		req.flash.notice = 'You\'re now set up as a creator.';
 
@@ -106,7 +135,7 @@ router.post('/new/name',
 
 		res.redirect('/dashboard/profile');
 	}
-);
+)
 
 router.get('/:id', async function(req, res, next) {
 	var creator = await Creator.findByPk(req.params.id, { include: User });

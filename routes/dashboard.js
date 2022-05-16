@@ -245,4 +245,10 @@ router.post('/payments/delete-payment-method', auth.authorize, async function(re
 	res.status(200).json({ message: 'Card was removed successfully' });
 });
 
+router.get('/policy', auth.authorizeRole('creator'), async function(req, res, next) {
+	var user = await User.findByPk(req.authUser.id);
+	var creator = await Creator.findOne({ where: { userid: user.id }});
+	res.render('dashboard/policy', { policy: creator.policy });
+});
+
 module.exports = router;

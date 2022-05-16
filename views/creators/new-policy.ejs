@@ -1,0 +1,102 @@
+<%
+_locals.title = "Your policy";
+_locals.noNav = true;
+
+var name = '';
+if(req.session && req.session.creatorSignup && req.session.creatorSignup.name) {
+	name = req.session.creatorSignup.name;
+}
+if(postedValues.name) {
+	name = postedValues.name;
+}
+%>
+
+<div class="row justify-content-center">
+	<div class="col-md-6">
+		<div class="rounded border bg-white p-5 my-4">
+			<h1 class="display-xxs">Your policy</h1>
+			<div class="body-sm-weak">
+				<p>
+					Welcome to Pluribus, where you can proactively crowdfund a safety net to hedge against a
+					potential cancellation. The ability to tailor your protection according to your personal
+					situation is extremely important to us, but for the sake of clarity, here are the basic
+					standards of what qualifies as legitimate scenarios to collect pledges for:
+				</p>
+				<p>
+					Scenarios wherein the pledge recipient experiences an event that directly removes
+					(not reduces) access to a channel that provides income directly (i.e. Patreon,
+					salaried job, etc.) or indirectly (i.e. Twitter, Facebook, etc.) via the audience
+					it provides. This means that temporary suspensions from platforms, delays on projects,
+					or other similarly unfortunate yet less severe situations do not currently meet the
+					necessary threshold (this will eventually change in time, but for now, we’re keeping
+					it simple).
+				</p>
+				<p>
+					Aside from this basic distinction, we will not be placing limits on how you articulate
+					the criteria you would like protection from- whether it’s being banned from one
+					platform, three, or seven plus two associated losses of income, this is all fair
+					game. However- please be advised that it is ultimately up to your supporters whether
+					your terms are deemed to be agreeable. List too many scenarios or set too low a bar,
+					and they will hardly be inclined to provide a financial lifeline that can be tapped
+					from a simple inconvenience. In addition, should you decide to execute your policy
+					(link to policy execution page), they will use their discretion to determine if your
+					claim falls within the parameters you are about to set. 
+				</p>
+				<p>
+					These are the minimal necessary conditions to deter bad actors. That said, if you are
+					good actor, then you have nothing to worry about- open, honest communication between
+					all parties is what will provide the trust necessary for every user to thrive
+					(and become collectively stronger against the forces that threaten all of us).
+					You know your relationship with your supporters better than we do, which is why
+					we&rsquo;ve left the rest up to you. Now &mdash; what scenario(s) would you like to protect
+					yourself against?  
+				</p>
+			</div>
+			<div class="body-sm-weak text-muted">
+				Examples: 
+				<ul>
+					<li>“I&rsquo;d like protection in case I get de-platformed from Twitter”</li>
+					<li>“I make my living on the road so I&rsquo;d like any pledges to kick in if any venues cancel my appearances from outside pressure in the future”</li>
+					<li>“I&rsquo;m on 2 Youtube strikes, I need this in case I get a 3rd”</li>
+					<li>“In case Facebook kicks me off”</li>
+					<li>“Don&rsquo;t make any money online so this is just in case I&rsquo;m doxxed and lose my IRL job”</li>
+					<li>“I mostly rely on Patreon donations and sponsorships, so I&rsquo;d like my policy to kick in if Patreon gives me the boot or if I lost 2 or more sponsorships the same month.”</li>
+				</ul>
+
+			</div>
+			<form method="post">
+				<div class="form-floating mt-4">
+					<textarea name="policy" id="policy" class="form-control" placeholder="Your policy" style="height:10rem;"><%= postedValues.policy %></textarea>
+					<label for="name">Your policy</label>
+					<%- validationMessage('policy') %>
+				</div>
+
+				<div class="mt-5 row">
+					<div class="col">
+						<button class="btn btn-primary w-100 py-3 heading-md-medium" id="continueBtn" disabled>Continue</button>
+					</div>
+				</div>
+			</form>
+			
+		</div>
+		
+	</div>
+</div>
+
+<script src="/js/forms.js"></script>
+<script>
+	window.addEventListener('load', function() {
+		var name = document.getElementById('policy');
+		var continueBtn = document.getElementById('continueBtn');
+
+		function inputChange(e) {
+			continueBtn.disabled = !name.value;
+		}
+
+		name.addEventListener('input', inputChange);
+
+		// In case the user went back, check if anything was previously entered
+		inputChange();
+	})
+	
+</script>

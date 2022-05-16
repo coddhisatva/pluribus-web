@@ -15,8 +15,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   CreatorCategory.init({
-    creatorId: DataTypes.INTEGER,
-    category: DataTypes.STRING
+    creatorId: { type: DataTypes.INTEGER, primaryKey: true },
+    category: { type: DataTypes.STRING, primaryKey: true } 
   }, {
     sequelize,
     modelName: 'CreatorCategory',

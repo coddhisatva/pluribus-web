@@ -93,7 +93,7 @@ app.locals.validationMessage = function(paramName) {
 		}
 
 		if(errors[paramName]) {
-			return '<div class="text-danger">' + errors[paramName].msg + '</div>';
+			return '<div class="text-danger server-validation-error" for="' + paramName + '">' + errors[paramName].msg + '</div>';
 		}
 	}
 }
