@@ -84,6 +84,43 @@ router.post('/creators/:id/delete', csrf.validateToken, async function(req, res,
 	res.redirect('/admin/creators');
 });
 
+router.get('/users', async function(req, res, next) {
+	var users = await User.findAll({ include: Creator });
+	res.render('admin/users/index', { users });
+});
+
+router.get('/users/:id', async function(req, res, next) {
+	var user = await User.findOne({ where: { id: req.params.id }});
+	if(!user) {
+		res.status(404).send('User not found');
+		return;
+	}
+	res.render('admin/users/show', { user });
+});
+
+router.post('/users/:id/delete', csrf.validateToken, async function(req, res, next) {
+	var user = await User.findOne({ where: { id: req.params.id } });
+	if(!user) {
+		res.status(404).send('User not found');
+		return;
+	}
+	
+	await sequelize.transaction(async t => {
+		if(user.creatorId) {
+			await sequelize.query('delete from Follows where creatorid = :creatorid', { replacements: { creatorid: user.creatorId } });
+			await sequelize.query('delete from CreatorCategories where creatorid = :creatorid', { replacements: { creatorid: user.creatorId } });
+			await sequelize.query('delete from Creators where id = :creatorid', { replacements: { creatorid: user.creatorId } });
+		}
+		
+		await sequelize.query('delete from OneTimeCodes where userid = :userid', { replacements: { userid: user.id } });
+		await sequelize.query('delete from Follows where userid = :userid', { replacements: { userid: user.id } });
+		await user.destroy({ transaction: t });
+	});
+	
+	req.flash.notice = `${user.email} was deleted successfully.`;
+	res.redirect('/admin/users');
+});
+
 //#########################################################################
 // Utilities
 //#########################################################################

@@ -26,6 +26,53 @@ var globalFuncs = {
 			result += expYear;
 		}
 		return result;
+	},
+	/**
+	 * Displays the date relative to the current time, e.g. 3 minutes ago
+	 * @param {Date} date 
+	 */
+	when: function(date) {
+		var now = new Date();
+		var diff = (now - date);
+		
+		if(diff < 0) return date; // Not supported for future dates
+		var seconds =  diff / 1000;
+
+		if(seconds < 90) {
+			return 'seconds ago';
+		}
+
+		var minutes = seconds / 60;
+		if(minutes < 90) {
+			return minutes + ' minutes ago';
+		}
+
+		var hours = minutes / 60.0;
+		if(hours < 36) {
+			return Math.round(hours) + ' hours ago';
+		}
+
+		var days = hours / 24.0;
+		if(days < 11) {
+			return Math.round(days) + ' days ago';
+		}
+
+		var weeks = days / 7.0;
+		if(weeks < 7) {
+			return Math.round(weeks) + ' weeks ago';
+		}
+
+		var months = days / 30;
+		const monthNames = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+		if(months < 12) {
+			if(date.getFullYear() == now.getFullYear()) {
+				return monthNames[date.getMonth() - 1] + ' ' + date.getDay();
+			}
+			return monthNames[date.getMonth() - 1] + ' ' + date.getDay() + ', ' + date.getFullYear();
+		}
+
+		return date;
+
 	}
 };
 

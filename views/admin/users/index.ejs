@@ -1,0 +1,15 @@
+<h1>Users</h1>
+<table class="table">
+	<thead>
+		<tr>
+			<td>Email</td>
+			<td>Registered</td>
+		</tr>
+	</thead>
+	<% for(user of users) { %>
+	<tr>
+		<td><a href="/admin/users/<%= user.id %>"><%= user.email %></a></td>
+		<td><%= when(user.createdAt) %></td>
+	</tr>
+	<% } %>
+</table>
