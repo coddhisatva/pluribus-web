@@ -1,3 +1,5 @@
+var csrf = require('./csrf');
+
 var globalFuncs = {
 	/**
 	 * Converts the supplied string to camel case.
@@ -27,9 +29,18 @@ var globalFuncs = {
 	}
 };
 
+// Functions that use the current request / response
+var reqResFuncs = {
+	csrfToken: csrf.newToken
+}
+
 function middleware(req, res, next) {
 	for(var fn in globalFuncs) {
 		res.locals[fn] = globalFuncs[fn];
+	}
+
+	for(var fn in reqResFuncs) {
+		res.locals[fn] = reqResFuncs[fn](req, res);
 	}
 	next();
 }

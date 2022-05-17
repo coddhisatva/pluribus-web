@@ -5,6 +5,7 @@
 	</div>
 	<div class="col">
 		<form method="post" action="/admin/creators/<%= creator.id %>/delete" onsubmit="return confirm('Really delete this creator?');">
+			<%- csrfToken() %>
 			<button class="btn btn-sm small btn-danger">Delete</button>
 		</form>
 	</div>

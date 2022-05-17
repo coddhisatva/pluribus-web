@@ -2,8 +2,10 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
-const { User, Follow, Creator, OneTimeCode } = require('../models');
+const csrf = require('../utils/csrf');
 const email = require('../utils/email');
+const { User, Follow, Creator, OneTimeCode } = require('../models');
+
 
 /* GET /login */
 router.get('/login', function(req, res, next) {
@@ -11,7 +13,8 @@ router.get('/login', function(req, res, next) {
 });
 
 /* POST /login (email:string, password:string, remember:1) */
-router.post('/login', [
+router.post('/login',
+	csrf.validateToken,
 	body('email').trim().isLength({min:1}).withMessage('Email is required').bail()
 		.isEmail().withMessage('Invalid email address'),
 	body('password', 'Please enter your password').trim().isLength({min:1}),
@@ -56,7 +59,7 @@ router.post('/login', [
 			res.redirect('/');
 		}
 	}
-]);
+);
 
 /**
  * GET /logout
