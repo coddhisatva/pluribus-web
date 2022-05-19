@@ -251,4 +251,8 @@ router.get('/policy', auth.authorizeRole('creator'), async function(req, res, ne
 	res.render('dashboard/policy', { policy: creator.policy });
 });
 
+router.get('/execute-policy', auth.authorizeRole('creator'), async function(req, res, next) {
+	res.render('dashboard/execute-policy');
+});
+
 module.exports = router;
