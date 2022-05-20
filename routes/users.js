@@ -102,7 +102,7 @@ router.post('/password', [
 
 		req.session.passwordResetEmail = email;
 		if(user) {
-			sendForgotPasswordEmail(req, user)
+			await sendForgotPasswordEmail(req, user)
 		}
 
 		res.redirect('password-reset-sent');
