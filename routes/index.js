@@ -21,4 +21,8 @@ router.get('/', async function(req, res, next) {
 	res.render('index', { creatorCount });
 });
 
+router.get('/how-it-works', function(req, res) {
+	res.render('how-it-works');
+});
+
 module.exports = router;
