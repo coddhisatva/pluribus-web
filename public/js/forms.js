@@ -71,6 +71,9 @@ var forms = {
 			if(index == 0) {
 				input.focus();
 			}
+			input.addEventListener('input', function(e) {
+				input.classList.remove('is-invalid');
+			});
 		});
 	}
 };
