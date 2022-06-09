@@ -251,6 +251,27 @@ router.get('/policy', auth.authorizeRole('creator'), async function(req, res, ne
 	res.render('dashboard/policy', { policy: creator.policy });
 });
 
+router.post('/policy',
+	auth.authorizeRole('creator'),
+	body('policy').trim().isLength({ min: 20 }).withMessage('Please enter more text (20 character minimum)'),
+	async function(req, res, next) {
+		var errors = validationResult(req);
+		if(!errors.isEmpty()) {
+			res.status(400).json({ errors: errors.array() });
+			return;
+		}
+
+		var user = await User.findByPk(req.authUser.id);
+		var creator = await Creator.findOne({ where: { userid: user.id }});
+
+		var policy = req.body.policy;
+		creator.policy = policy;
+		await creator.save();
+
+		res.json({ result: "ok" });
+	}
+);
+
 router.get('/execute-policy', auth.authorizeRole('creator'), async function(req, res, next) {
 	res.render('dashboard/execute-policy');
 });

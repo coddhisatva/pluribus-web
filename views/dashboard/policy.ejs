@@ -2,18 +2,106 @@
 
 <div class="row">
 	<div class="col-md-8">
-		<div class="rounded border bg-white p-4">
-			<div class="white-space:pre;"><%= policy %></div>
+		<div id="policyForm" class="rounded border bg-white p-4">
+			<div>
+				<h3 class="heading-sm-weak mb-2">
+					Need to make a policy change?
+				</h3>
+				<p class="body-sm-weak text-medium">You can view or edit your coverage options</p>
+				<div id="savedMsg" class="alert alert-success mb-3 d-inline-block" style="display:none">Your policy changes were saved.</div>
+				<div class="rounded bg-neutral p-3 text-strong">
+					<h3 class="body-xs-medium"><svg width="24" height="24" class="text-primary me-2"><use href="/images/ui/icons.svg#website"></use></svg>Your current policy</h3>
+					<div style="white-space:pre-wrap;" class="body-xs-weak" id="displayPolicy"><%= policy %></div>
+				</div>
+				<div class="my-3">
+					<a href="#" id="startEditBtn" class="text-black">Update my policy</a>
+					<div id="editForm" style="display:none">
+						<div class="form-floating">
+							<textarea id="policy" class="form-control" placeholder="New policy" style="height:8em;"></textarea>
+							<label for="policy">New policy</label>
+						</div>
+						<div class="mt-3">
+							<button id="saveBtn" class="btn bg-black text-white">Save</button>
+							<a href="#" id="cancelEditBtn" class="text-black ms-2">Cancel</a>
+						</div>
+					</div>
+				</div>
+			</div>
 
-			<div class="my-3">
+			<div class="my-4">
+				<h3 class="heading-sm-weak mb-2">Execute policy</h3>
+				<p>
+					Activate your policy to convert the pledges you have accumulated into active donations
+					to be transferred to your account.
+				</p>
 				<a href="/dashboard/execute-policy" class="btn btn-primary">Execute policy</a>
 			</div>
 		</div>
 	</div><!-- end main column -->
 
-	<div class="col">
-		<div class="rounded border bg-white p-4">
-			<p></p>
-		</div>
-	</div><!-- end sidebar -->
 </div><!-- end .row -->
+
+<script>
+	var startEditBtn = document.getElementById('startEditBtn');
+	var editForm = document.getElementById('editForm');
+	var displayPolicy = document.getElementById('displayPolicy');
+	var policy = document.getElementById('policy');
+	var saveBtn = document.getElementById('saveBtn');
+	var cancelEditBtn = document.getElementById('cancelEditBtn');
+	var savedMsg = document.getElementById('savedMsg');
+	var savedPolicy = '<%= policy %>';
+
+	startEditBtn.addEventListener('click', function(e) {
+		e.preventDefault();
+		policy.value = savedPolicy;
+		editForm.style.display = 'block';
+		startEditBtn.style.display = 'none';
+		policy.focus();
+	});
+
+	saveBtn.addEventListener('click', function(e) {
+		e.preventDefault();
+
+		document.body.classList.add('page-loading');
+
+		var data = new URLSearchParams([['policy', policy.value]]);
+
+		fetch('/dashboard/policy', { method: 'post', body: data })
+			.then((res) => {
+				document.body.classList.remove('page-loading');
+				if(res.ok) {
+					savedPolicy = policy.value;
+					savedMsg.style.display = 'block';
+					editForm.style.display = 'none';
+					startEditBtn.style.display = 'inline';
+					displayPolicy.textContent = savedPolicy;
+				} else {
+					// Display errors
+					res.json().then(json => {
+						for(var error of json.errors) {
+							var input = document.getElementById(error.param);
+							if(input) {
+								input.classList.add('is-invalid');
+								var errorDiv = document.createElement('div');
+								errorDiv.textContent = error.msg;
+								errorDiv.classList.add('invalid-feedback');
+								input.after(errorDiv);
+								input.addEventListener('input', function() {
+									input.classList.remove('is-invalid');
+									errorDiv.remove();
+								});
+							}
+						}
+					});					
+				}
+			});
+	});
+
+	cancelEditBtn.addEventListener('click', function(e) {
+		e.preventDefault();
+		editForm.style.display = 'none';
+		startEditBtn.style.display = 'inline';
+	});
+
+</script>
+
