@@ -8,7 +8,7 @@
 					Need to make a policy change?
 				</h3>
 				<p class="body-sm-weak text-medium">You can view or edit your coverage options</p>
-				<div id="savedMsg" class="alert alert-success mb-3 d-inline-block" style="display:none">Your policy changes were saved.</div>
+				<div id="savedMsg" class="alert alert-success mb-3" style="display:none">Your policy changes were saved.</div>
 				<div class="rounded bg-neutral p-3 text-strong">
 					<h3 class="body-xs-medium"><svg width="24" height="24" class="text-primary me-2"><use href="/images/ui/icons.svg#website"></use></svg>Your current policy</h3>
 					<div style="white-space:pre-wrap;" class="body-xs-weak" id="displayPolicy"><%= policy %></div>
@@ -71,7 +71,7 @@
 				document.body.classList.remove('page-loading');
 				if(res.ok) {
 					savedPolicy = policy.value;
-					savedMsg.style.display = 'block';
+					savedMsg.style.display = 'inline-block';
 					editForm.style.display = 'none';
 					startEditBtn.style.display = 'inline';
 					displayPolicy.textContent = savedPolicy;

@@ -2,6 +2,7 @@
 :root {
 	--border-neutral: #e0e0e0;
 	--text-medium: #717171;
+	--text-neutral-dark: #e1e3e4
 }
 
 .inverse .alert-success {
@@ -118,6 +119,13 @@ input.has-password-visibility.form-control.is-valid + .password-visibility-toggl
 	transform: translateY(30%);
 	animation: loadBounce 1s infinite;
 	animation-delay: calc(var(--order) * 200ms);
+}
+
+.foot-links {
+	margin: 24px 0;
+}
+.foot-links a {
+	color: var(--text-neutral-dark);
 }
 
 @keyframes loadBounce {
