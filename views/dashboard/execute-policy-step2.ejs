@@ -1,0 +1,50 @@
+<%
+_locals.title = 'Execute policy';
+_locals.noSidebar = true;
+%>
+<link rel="stylesheet" href="/css/steps.css" />
+<div class="row justify-content-center">
+	<div class="steps col-lg-8 col-xl-6">
+
+		<div id="step2" class="step rounded border bg-white p-4 mb-5">
+			<form method="post" action="/dashboard/execute-policy/3">
+				<h5 class="heading-md-weak text-strong">Step 2 of 3</h5>
+				<h1 class="display-xxs text-strong">Policy Execution</h1>
+				<div class="form-floating">
+					<textarea id="reason" name="reason" class="form-control" placeholder="Why are you executing your policy?" style="height:8rem;"></textarea>
+					<label for="reason">Why are you executing your policy?</label>
+				</div>
+
+				<div class="my-3 text-end">
+					<a href="#" id="backBtn" class="btn btn-outline btn-lg me-2">Back</a>
+					<button id="continueBtn" class="btn btn-primary btn-lg float-end" disabled>Preview</button>
+				</div>
+			</form>
+		</div>
+
+	</div><!-- end main column -->
+
+</div><!-- end .row -->
+
+<script>
+	function getElements(ids) {
+		for(var id of ids) {
+			window[id] = document.getElementById(id);
+		}
+	}
+
+	var els = getElements('step2', 'backBtn', 'continueBtn', 'reason');
+
+	backBtn.addEventListener('click', function(e) {
+		e.preventDefault();
+		history.go(-1);
+	});
+
+	function toggleContinue() {
+		continueBtn.disabled = !reason.value
+	}
+
+	reason.addEventListener('input', toggleContinue);
+	window.addEventListener('load', toggleContinue);
+
+</script>

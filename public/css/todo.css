@@ -2,7 +2,8 @@
 :root {
 	--border-neutral: #e0e0e0;
 	--text-medium: #717171;
-	--text-neutral-dark: #e1e3e4
+	--text-neutral-dark: #e1e3e4;
+	--fill-neutral-light: #F0F2F3;
 }
 
 .inverse .alert-success {
@@ -126,6 +127,21 @@ input.has-password-visibility.form-control.is-valid + .password-visibility-toggl
 }
 .foot-links a {
 	color: var(--text-neutral-dark);
+}
+
+.btn-lg {
+	font-size: 18px;
+	padding-top: 12px;
+	padding-bottom: 12px;
+}
+
+.btn-outline {
+	border-width: 2px;
+	color: var(--text-strong);
+}
+
+.fill-neutral-light {
+	background-color: var(--fill-neutral-light);
 }
 
 @keyframes loadBounce {

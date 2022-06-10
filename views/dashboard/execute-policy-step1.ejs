@@ -1,0 +1,68 @@
+<%
+_locals.title = 'Execute policy';
+_locals.noSidebar = true;
+%>
+<link rel="stylesheet" href="/css/steps.css" />
+<div class="row justify-content-center">
+	<div class="steps col-lg-8 col-xl-6">
+		<div id="step1" class="step initial rounded border bg-white p-4 mb-5">
+			
+			<h5 class="heading-md-weak text-strong">Step 1 of 3</h5>
+			<h1 class="display-xxs text-strong">Your policy</h1>
+
+			<p>
+				Everyone that has contributed toward your pledge pool will be notified that you have elected to do so.
+				As per our policy, the default assumption is that your claim is legitimate, and the pledged funds will
+				be transferred to your account in 7 days pending confirmation the majority of your donors do not disapprove
+				of this action. 
+			</p>
+			<p>
+				While approving your claim is the baseline result, they are given the option to vote “Thumbs Down” and
+				if more than 50% feel your rationale falls outside of the parameters they agreed to payout for, your claim
+				will be placed on hold pending a 2nd vote. For more information see How it Works.
+			</p>
+			<p>
+				With this in mind, we encourage you to reassess whether the circumstances that triggered your decision to
+				activate this policy does in fact meet the previously specified criteria and that your supporters will agree. 
+			</p>
+			<p>
+				Now, kindly articulate to your supporters why you are electing to activate your policy at this time.
+			</p>
+			<div class="form-check">
+				<input class="form-check-input" type="checkbox" value="" id="agree">
+				<label class="form-check-label" for="agree">I have read and agree to the terms</label>
+			</div>
+			<div class="mt-4">
+				<button class="btn btn-primary w-100 btn-lg" disabled id="continueBtn">Continue</button>
+			</div>
+		</div>
+
+	</div><!-- end main column -->
+
+</div><!-- end .row -->
+
+<script>
+	function getElements(ids) {
+		for(var id of ids) {
+			window[id] = document.getElementById(id);
+		}
+	}
+
+	var els = getElements('step1', 'agree', 'continueBtn');
+
+	// Step 1
+	function toggleContinue() {
+		continueBtn.disabled = !agree.checked;
+	}
+	agree.addEventListener('change', toggleContinue);
+	window.addEventListener('load', function() {
+		toggleContinue();
+	});
+	
+	continueBtn.addEventListener('click', function() {
+		document.location = '/dashboard/execute-policy/2';		
+	});
+
+
+
+</script>

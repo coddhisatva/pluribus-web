@@ -273,7 +273,20 @@ router.post('/policy',
 );
 
 router.get('/execute-policy', auth.authorizeRole('creator'), async function(req, res, next) {
-	res.render('dashboard/execute-policy');
+	res.redirect('/dashboard/execute-policy/1');
+});
+
+router.get('/execute-policy/1', auth.authorizeRole('creator'), async function(req, res, next) {
+	res.render('dashboard/execute-policy-step1');
+});
+router.get('/execute-policy/2', auth.authorizeRole('creator'), async function(req, res, next) {
+	res.render('dashboard/execute-policy-step2');
+});
+router.post('/execute-policy/3', auth.authorizeRole('creator'), async function(req, res, next) {
+	var reason = req.body.reason;
+	var user = await User.findOne({ where: { id: req.authUser.id }});
+	var creator = await Creator.findOne({ where: { userId: user.id }});
+	res.render('dashboard/execute-policy-step3', { reason, creator });
 });
 
 module.exports = router;

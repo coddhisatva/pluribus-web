@@ -65,6 +65,7 @@
 		<div class="container-fluid">
 			<div class="row flex-nowrap">
 				<% /* Side menu */ %>
+				<% if(!_locals.noSidebar) { %>
 				<div class="col-md-2 col-auto g-0">
 
 					<div class="sidebar pt-5">
@@ -88,9 +89,10 @@
 					</div>
 					
 				</div>
+				<% } %>
 
 				<% /* Content area*/ %>
-				<div class="col bg-light p-5 mt-5">
+				<div class="col bg-light p-5 mt-5 <%= locals.noSidebar ? 'justify-content-center': '' %>">
 					<%- include('../_flash') %>
 					<%- body %>
 				</div>				
