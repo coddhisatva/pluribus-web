@@ -288,5 +288,8 @@ router.post('/execute-policy/3', auth.authorizeRole('creator'), async function(r
 	var creator = await Creator.findOne({ where: { userId: user.id }});
 	res.render('dashboard/execute-policy-step3', { reason, creator });
 });
+router.get('/execute-policy/executed', auth.authorizeRole('creator'), async function(req, res, next) {
+	res.render('dashboard/execute-policy-executed');
+});
 
 module.exports = router;
