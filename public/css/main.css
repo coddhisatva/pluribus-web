@@ -1,6 +1,6 @@
 @charset "UTF-8";
 /**
- * CSS Compiled on: 2022-05-07 20:24:35 -07:00
+ * CSS Compiled on: 2022-06-11 11:54:46 -07:00
  * ============================================================================== *
  */
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Display:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap");
@@ -11374,10 +11374,13 @@ header.nonav figure {
   margin: 0 1rem 0 0;
   padding: 0;
 }
+.social-list a {
+  color: #fff;
+}
 .social-list a:before {
-  content: "";
   background: url("../images/ui/socialmedia/icon-facebook.svg") center no-repeat;
   background-size: 100%;
+  content: "";
   height: 2rem;
   width: 2rem;
   display: block;
