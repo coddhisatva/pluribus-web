@@ -1,55 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title><%= _locals.title ? (_locals.title != 'Pluribus' ? _locals.title + ' - Pluribus' : _locals.title) : 'Pluribus' %></title>
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" href="/css/main.css?v=1" />
+		<link rel="stylesheet" href="/css/pages/dash.css" />
 		<link rel="stylesheet" href="/css/todo.css?v=1" />
-
-		<style>
-			.navbar {
-				box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.12);
-				position: fixed;
-				top: 0;
-				width: 100%;
-				z-index: 1;
-			}
-			.sidebar {
-				display: flex;
-				flex-direction: column;
-				min-height: 100vh;
-			}
-
-			.sidebar nav {
-				display: flex;
-				flex-direction: column;
-			}
-
-			.sidebar nav a {
-				text-decoration: none;
-				color: var(--text-strong);
-				padding: 17.5px 32px 17.5px 72px;
-				position: relative;
-			}
-
-			.sidebar nav a:hover,
-			.sidebar nav a.active {
-				background-color: #f0f3f3;
-				color: var(--bs-primary);
-			}
-
-			.sidebar a svg {
-				position: absolute;
-				width: 24px;
-				height: 24px;
-				left: 32px;
-			}
-
-			.sidebar-text {
-				padding: 32px;
-			}
-
-		</style>
+		<meta name="theme-color" content="#5257f7">
 		<% if(_locals.headScripts) { %>
 			<% _locals.headScripts.forEach(src => { %>
 		<script src="<%= src %>"></script>
@@ -57,46 +15,38 @@
 		<% } %>
 	</head>
 	<body class="<%= _locals.bodyClass %>">
-		<div class="navbar navbar-expand-lg navbar-light bg-white">
-			<div class="container-fluid">
-				<a class="navbar-brand text-black ms-3" href="/">Pluribus.</a>
-			</div>
-		</div>
-		<div class="container-fluid">
-			<div class="row flex-nowrap">
-				<% /* Side menu */ %>
-				<% if(!_locals.noSidebar) { %>
-				<div class="col-md-2 col-auto g-0">
+		<% /* Header */ %>
+		<%- include('_header') %>
 
-					<div class="sidebar pt-5">
-						<div class="sidebar-text">
-							<div class="heading-md-medium">Hi</div>
-							<div class="heading-xs-weak text-medium"><%= authUser.roles.includes('creator') ? 'Creator' : 'Supporter' %></div>
-						</div>			
-						<nav class="flex-column">
-							<a href="/dashboard" class="<%= _locals.nav == 'home' ? 'active' : '' %>"><svg><use href="/images/ui/icons.svg#home"></use></svg>Home</a>
-							<a href="/dashboard/profile" class="<%= _locals.nav == 'profile' ? 'active' : '' %>"><svg><use href="/images/ui/icons.svg#profile"></use></svg>Profile</a>
-							<a href="#"><svg><use href="/images/ui/icons.svg#lock"></use></svg>Login &amp; security</a>
-							<a href="/dashboard/payments" class="<%= _locals.nav == 'payments' ? 'active' : '' %>"><svg><use href="/images/ui/icons.svg#credit-card"></use></svg>Payments</a>
-							<a href="#"><svg><use href="/images/ui/icons.svg#globe-alt"></use></svg>Settings</a>
-							<a href="#"><svg><use href="/images/ui/icons.svg#stack"></use></svg>Referral program</a>
-							<a href="/dashboard/policy"><svg><use href="/images/ui/icons.svg#website"></use></svg>Policy</a>
-						</nav>
+		<div class="dash-grid">
 
-						<nav style="margin-top:auto;">
-							<a href="/users/logout"><svg><use href="/images/ui/icons.svg#log-out"></use></svg>Log out</a>
-						</nav>
+			<% /* Side navigation */ %>
+			<% if(!_locals.noSidenav) { %>
+			<%- include('_sidenav') %>
+			<% } %>
+
+			<div class="content">
+				<div class="inner-content">
+	
+					<div class="main-content" role="main">
+						<%- include('../_flash') %>
+						<%- body %>
 					</div>
-					
-				</div>
-				<% } %>
 
-				<% /* Content area*/ %>
-				<div class="col bg-light p-5 mt-5 <%= locals.noSidebar ? 'justify-content-center': '' %>">
-					<%- include('../_flash') %>
-					<%- body %>
-				</div>				
+					<% if(locals.aside) { %>
+						<aside class="side-content">
+							<div class="card">
+								<div class="card-body flow">
+									<%- defineContent('aside') %>
+								</div>
+							</div>
+						</aside>
+					<% } %>
+					
+
+				</div>
 			</div>
+
 		</div>
 
 		<svg id="loading-svg" width="112px" height="22px" viewBox="0 0 112 44">
@@ -110,5 +60,7 @@
 
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 		<%- script %>
+
+		<%- include('../_footer') %>
 	</body>
 </html>

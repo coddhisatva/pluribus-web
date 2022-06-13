@@ -1,0 +1,67 @@
+<div id="dashboard-navigation" class="collapse">
+	<div class="controls">
+		<div class="user-display">
+			<dl>
+				<dt>Hi Jean</dt>
+				<dd>Creator</dd>
+			</dl>
+		</div>
+		<nav>
+			<ul>
+				<li class="touch-toggle">
+					<button>
+						<span>Close Navigation</span>
+					</button>
+				</li>
+				<li>
+					<a href="/dashboard" class="<%= _locals.nav == 'home' ? 'active' : '' %>">
+						<svg><use href="/images/ui/icons.svg#home"></use></svg>
+						<span>Home</span>
+					</a>
+				</li>
+				<li>
+					<a href="/dashboard/profile" class="<%= _locals.nav == 'profile' ? 'active' : '' %>">
+						<svg><use href="/images/ui/icons.svg#profile"></use></svg>
+						<span>Profile</span>
+					</a>
+				</li>
+				<li>
+					<a href="#">
+						<svg><use href="/images/ui/icons.svg#lock"></use></svg>
+						<span>Login & security</span>
+					</a>
+				</li>
+				<li>
+					<a href="/dashboard/payments" class="<%= _locals.nav == 'payments' ? 'active' : '' %>">
+						<svg><use href="/images/ui/icons.svg#credit-card"></use></svg>
+						<span>Payments</span>
+					</a>
+				</li>
+				<li>
+					<a href="#">
+						<svg><use href="/images/ui/icons.svg#globe-alt"></use></svg>
+						<span>Settings</span>
+					</a>
+				</li>
+				<li>
+					<a href="#">
+						<svg><use href="/images/ui/icons.svg#stack"></use></svg>
+						<span>Referral program</span>
+					</a>
+				</li>
+				<li>
+					<a href="/dashboard/policy" class="<%= _locals.nav == 'policy' ? 'active' : '' %>">
+						<svg><use href="/images/ui/icons.svg#website"></use></svg>
+						<span>Policy</span>
+					</a>
+				</li>
+				<li>
+					<a href="/users/logout">
+						<svg><use href="/images/ui/icons.svg#log-out"></use></svg>
+						<span>Log Out</span>
+					</a>
+				</li>
+			</ul>
+		</nav>
+	</div>
+</div>
