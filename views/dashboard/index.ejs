@@ -2,19 +2,25 @@
 	_locals.title = 'Dashboard';
 	_locals.nav = 'home';
 %> 
-<h1>Dashboard</h1>
+<header>
+	<h1>Dashboard</h1>
+</header>
 
-<% if(following && following.length) { %>
-	<h3>Following</h3>
-	<ul>
-	<% following.forEach(follow => { %>
-		<li><a href="/creators/<%= follow.creatorId %>"><%= follow.Creator.name %></a></li>
-	<% }); %>
-	</ul>
-<% } else { %>
-	<p>You're not following anyone yet. Followed creators will show up here once you do.</p>
-<% } %>
+<div class="card">
+	<div class="card-body">
+	<% if(following && following.length) { %>
+		<h3>Following</h3>
+		<ul>
+		<% following.forEach(follow => { %>
+			<li><a href="/creators/<%= follow.creatorId %>"><%= follow.Creator.name %></a></li>
+		<% }); %>
+		</ul>
+	<% } else { %>
+		<p>You're not following anyone yet. Followed creators will show up here once you do.</p>
+	<% } %>
 
-<% if(!authUser.roles.includes('creator')) { %>
-	<a href="/creators/new" class="btn btn-primary">Set up creator profile</a>
-<% } %>
+	<% if(!authUser.roles.includes('creator')) { %>
+		<a href="/creators/new" class="btn btn-primary">Set up creator profile</a>
+	<% } %>
+	</div>
+</div>

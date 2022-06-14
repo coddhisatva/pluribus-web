@@ -1,45 +1,40 @@
 <h1 class="mb-3">Your policy</h1>
 
-<div class="row">
-	<div class="col-md-8">
-		<div id="policyForm" class="rounded border bg-white p-4">
-			<div>
-				<h3 class="heading-sm-weak mb-2">
-					Need to make a policy change?
-				</h3>
-				<p class="body-sm-weak text-medium">You can view or edit your coverage options</p>
-				<div id="savedMsg" class="alert alert-success mb-3" style="display:none">Your policy changes were saved.</div>
-				<div class="rounded bg-neutral p-3 text-strong">
-					<h3 class="body-xs-medium"><svg width="24" height="24" class="text-primary me-2"><use href="/images/ui/icons.svg#website"></use></svg>Your current policy</h3>
-					<div style="white-space:pre-wrap;" class="body-xs-weak" id="displayPolicy"><%= policy %></div>
+<div id="policyForm" class="rounded border bg-white p-4">
+	<div>
+		<h3 class="heading-sm-weak mb-2">
+			Need to make a policy change?
+		</h3>
+		<p class="body-sm-weak text-medium">You can view or edit your coverage options</p>
+		<div id="savedMsg" class="alert alert-success mb-3" style="display:none">Your policy changes were saved.</div>
+		<div class="rounded bg-neutral p-3 text-strong">
+			<h3 class="body-xs-medium"><svg width="24" height="24" class="text-primary me-2"><use href="/images/ui/icons.svg#website"></use></svg>Your current policy</h3>
+			<div style="white-space:pre-wrap;" class="body-xs-weak" id="displayPolicy"><%= policy %></div>
+		</div>
+		<div class="my-3">
+			<a href="#" id="startEditBtn" class="text-black">Update my policy</a>
+			<div id="editForm" style="display:none">
+				<div class="form-floating">
+					<textarea id="policy" class="form-control" placeholder="New policy" style="height:8em;"></textarea>
+					<label for="policy">New policy</label>
 				</div>
-				<div class="my-3">
-					<a href="#" id="startEditBtn" class="text-black">Update my policy</a>
-					<div id="editForm" style="display:none">
-						<div class="form-floating">
-							<textarea id="policy" class="form-control" placeholder="New policy" style="height:8em;"></textarea>
-							<label for="policy">New policy</label>
-						</div>
-						<div class="mt-3">
-							<button id="saveBtn" class="btn bg-black text-white">Save</button>
-							<a href="#" id="cancelEditBtn" class="text-black ms-2">Cancel</a>
-						</div>
-					</div>
+				<div class="mt-3">
+					<button id="saveBtn" class="btn bg-black text-white">Save</button>
+					<a href="#" id="cancelEditBtn" class="text-black ms-2">Cancel</a>
 				</div>
-			</div>
-
-			<div class="my-4">
-				<h3 class="heading-sm-weak mb-2">Execute policy</h3>
-				<p>
-					Activate your policy to convert the pledges you have accumulated into active donations
-					to be transferred to your account.
-				</p>
-				<a href="/dashboard/execute-policy" class="btn btn-primary">Execute policy</a>
 			</div>
 		</div>
-	</div><!-- end main column -->
+	</div>
 
-</div><!-- end .row -->
+	<div class="my-4">
+		<h3 class="heading-sm-weak mb-2">Execute policy</h3>
+		<p>
+			Activate your policy to convert the pledges you have accumulated into active donations
+			to be transferred to your account.
+		</p>
+		<a href="/dashboard/execute-policy" class="btn btn-primary">Execute policy</a>
+	</div>
+</div>
 
 <script>
 	var startEditBtn = document.getElementById('startEditBtn');

@@ -4,156 +4,151 @@ _locals.nav = 'payments';
 _locals.headScripts = [ 'https://js.stripe.com/v3/' ];
 %> 
 
-<h1 class="mb-3">Payment information</h1>
+<header>
+	<h1 class="display-xxs">Payment information</h1>
+</header>
 
-<div class="row">
-	<div class="col-md-8">
-		<div class="rounded border bg-white p-4">
-			<h3 class="heading-sm-weak">
-				Payment history
-				<a href="#" class="text-medium float-end">View payments</a>
-			</h3>
-			<p class="body-sm-weak text-medium">All the payments you've made and received.</p>
+<div class="card">
+	<div class="card-body">
+		<h3 class="heading-sm-weak">
+			Payment history
+			<a href="#" class="text-medium float-end">View payments</a>
+		</h3>
+		<p class="body-sm-weak text-medium">All the payments you've made and received.</p>
 
-			<h3 class="heading-sm-weak">Payment methods</h3>
+		<h3 class="heading-sm-weak">Payment methods</h3>
 
-			<% if(primaryCardPaymentMethod) { %>
-			<div class="rounded border white-bg my-3 p-3">
-				<h3 class="body-sm-medium">Your primary payment method <a href="#" id="changePaymentMethodBtn" class="float-end">Change</a></h3>
+		<% if(primaryCardPaymentMethod) { %>
+		<div class="rounded border white-bg my-3 p-3">
+			<h3 class="body-sm-medium">Your primary payment method <a href="#" id="changePaymentMethodBtn" class="float-end">Change</a></h3>
 
-				<div class="my-3">
-					<div style="width:60px;text-align:center;padding:4.5px 0;border: 1px solid var(--border-neutral);border-radius:2px;float: left;margin-right: 8px;">
-						<svg viewbox="0 0 24 24" width="36"><use href="/images/ui/credit-card-icons.svg#<%= primaryCardPaymentMethod.cardType%>"></use></svg>
-					</div>
-
-					<h3 class="body-sm-medium mb-0"><%= primaryCardPaymentMethod.nickname || camelize(primaryCardPaymentMethod.cardType) %></h3>
-					<div class="body-xs-weak text-strong"><%= primaryCardPaymentMethod.last4 %></div>
+			<div class="my-3">
+				<div style="width:60px;text-align:center;padding:4.5px 0;border: 1px solid var(--border-neutral);border-radius:2px;float: left;margin-right: 8px;">
+					<svg viewbox="0 0 24 24" width="36"><use href="/images/ui/credit-card-icons.svg#<%= primaryCardPaymentMethod.cardType%>"></use></svg>
 				</div>
-				<div style="clear:both" class="body-sm-weak text-strong">Expires <%= cardExpiryDisplay(primaryCardPaymentMethod.expMonth, primaryCardPaymentMethod.expYear) %></div>
+
+				<h3 class="body-sm-medium mb-0"><%= primaryCardPaymentMethod.nickname || camelize(primaryCardPaymentMethod.cardType) %></h3>
+				<div class="body-xs-weak text-strong"><%= primaryCardPaymentMethod.last4 %></div>
 			</div>
-			<% } %>
-
-			<a href="#" class="btn bg-black text-white" id="addPaymentMethodBtn">Add payment method</a>
+			<div style="clear:both" class="body-sm-weak text-strong">Expires <%= cardExpiryDisplay(primaryCardPaymentMethod.expMonth, primaryCardPaymentMethod.expYear) %></div>
 		</div>
-	</div><!-- end main .col -->
+		<% } %>
 
-	<!-- Payment type modal -->
-	<div class="modal" id="paymentTypeModal" tabindex="-1" aria-labelledby="addPaymentMethodBtn">
-		<div class="modal-dialog modal-lg modal-dialog-centered">
-			<div class="modal-content">
+		<a href="#" class="btn bg-black text-white" id="addPaymentMethodBtn">Add payment method</a>
+	</div>
+</div>
+
+<!-- Payment type modal -->
+<div class="modal" id="paymentTypeModal" tabindex="-1" aria-labelledby="addPaymentMethodBtn">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title heading-xl-medium">Payment type</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body p-4 py-5">
+				<div class="d-flex">
+					<a class="selection rounded bg-white p-4 mb-2 text-decoration-none text-strong heading-sm-weak me-2" id="addCardBtn" href="#">
+						Credit/Debit card
+						<svg><use href="/images/ui/icons.svg#credit-card"></use></svg>
+					</a>
+			
+					<a class="selection rounded bg-white p-4 mb-2 text-decoration-none text-strong heading-sm-weak ms-2" href="javascript:alert('Not implemented.')">
+						Cryptocurrency
+						<svg><use href="/images/ui/icons.svg#bitcoin"></use></svg>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Add card modal -->
+<div class="modal" id="addCardModal" tabindex="-1">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content">
+			<form id="addCardForm" class="needs-validation" novalidate>
+			<div class="modal-header">
+				<h5 class="modal-title heading-xl-medium">Credit card</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+			<div class="modal-body p-4">
+				<div class="form-floating mb-4">
+					<input type="text" id="cardNickname" class="form-control" placeholder="Nickname" />
+					<label for="cardNickname">Card nickname (optional)</label>
+				</div>
+				<div class="form-floating mb-4">
+					<input type="text" id="cardFirstName" class="form-control" placeholder="First name" required />
+					<label for="cardFirstName">First name</label>
+					<div class="invalid-feedback">
+						Please enter your first name.
+					</div>
+				</div>
+				<div class="form-floating mb-4">
+					<input type="text" id="cardLastName" class="form-control" placeholder="Last name" required />
+					<label for="cardLastName">Last name</label>
+					<div class="invalid-feedback">
+						Please enter your last name.
+					</div>
+				</div>
+				<div id="stripePaymentElement">
+					<!-- Stripe Elements will create form elements here -->
+				</div>
+				<div id="stripeErrorMessage" class="alert alert-danger visually-hidden mt-3">
+					<!-- Display error message to your customers here -->
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button id="cancelAddCardBtn" class="btn btn-outline-dark heading-md-medium">Cancel</button>
+				<button class="btn bg-black text-white heading-md-medium">Save payment method</button>
+			</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- Change payment method modal -->
+<div class="modal" id="changePaymentMethodModal" tabindex="-1">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content">
+			<form method="post" action="/dashboard/payments/set-primary-method" id="changePaymentMethodForm">
 				<div class="modal-header">
-					<h5 class="modal-title heading-xl-medium">Payment type</h5>
+					<h5 class="modal-title heading-xl-medium">Your saved payment methods</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body p-4 py-5">
-					<div class="d-flex">
-						<a class="selection rounded bg-white p-4 mb-2 text-decoration-none text-strong heading-sm-weak me-2" id="addCardBtn" href="#">
-							Credit/Debit card
-							<svg><use href="/images/ui/icons.svg#credit-card"></use></svg>
-						</a>
-				
-						<a class="selection rounded bg-white p-4 mb-2 text-decoration-none text-strong heading-sm-weak ms-2" href="#">
-							Cryptocurrency
-							<svg><use href="/images/ui/icons.svg#bitcoin"></use></svg>
-						</a>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- Add card modal -->
-	<div class="modal" id="addCardModal" tabindex="-1">
-		<div class="modal-dialog modal-lg modal-dialog-centered">
-			<div class="modal-content">
-				<form id="addCardForm" class="needs-validation" novalidate>
-				<div class="modal-header">
-					<h5 class="modal-title heading-xl-medium">Credit card</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				  </div>
-				<div class="modal-body p-4">
-					<div class="form-floating mb-4">
-						<input type="text" id="cardNickname" class="form-control" placeholder="Nickname" />
-						<label for="cardNickname">Card nickname (optional)</label>
-					</div>
-					<div class="form-floating mb-4">
-						<input type="text" id="cardFirstName" class="form-control" placeholder="First name" required />
-						<label for="cardFirstName">First name</label>
-						<div class="invalid-feedback">
-							Please enter your first name.
+					<% cardPaymentMethods.forEach(function(paymentMethod, i) { %>
+						<div class="payment-method-option form-check py-3">
+							<input type="radio" class="form-check-input" id="paymentMethod_<%= paymentMethod.id %>" name="id" value="<%= paymentMethod.id %>" <%= paymentMethod.id == primaryCardPaymentMethod.id ? 'checked' : ''%> />
+							<label class="form-check-label" for="paymentMethod_<%= paymentMethod.id %>">
+								<div class="d-inline-block rounded border position-relative" style="width:40px;height:24px;overflow:hidden;vertical-align:bottom;">
+									<svg width="24" height="24" style="position:absolute;top:-1px;left:8px;"><use href="/images/ui/credit-card-icons.svg#<%= paymentMethod.cardType %>"></use></svg>
+								</div>
+								<b class="body-sm-medium me-2"><%= paymentMethod.last4 %></b>
+								<span>Expires: <%= cardExpiryDisplay(paymentMethod.expMonth, paymentMethod.expYear) %></span>
+							</label>
+							<% if(paymentMethod.id != primaryCardPaymentMethod.id) { %>
+							<a href="#" class="float-end" data-remove-id="<%= paymentMethod.id %>">Remove</a>
+							<% } %>
 						</div>
-					</div>
-					<div class="form-floating mb-4">
-						<input type="text" id="cardLastName" class="form-control" placeholder="Last name" required />
-						<label for="cardLastName">Last name</label>
-						<div class="invalid-feedback">
-							Please enter your last name.
-						</div>
-					</div>
-					<div id="stripePaymentElement">
-						<!-- Stripe Elements will create form elements here -->
-					</div>
-					<div id="stripeErrorMessage" class="alert alert-danger visually-hidden mt-3">
-						<!-- Display error message to your customers here -->
-					</div>
+					<% }) %>
 				</div>
 				<div class="modal-footer">
-					<button id="cancelAddCardBtn" class="btn btn-outline-dark heading-md-medium">Cancel</button>
-					<button class="btn bg-black text-white heading-md-medium">Save payment method</button>
+					<a class="btn btn-outline-dark heading-md-medium" href="javascript:;" data-bs-dismiss="modal">Cancel</a>
+					<button class="btn bg-black text-white heading-md-medium" id="savePrimaryPaymentMethodBtn">Use this method</button>
 				</div>
-				</form>
-			</div>
+			</form>
 		</div>
 	</div>
+</div>
 
-	<!-- Change payment method modal -->
-	<div class="modal" id="changePaymentMethodModal" tabindex="-1">
-		<div class="modal-dialog modal-lg modal-dialog-centered">
-			<div class="modal-content">
-				<form method="post" action="/dashboard/payments/set-primary-method" id="changePaymentMethodForm">
-					<div class="modal-header">
-						<h5 class="modal-title heading-xl-medium">Your saved payment methods</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body p-4 py-5">
-						<% cardPaymentMethods.forEach(function(paymentMethod, i) { %>
-							<div class="payment-method-option form-check py-3">
-								<input type="radio" class="form-check-input" id="paymentMethod_<%= paymentMethod.id %>" name="id" value="<%= paymentMethod.id %>" <%= paymentMethod.id == primaryCardPaymentMethod.id ? 'checked' : ''%> />
-								<label class="form-check-label" for="paymentMethod_<%= paymentMethod.id %>">
-									<div class="d-inline-block rounded border position-relative" style="width:40px;height:24px;overflow:hidden;vertical-align:bottom;">
-										<svg width="24" height="24" style="position:absolute;top:-1px;left:8px;"><use href="/images/ui/credit-card-icons.svg#<%= paymentMethod.cardType %>"></use></svg>
-									</div>
-									<b class="body-sm-medium me-2"><%= paymentMethod.last4 %></b>
-									<span>Expires: <%= cardExpiryDisplay(paymentMethod.expMonth, paymentMethod.expYear) %></span>
-								</label>
-								<% if(paymentMethod.id != primaryCardPaymentMethod.id) { %>
-								<a href="#" class="float-end" data-remove-id="<%= paymentMethod.id %>">Remove</a>
-								<% } %>
-							</div>
-						<% }) %>
-					</div>
-					<div class="modal-footer">
-						<a class="btn btn-outline-dark heading-md-medium" href="javascript:;" data-bs-dismiss="modal">Cancel</a>
-						<button class="btn bg-black text-white heading-md-medium" id="savePrimaryPaymentMethodBtn">Use this method</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-
-
-	<!-- right sidebar -->
-	<div class="col">
-		<div class="rounded border bg-white p-4">
-			<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<path fill-rule="evenodd" clip-rule="evenodd" d="M14 28C16.2091 28 18 26.2091 18 24C18 21.7909 16.2091 20 14 20C11.7909 20 10 21.7909 10 24C10 26.2091 11.7909 28 14 28ZM20.9297 20C19.5465 17.6088 16.9611 16 14 16C10.2723 16 7.14012 18.5495 6.25204 22H4C2.89543 22 2 22.8954 2 24C2 25.1046 2.89543 26 4 26H6.25204C7.14012 29.4505 10.2723 32 14 32C18.4183 32 22 28.4183 22 24H26C26 28.4183 29.5817 32 34 32C37.7277 32 40.8599 29.4505 41.748 26H44C45.1046 26 46 25.1046 46 24C46 22.8954 45.1046 22 44 22H41.748C40.8599 18.5495 37.7277 16 34 16C31.0389 16 28.4535 17.6088 27.0703 20H20.9297ZM30 24C30 26.2091 31.7909 28 34 28C36.2091 28 38 26.2091 38 24C38 21.7909 36.2091 20 34 20C31.7909 20 30 21.7909 30 24Z" fill="#1D1D23"/>
-			</svg>
-				
-			<h3 class="heading-lg-medium text-strong">What do we do with your information?</h3>
-			<p class="body-sm-weak text-medium">Gravida ut varius feugiat viverra. Ipsum, dis aenean quisque vel amet eget. Faucibus potenti consectetur duis id habitant nunc, elementum, fringilla vitae.</p>
-		</div>
-	</div>
-</div><!-- .row -->
+<%- contentFor('aside') %>
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<path fill-rule="evenodd" clip-rule="evenodd" d="M14 28C16.2091 28 18 26.2091 18 24C18 21.7909 16.2091 20 14 20C11.7909 20 10 21.7909 10 24C10 26.2091 11.7909 28 14 28ZM20.9297 20C19.5465 17.6088 16.9611 16 14 16C10.2723 16 7.14012 18.5495 6.25204 22H4C2.89543 22 2 22.8954 2 24C2 25.1046 2.89543 26 4 26H6.25204C7.14012 29.4505 10.2723 32 14 32C18.4183 32 22 28.4183 22 24H26C26 28.4183 29.5817 32 34 32C37.7277 32 40.8599 29.4505 41.748 26H44C45.1046 26 46 25.1046 46 24C46 22.8954 45.1046 22 44 22H41.748C40.8599 18.5495 37.7277 16 34 16C31.0389 16 28.4535 17.6088 27.0703 20H20.9297ZM30 24C30 26.2091 31.7909 28 34 28C36.2091 28 38 26.2091 38 24C38 21.7909 36.2091 20 34 20C31.7909 20 30 21.7909 30 24Z" fill="#1D1D23"/>
+</svg>
+	
+<h3 class="heading-lg-medium text-strong">What do we do with your information?</h3>
+<p class="body-sm-weak text-medium">Gravida ut varius feugiat viverra. Ipsum, dis aenean quisque vel amet eget. Faucibus potenti consectetur duis id habitant nunc, elementum, fringilla vitae.</p>
 
 <style>
 	a.selection {

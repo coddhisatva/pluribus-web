@@ -15,219 +15,221 @@ _locals.nav = 'profile';
 
 <h1 class="mb-3">Profile Information</h1>
 
-<div id="profileForm" class="card p-4">
+<div id="profileForm" class="card">
+	<div class="card-body">
 
-	<!-- Photo -->
-	<div class="mb-4">
-		<div view>
-			<div class="heading-sm-weak mb-2">
-				Photo
-				<a edit-btn href="#" bind="photo ? 'Update' : 'Add'" class="float-end text-black"></a>
-			</div>
-			<div class="body-sm-weak text-medium">
-				<img bind="src:photo ? '/images/uploads/creators/<%= creator.id %>/' + photo : ''" if="photo" class="rounded-circle" style="max-width:80px;max-height:80px" />
-				<div else>Not provided</div>
-			</div>
-		</div>
-		<div edit>
-			<div class="row">
-				<div class="col">
-					<div class="mb-3">
-						<label for="newPhoto" class="form-label">Upload a new photo</label>
-						<input type="file" name="newPhoto" id="newPhoto" class="form-control" placeholder="Choose a photo" accept="image/*" />
-					</div>
-
-					<div class="mb-2">
-						<a id="removeExistingPhoto" href="#">Remove existing photo</a>
-					</div>
-
-					<button save-btn class="btn bg-black text-white saving">Save</button>
+		<!-- Photo -->
+		<div class="mb-4">
+			<div view>
+				<div class="heading-sm-weak mb-2">
+					Photo
+					<a edit-btn href="#" bind="photo ? 'Update' : 'Add'" class="float-end text-black"></a>
 				</div>
-				<div class="col-md-2">
-					<a href="#" cancel-btn class="float-end text-black">Cancel</a>
+				<div class="body-sm-weak text-medium">
+					<img bind="src:photo ? '/images/uploads/creators/<%= creator.id %>/' + photo : ''" if="photo" class="rounded-circle" style="max-width:80px;max-height:80px" />
+					<div else>Not provided</div>
 				</div>
-			</div>			
-		</div>
-	</div>
+			</div>
+			<div edit>
+				<div class="row">
+					<div class="col">
+						<div class="mb-3">
+							<label for="newPhoto" class="form-label">Upload a new photo</label>
+							<input type="file" name="newPhoto" id="newPhoto" class="form-control" placeholder="Choose a photo" accept="image/*" />
+						</div>
 
-	<!-- Name -->
-	<div class="mb-4">
-		<div view>
-			<div class="heading-sm-weak mb-2">
-				Full name
-				<a edit-btn href="#" bind="name ? 'Update' : 'Add'" class="float-end text-black"></a>
-			</div>
-			<div class="body-sm-weak text-medium">
-				<div bind="name" if="name"></div>
-				<div else>Not provided</div>
+						<div class="mb-2">
+							<a id="removeExistingPhoto" href="#">Remove existing photo</a>
+						</div>
+
+						<button save-btn class="btn bg-black text-white saving">Save</button>
+					</div>
+					<div class="col-md-2">
+						<a href="#" cancel-btn class="float-end text-black">Cancel</a>
+					</div>
+				</div>			
 			</div>
 		</div>
-		<div edit>
-			<div class="row">
-				<div class="col">
-					<label for="name" class="form-label">Full name</label>
-					<div class="form-floating mb-3">
-						<input type="text" name="name" id="name" class="form-control" placeholder="Your name" />
+
+		<!-- Name -->
+		<div class="mb-4">
+			<div view>
+				<div class="heading-sm-weak mb-2">
+					Full name
+					<a edit-btn href="#" bind="name ? 'Update' : 'Add'" class="float-end text-black"></a>
+				</div>
+				<div class="body-sm-weak text-medium">
+					<div bind="name" if="name"></div>
+					<div else>Not provided</div>
+				</div>
+			</div>
+			<div edit>
+				<div class="row">
+					<div class="col">
 						<label for="name" class="form-label">Full name</label>
+						<div class="form-floating mb-3">
+							<input type="text" name="name" id="name" class="form-control" placeholder="Your name" />
+							<label for="name" class="form-label">Full name</label>
+						</div>
+
+						<button save-btn class="btn bg-black text-white saving">Save</button>
 					</div>
-
-					<button save-btn class="btn bg-black text-white saving">Save</button>
-				</div>
-				<div class="col-md-2">
-					<a href="#" cancel-btn class="float-end text-black">Cancel</a>
-				</div>
-			</div>			
-		</div>
-	</div>
-
-	<!-- About me -->
-	<div class="mb-4">
-		<div view>
-			<div class="heading-sm-weak mb-2">
-				About me
-				<a edit-btn href="#" bind="about ? 'Update' : 'Add'" class="float-end text-black"></a>
-			</div>
-			<div class="body-sm-weak text-medium">
-				<div bind="about" if="about"></div>
-				<div else>Not provided</div>
-			</div>
-		</div>
-		<div edit>
-			<div class="row">
-				<div class="col">
-					<label for="about" class="form-label">About me</label>
-					<div class="form-floating mb-3">
-						<textarea name="about" id="about" class="form-control" placeholder="Write your message here" style="height:120px"></textarea>
-						<label for="about" class="form-label">Write your message here</label>
+					<div class="col-md-2">
+						<a href="#" cancel-btn class="float-end text-black">Cancel</a>
 					</div>
-
-					<button save-btn class="btn bg-black text-white">Save</button>
-				</div>
-				<div class="col-md-2">
-					<a href="#" cancel-btn class="float-end text-black">Cancel</a>
-				</div>
-			</div>					
-		</div>
-	</div>
-
-	<!-- Website -->
-	<div class="mb-4">
-		<div view>
-			<div class="heading-sm-weak mb-2">
-				Website
-				<a edit-btn href="#" bind="website ? 'Update' : 'Add'" class="float-end text-black"></a>
-			</div>
-			<div class="body-sm-weak text-medium">
-				<div bind="website" if="website"></div>
-				<div else>Not provided</div>
+				</div>			
 			</div>
 		</div>
-		<div edit>
-			<div class="row">
-				<div class="col">
-					<label for="website" class="form-label">Website</label>
-					<div class="form-floating mb-3">
-						<input type="text" name="website" id="website" class="form-control" placeholder="www.example.com" />
-						<label for="website" class="form-label">Your website address</label>
+
+		<!-- About me -->
+		<div class="mb-4">
+			<div view>
+				<div class="heading-sm-weak mb-2">
+					About me
+					<a edit-btn href="#" bind="about ? 'Update' : 'Add'" class="float-end text-black"></a>
+				</div>
+				<div class="body-sm-weak text-medium">
+					<div bind="about" if="about"></div>
+					<div else>Not provided</div>
+				</div>
+			</div>
+			<div edit>
+				<div class="row">
+					<div class="col">
+						<label for="about" class="form-label">About me</label>
+						<div class="form-floating mb-3">
+							<textarea name="about" id="about" class="form-control" placeholder="Write your message here" style="height:120px"></textarea>
+							<label for="about" class="form-label">Write your message here</label>
+						</div>
+
+						<button save-btn class="btn bg-black text-white">Save</button>
 					</div>
-
-					<button save-btn class="btn bg-black text-white">Save</button>
-				</div>
-				<div class="col-md-2">
-					<a href="#" cancel-btn class="float-end text-black">Cancel</a>
-				</div>
-			</div>					
-		</div>
-	</div>
-
-	<!-- Social profiles -->
-	<div class="mb-4">
-		<div view id="socialProfilesView">
-			<div class="heading-sm-weak mb-2">
-				Social profiles
-				<a edit-btn href="#" bind="socialProfiles ? 'Update' : 'Add'" class="float-end text-black"></a>
-			</div>
-			<div class="body-sm-weak text-medium">
-				<div if="socialProfiles">
-					<a foreach="profileUrl in socialProfiles.split('||')" bind="href:profileUrl,class:'d-block profile-link '+lookupSocialProfile(profileUrl)[0]" target="_blank">
-						<svg><use bind="href:'/images/ui/social-icons.svg#' + (lookupSocialProfile(profileUrl)[0] || 'twitter')"></use></svg><span bind="lookupSocialProfile(profileUrl)[1] || profileUrl"></span>
-					</a>
-				</div>
-				<div else>Not provided</div>
-			</div>
-		</div>
-		<div edit>
-			<div class="row">
-				<div class="col">
-					<label class="form-label">Social profiles</label>
-					
-					<!-- Twitter -->
-					<div class="form-floating mb-3">
-						<input type="text" name="socialProfiles_twitter" id="socialProfiles_twitter" class="form-control" placeholder="Twitter" />
-						<label for="socialProfiles_twitter">Twitter</label>
+					<div class="col-md-2">
+						<a href="#" cancel-btn class="float-end text-black">Cancel</a>
 					</div>
+				</div>					
+			</div>
+		</div>
 
-					<!-- YouTube -->
-					<div class="form-floating mb-3">
-						<input type="text" name="socialProfiles_youtube" id="socialProfiles_youtube" class="form-control" placeholder="YouTube" />
-						<label for="socialProfiles_youtube">YouTube</label>
-					</div>
-
-					<!-- Instagram -->
-					<div class="form-floating mb-3">
-						<input type="text" name="socialProfiles_instagram" id="socialProfiles_instagram" class="form-control" placeholder="Instagram" />
-						<label for="socialProfiles_instagram">Instagram</label>
-					</div>
-
-					<!-- Substack -->
-					<div class="form-floating mb-3">
-						<input type="text" name="socialProfiles_substack" id="socialProfiles_substack" class="form-control" placeholder="Substack" />
-						<label for="socialProfiles_substack">Substack</label>
-					</div>
-
-					<button save-btn class="btn bg-black text-white">Update social profiles</button>
+		<!-- Website -->
+		<div class="mb-4">
+			<div view>
+				<div class="heading-sm-weak mb-2">
+					Website
+					<a edit-btn href="#" bind="website ? 'Update' : 'Add'" class="float-end text-black"></a>
 				</div>
-				<div class="col-md-2">
-					<a href="#" cancel-btn class="float-end text-black">Cancel</a>
+				<div class="body-sm-weak text-medium">
+					<div bind="website" if="website"></div>
+					<div else>Not provided</div>
 				</div>
-			</div>					
-		</div>
-	</div>
+			</div>
+			<div edit>
+				<div class="row">
+					<div class="col">
+						<label for="website" class="form-label">Website</label>
+						<div class="form-floating mb-3">
+							<input type="text" name="website" id="website" class="form-control" placeholder="www.example.com" />
+							<label for="website" class="form-label">Your website address</label>
+						</div>
 
-	<!-- Supporter count toggle -->
-	<div class="mb-4 row">
-		<div class="col">
-			<label class="heading-sm-weak mb-2" for="displaySupporterCount">
-				Display supporter count
-			</label>
-			<div class="body-sm-weak text-medium">
-				Credibility is key for supporters. Display your supporter count to inspire more support from your audience.
+						<button save-btn class="btn bg-black text-white">Save</button>
+					</div>
+					<div class="col-md-2">
+						<a href="#" cancel-btn class="float-end text-black">Cancel</a>
+					</div>
+				</div>					
 			</div>
 		</div>
-		<div class="col-md-2 d-flex justify-content-end">
-			<div class="form-check form-switch">
-				<input class="form-check-input" type="checkbox" id="displaySupporterCount" value="yes" <%= creator.displaySupporterCount ? 'checked': ''%>>
-			</div>
-		</div>
-	</div>
 
-	<!-- Public profile toggle -->
-	<div class="mb-4 row">
-		<div class="col">
-			<label class="heading-sm-weak mb-2" for="publicProfile">
-				Make my profile public
-			</label>
-			<div class="body-sm-weak text-medium">
-				Feugiat sit ullamcorper a neque, sit. Dictumst est lectus ut elementum magna amet. Egestas tempus nulla.
+		<!-- Social profiles -->
+		<div class="mb-4">
+			<div view id="socialProfilesView">
+				<div class="heading-sm-weak mb-2">
+					Social profiles
+					<a edit-btn href="#" bind="socialProfiles ? 'Update' : 'Add'" class="float-end text-black"></a>
+				</div>
+				<div class="body-sm-weak text-medium">
+					<div if="socialProfiles">
+						<a foreach="profileUrl in socialProfiles.split('||')" bind="href:profileUrl,class:'d-block profile-link '+lookupSocialProfile(profileUrl)[0]" target="_blank">
+							<svg><use bind="href:'/images/ui/social-icons.svg#' + (lookupSocialProfile(profileUrl)[0] || 'twitter')"></use></svg><span bind="lookupSocialProfile(profileUrl)[1] || profileUrl"></span>
+						</a>
+					</div>
+					<div else>Not provided</div>
+				</div>
+			</div>
+			<div edit>
+				<div class="row">
+					<div class="col">
+						<label class="form-label">Social profiles</label>
+						
+						<!-- Twitter -->
+						<div class="form-floating mb-3">
+							<input type="text" name="socialProfiles_twitter" id="socialProfiles_twitter" class="form-control" placeholder="Twitter" />
+							<label for="socialProfiles_twitter">Twitter</label>
+						</div>
+
+						<!-- YouTube -->
+						<div class="form-floating mb-3">
+							<input type="text" name="socialProfiles_youtube" id="socialProfiles_youtube" class="form-control" placeholder="YouTube" />
+							<label for="socialProfiles_youtube">YouTube</label>
+						</div>
+
+						<!-- Instagram -->
+						<div class="form-floating mb-3">
+							<input type="text" name="socialProfiles_instagram" id="socialProfiles_instagram" class="form-control" placeholder="Instagram" />
+							<label for="socialProfiles_instagram">Instagram</label>
+						</div>
+
+						<!-- Substack -->
+						<div class="form-floating mb-3">
+							<input type="text" name="socialProfiles_substack" id="socialProfiles_substack" class="form-control" placeholder="Substack" />
+							<label for="socialProfiles_substack">Substack</label>
+						</div>
+
+						<button save-btn class="btn bg-black text-white">Update social profiles</button>
+					</div>
+					<div class="col-md-2">
+						<a href="#" cancel-btn class="float-end text-black">Cancel</a>
+					</div>
+				</div>					
 			</div>
 		</div>
-		<div class="col-md-2 d-flex justify-content-end">
-			<div class="form-check form-switch">
-				<input class="form-check-input" type="checkbox" id="publicProfile" value="yes" <%= creator.publicProfile ? 'checked': ''%>>
+
+		<!-- Supporter count toggle -->
+		<div class="mb-4 row">
+			<div class="col">
+				<label class="heading-sm-weak mb-2" for="displaySupporterCount">
+					Display supporter count
+				</label>
+				<div class="body-sm-weak text-medium">
+					Credibility is key for supporters. Display your supporter count to inspire more support from your audience.
+				</div>
+			</div>
+			<div class="col-md-2 d-flex justify-content-end">
+				<div class="form-check form-switch">
+					<input class="form-check-input" type="checkbox" id="displaySupporterCount" value="yes" <%= creator.displaySupporterCount ? 'checked': ''%>>
+				</div>
 			</div>
 		</div>
-	</div>
-</div>
+
+		<!-- Public profile toggle -->
+		<div class="mb-4 row">
+			<div class="col">
+				<label class="heading-sm-weak mb-2" for="publicProfile">
+					Make my profile public
+				</label>
+				<div class="body-sm-weak text-medium">
+					Feugiat sit ullamcorper a neque, sit. Dictumst est lectus ut elementum magna amet. Egestas tempus nulla.
+				</div>
+			</div>
+			<div class="col-md-2 d-flex justify-content-end">
+				<div class="form-check form-switch">
+					<input class="form-check-input" type="checkbox" id="publicProfile" value="yes" <%= creator.publicProfile ? 'checked': ''%>>
+				</div>
+			</div>
+		</div>
+	</div><!-- .card-body -->
+</div><!-- .card -->
 
 <%- contentFor('aside') %>
 <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
