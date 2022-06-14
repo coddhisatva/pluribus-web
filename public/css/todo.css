@@ -38,6 +38,21 @@ input.form-check-input[type=checkbox] + label.form-check-label {
 	padding: .6125rem;
 }
 
+.flash {
+	animation: fadeIn forwards 1s;
+}
+
+@keyframes fadeIn {
+	0%   { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+body.landing .flash {
+	position: absolute;
+	top: 70px;
+	left: calc(50vw - 1320px/2 + 12px);
+}
+
 
 /*****************************************
 / Password visibility toggle for forms.
