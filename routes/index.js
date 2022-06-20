@@ -33,4 +33,8 @@ router.get('/roadmap', function(req, res) {
 	res.render('roadmap');
 });
 
+router.get('/faq/creators', function(req, res) {
+	res.render('faq-creators');
+});
+
 module.exports = router;
