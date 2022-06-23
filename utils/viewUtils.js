@@ -44,7 +44,7 @@ var globalFuncs = {
 
 		var minutes = seconds / 60;
 		if(minutes < 90) {
-			return minutes + ' minutes ago';
+			return Math.round(minutes) + ' minutes ago';
 		}
 
 		var hours = minutes / 60.0;
