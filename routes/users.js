@@ -221,7 +221,7 @@ async function sendActivationEmail(req, user) {
 		link += '?continue=creator';
 	}
 	await email.send(req.app.get('env'), {
-		from: 'noreply@pluribusworkspace',
+		from: 'noreply@becomepluribus.com',
 		to: user.email,
 		subject: 'Pluribus Sign Up',
 		text: `Please click the following link to activate your Pluribus account:\r\n
@@ -244,7 +244,7 @@ async function sendForgotPasswordEmail(req, user) {
 	await OneTimeCode.create({ userId: user.id, email: user.email, code, expires });
 
 	var info = await email.send(req.app.get('env'), {
-		from: 'noreply@pluribusworkspace',
+		from: 'noreply@becomepluribus.com',
 		to: user.email,
 		subject: 'Reset your Pluribus password',
 		text: `It looks like you've been having trouble accessing your Pluribus account.
