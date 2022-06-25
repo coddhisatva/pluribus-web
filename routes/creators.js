@@ -42,7 +42,8 @@ router.post('/new/categories',
 		if(!req.session.creatorSignup) {
 			req.session.creatorSignup = { };
 		}
-		req.session.creatorSignup.categories = req.body.categories;
+		req.session.creatorSignup.categories = Array.isArray(req.body.categories) ?
+			req.body.categories : [req.body.categories];
 		res.redirect('/creators/new/about');
 	}
 );
