@@ -1,6 +1,6 @@
 @charset "UTF-8";
 /**
- * CSS Compiled on: 2022-06-11 11:54:46 -07:00
+ * CSS Compiled on: 2022-06-25 18:32:46 -07:00
  * ============================================================================== *
  */
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Display:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap");
@@ -10920,6 +10920,10 @@ body {
   --btn-outline-val-bg: rgba(255, 255, 255, 0);
   --btn-outline-val-hover: rgba(0, 0, 0, 1);
   --btn-outline-val-bg-hover: rgba(255, 255, 255, 1);
+  --btn-solid-val: rgba(255, 255, 255, 0.85);
+  --btn-solid-val-bg: rgba(0, 0, 0, 1);
+  --btn-solid-val-hover: rgba(255, 255, 255, 1);
+  --btn-solid-val-bg-hover: rgba(0, 0, 0, 1);
 }
 
 .inverse,
@@ -10994,6 +10998,17 @@ body {
   background-color: var(--btn-outline-val-bg-hover) !important;
   border-color: var(--btn-outline-val-hover);
   color: var(--btn-outline-val-hover);
+}
+
+.btn-solid {
+  background-color: var(--btn-solid-val-bg) !important;
+  border-color: var(--btn-solid-val);
+  color: var(--btn-solid-val);
+}
+.btn-solid:hover {
+  background-color: var(--btn-solid-val-bg-hover) !important;
+  border-color: var(--btn-solid-val-hover);
+  color: var(--btn-solid-val-hover);
 }
 
 .body-xl-weak {
@@ -11407,6 +11422,10 @@ header.nonav figure {
 
 b, strong {
   font-weight: 700;
+}
+
+.container {
+  max-width: 1200px;
 }
 
 .nav-link.btn {
