@@ -315,8 +315,12 @@ h1.display-1 {
     order: -1;
   }
 }
+.how-section {
+  display: none;
+}
 .how-grid {
   display: grid;
+  display: none;
   grid-template-columns: 1fr 2fr;
   grid-template-rows: auto;
   grid-template-areas: ". content";
