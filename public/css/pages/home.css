@@ -317,11 +317,9 @@ h1.display-1 {
 }
 .how-grid {
   display: grid;
-  display: none;
   grid-template-columns: 1fr 2fr;
   grid-template-rows: auto;
   grid-template-areas: ". content";
-  padding: 6rem 0;
 }
 .how-grid .inner-content {
   border-radius: 17px 0 0 17px;
