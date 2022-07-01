@@ -1,6 +1,6 @@
 @charset "UTF-8";
 /**
- * CSS Compiled on: 2022-06-26 17:16:33 -07:00
+ * CSS Compiled on: 2022-06-30 18:10:05 -07:00
  * ============================================================================== *
  */
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Display:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap");
@@ -11259,6 +11259,26 @@ figure img {
   max-width: 100%;
 }
 
+.video_wrapper {
+  min-width: 480px;
+  height: 0;
+  margin-bottom: 1.5rem;
+  padding-bottom: 56.25%;
+  position: relative;
+}
+.video_wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+@media only screen and (max-width: 767px) {
+  .video_wrapper {
+    min-width: 100%;
+  }
+}
 /*****************************************
 / Password visibility toggle for forms.
 /*****************************************/
