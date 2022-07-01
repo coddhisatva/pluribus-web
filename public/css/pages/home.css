@@ -1,5 +1,5 @@
 /**
- * CSS Compiled on: 2022-06-29 16:54:03 -07:00
+ * CSS Compiled on: 2022-06-30 18:10:06 -07:00
  * ============================================================================== *
  */
 /*  4. Custom Mixins  */
@@ -246,7 +246,7 @@ h4, .h4, *[class~=heading-sm], .heading-sm-medium {
   font-weight: 400;
 }
 
-h5, .h5, *[class~=heading-xs], .heading-xs-medium {
+.animation small, h5, .h5, *[class~=heading-xs], .heading-xs-medium {
   font-size: var(--heading-xs);
   font-weight: 500;
 }
@@ -379,6 +379,15 @@ h1.display-1 {
   max-width: 500px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.animation small {
+  display: block;
+  margin-bottom: 1.5rem;
+}
+.animation small span {
+  display: inline-block;
+  padding: 0.1875rem 6px;
 }
 
 .getting-cancelled .splitter::before {
