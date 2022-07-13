@@ -266,8 +266,6 @@ If you did not make this request, please disregard this email.`
  	body('email')
 	 	.trim().isLength({ min: 1}).withMessage('Please enter your email address').bail()
 		.isEmail().withMessage('Invalid email address'),
-	body('agree')
-		.equals('yes').withMessage('You must agree to the terms and conditions'),
 	async function(req, res, next) {
 		var errors = validationResult(req);
 

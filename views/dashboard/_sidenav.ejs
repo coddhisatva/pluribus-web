@@ -1,8 +1,17 @@
+<% 
+var name = user.email.split('@')[0];
+if(creator) {
+	if(creator.name) {
+		name = creator.name.split(' ')[0];
+	}
+}
+locals.name = name;
+ %> 
 <div id="dashboard-navigation" class="collapse">
 	<div class="controls">
 		<div class="user-display">
 			<dl>
-				<dt>Hi Jean</dt>
+				<dt>Hi <%= name %></dt>
 				<dd>Creator</dd>
 			</dl>
 		</div>

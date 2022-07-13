@@ -14,10 +14,11 @@ const credentials = require('../config/credentials');
 
 router.get('/', auth.authorize, async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
+	var creator = await Creator.findOne({ where: { userId: user.id }});
 	var following = await Follow.findAll({ where: { userId: user.id }, include: Creator });
 	console.log(following);
 
-	res.render('dashboard/index', { user, following });
+	res.render('dashboard/index', { user, creator, following });
 });
 
 router.get('/profile', auth.authorizeRole('creator'), async function(req, res, next) {
@@ -148,10 +149,12 @@ router.get('/payments', auth.authorize, async function(req, res, next) {
 	var stripePublicKey = credentials.stripe.publicKey;
 
 	var user = await User.findByPk(req.authUser.id);
+	var creator = await Creator.findOne({ where: { userId: user.id }});
+	
 	var cardPaymentMethods = await CardPaymentMethod.findAll({ where: { userId: req.authUser.id }});
 	var primaryCardPaymentMethod = cardPaymentMethods.find(method => method.id == user.primaryCardPaymentMethodId);
 
-	res.render('dashboard/payments', { stripePublicKey, cardPaymentMethods, primaryCardPaymentMethod });
+	res.render('dashboard/payments', { user, creator, stripePublicKey, cardPaymentMethods, primaryCardPaymentMethod });
 });
 
 /**
@@ -248,7 +251,7 @@ router.post('/payments/delete-payment-method', auth.authorize, async function(re
 router.get('/policy', auth.authorizeRole('creator'), async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userid: user.id }});
-	res.render('dashboard/policy', { policy: creator.policy });
+	res.render('dashboard/policy', { user, creator, policy: creator.policy });
 });
 
 router.post('/policy',
