@@ -25,6 +25,17 @@ if(postedValues.name) {
 					<%- validationMessage('name') %>
 				</div>
 
+				<div class="mt-4">
+					<div class="form-check">
+						<input type="checkbox" name="publicProfile" id="publicProfile" class="form-check-input" value="1" />
+						<label for="publicProfile" class="form-check-label">Make my profile public</label>
+					</div>
+					<%- validationMessage('publicProfile') %>
+					<div class="body-sm-weak text-medium mt-2">
+						Making your profile public is a really good way to let the public find you. To keep things private, just leave it as private.
+					</div>
+				</div>
+
 				<div class="mt-5 row">
 					<div class="col">
 						<button class="btn btn-primary text-black bg-white w-100 py-3 heading-md-medium border-0" name="skip" value="1">Skip for now</button>

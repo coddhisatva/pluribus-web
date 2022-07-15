@@ -166,3 +166,10 @@ input.has-password-visibility.form-control.is-valid + .password-visibility-toggl
 	80% { transform: translateY(45%) scaleY(0.8); }
 	100% { transform: translateY(30%); }
 }
+
+#dashboard-navigation .user-display dt {
+	max-width: 172px;
+	text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}

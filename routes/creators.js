@@ -87,6 +87,7 @@ router.post('/new/name',
 			}
 
 			req.session.creatorSignup.name = req.body.name;
+			req.session.creatorSignup.publicProfile = req.body.publicProfile == '1';
 		}
 
 		res.redirect('/creators/new/policy');
@@ -112,6 +113,7 @@ router.post('/new/policy',
 
 		var about = req.session.creatorSignup.about || '';
 		var name = req.session.creatorSignup.name || '';
+		var publicProfile = req.session.creatorSignup.publicProfile || false;
 		var userId = res.locals.authUser.id;
 
 		var creator = await Creator.create({
@@ -120,7 +122,7 @@ router.post('/new/policy',
 			policy,
 			userId,
 			displaySupporterCount: true,
-			publicProfile: false,
+			publicProfile,
 			hasPhoto: false
 		});
 

@@ -1,9 +1,7 @@
 <% 
 var name = user.email.split('@')[0];
-if(creator) {
-	if(creator.name) {
-		name = creator.name.split(' ')[0];
-	}
+if(creator && creator.name) {
+	name = creator.name;
 }
 locals.name = name;
  %> 
@@ -11,8 +9,8 @@ locals.name = name;
 	<div class="controls">
 		<div class="user-display">
 			<dl>
-				<dt>Hi <%= name %></dt>
-				<dd>Creator</dd>
+				<dt title="<%= name // for when ellipses are shown on long names %>">Hi <%= name %></dt>
+				<dd><%= authUser.roles.indexOf('creator') != -1 ? 'Creator' : 'Supporter' %></dd>
 			</dl>
 		</div>
 		<nav>
@@ -28,12 +26,14 @@ locals.name = name;
 						<span>Home</span>
 					</a>
 				</li>
+				<% if(authUser.roles.indexOf('creator') != -1) { %>
 				<li>
 					<a href="/dashboard/profile" class="<%= _locals.nav == 'profile' ? 'active' : '' %>">
 						<svg><use href="/images/ui/icons.svg#profile"></use></svg>
 						<span>Profile</span>
 					</a>
 				</li>
+				<% } %>
 				<li>
 					<a href="javascript:alert('Not implemented.')">
 						<svg><use href="/images/ui/icons.svg#lock"></use></svg>

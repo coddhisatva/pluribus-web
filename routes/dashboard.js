@@ -16,7 +16,6 @@ router.get('/', auth.authorize, async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userId: user.id }});
 	var following = await Follow.findAll({ where: { userId: user.id }, include: Creator });
-	console.log(following);
 
 	res.render('dashboard/index', { user, creator, following });
 });
