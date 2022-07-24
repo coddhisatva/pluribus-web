@@ -58,7 +58,8 @@ Changed this from position: fixed -> position: sticky as a temporary fix.
 body.landing .flash {
 	position: absolute;
 	top: 70px;
-	left: calc(50vw - 1320px/2 + 12px);
+	left: 50%;
+	transform: translateX(-50%);
 }
 
 
