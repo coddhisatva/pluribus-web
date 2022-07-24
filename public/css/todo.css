@@ -32,6 +32,14 @@ input.form-check-input[type=checkbox] + label.form-check-label {
 	color: var(--text-medium);
 }
 
+/*
+Fixed navbar tends to cover content, especially at smaller screen sizes.
+Changed this from position: fixed -> position: sticky as a temporary fix.
+*/
+.navbar.fixed-top {
+	position: sticky;
+}
+
 
 /* Fixes close button for flash messages sitting outside the message border */
 .alert-dismissible .btn-close {

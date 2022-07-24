@@ -67,4 +67,8 @@ router.get('/faq/creators', function(req, res) {
 	res.render('faq-creators');
 });
 
+router.get('/pricing', function(req, res, next) {
+	res.render('coming-soon');
+});
+
 module.exports = router;
