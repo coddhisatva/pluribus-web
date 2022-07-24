@@ -2,19 +2,21 @@
 _locals.title = creator.name;
 _locals.nav = 'creators';
 %>
-<h1><%= creator.name %></h1>
+<div class="container my-4">
+	<h1><%= creator.name %></h1>
 
-<%# Follow button %>
-<div class="my-2">
-	<button id="followBtn" data-following="<%= isFollowing %>" data-bs-toggle="dropdown" aria-expanded="false" class="btn <%= isFollowing ? 'btn-outline-secondary' : 'btn-secondary' %>">
-		<%= isFollowing ? 'Following' : 'Follow' %>
-	</button>
-	<ul class="dropdown-menu" aria-labelledby="followBtn" id="followBtnDropdown">
-		<li><a class="dropdown-item text-danger" href="#" id="unfollowDropdownItem">Unfollow <%= creator.name %></a></li>
-	</ul>
+	<%# Follow button %>
+	<div class="my-2">
+		<button id="followBtn" data-following="<%= isFollowing %>" data-bs-toggle="dropdown" aria-expanded="false" class="btn <%= isFollowing ? 'btn-outline-secondary' : 'btn-secondary' %>">
+			<%= isFollowing ? 'Following' : 'Follow' %>
+		</button>
+		<ul class="dropdown-menu" aria-labelledby="followBtn" id="followBtnDropdown">
+			<li><a class="dropdown-item text-danger" href="#" id="unfollowDropdownItem">Unfollow <%= creator.name %></a></li>
+		</ul>
+	</div>
+
+	<p><%= creator.about %></p>
 </div>
-
-<p><%= creator.about %></p>
 
 <script>
 	var followBtn = document.getElementById('followBtn');
