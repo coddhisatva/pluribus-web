@@ -68,6 +68,7 @@ router.get('/faq/creators', function(req, res) {
 });
 
 router.get('/pricing', function(req, res, next) {
+	res.locals.nav = 'pricing';
 	res.render('coming-soon');
 });
 
