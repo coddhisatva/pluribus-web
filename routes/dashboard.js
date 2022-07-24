@@ -294,4 +294,25 @@ router.get('/execute-policy/executed', auth.authorizeRole('creator'), async func
 	res.render('dashboard/execute-policy-executed');
 });
 
+router.get('/security', async function(req, res, next) {
+	var user = await User.findByPk(req.authUser.id);
+	var creator = await Creator.findOne({ where: { userid: user.id }});
+	res.locals.nav = 'security';
+	res.render('coming-soon', { user, creator });
+});
+
+router.get('/settings', async function(req, res, next) {
+	var user = await User.findByPk(req.authUser.id);
+	var creator = await Creator.findOne({ where: { userid: user.id }});
+	res.locals.nav = 'settings';
+	res.render('coming-soon', { user, creator });
+});
+
+router.get('/referrals', async function(req, res, next) {
+	var user = await User.findByPk(req.authUser.id);
+	var creator = await Creator.findOne({ where: { userid: user.id }});
+	res.locals.nav = 'referrals';
+	res.render('coming-soon', { user, creator });
+});
+
 module.exports = router;

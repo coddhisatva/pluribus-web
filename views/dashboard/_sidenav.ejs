@@ -35,7 +35,7 @@ locals.name = name;
 				</li>
 				<% } %>
 				<li>
-					<a href="javascript:alert('Not implemented.')">
+					<a href="/dashboard/security" class="<%= _locals.nav == 'security' ? 'active' : '' %>">
 						<svg><use href="/images/ui/icons.svg#lock"></use></svg>
 						<span>Login & security</span>
 					</a>
@@ -47,13 +47,13 @@ locals.name = name;
 					</a>
 				</li>
 				<li>
-					<a href="javascript:alert('Not implemented.')">
+					<a href="/dashboard/settings" class="<%= _locals.nav == 'settings' ? 'active' : '' %>">
 						<svg><use href="/images/ui/icons.svg#globe-alt"></use></svg>
 						<span>Settings</span>
 					</a>
 				</li>
 				<li>
-					<a href="javascript:alert('Not implemented.')">
+					<a href="/dashboard/referrals" class="<%= _locals.nav == 'referrals' ? 'active' : '' %>">
 						<svg><use href="/images/ui/icons.svg#stack"></use></svg>
 						<span>Referral program</span>
 					</a>
