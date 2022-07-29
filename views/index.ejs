@@ -3,8 +3,6 @@ _locals.title = 'Pluribus';
 _locals.bodyClass = 'landing';
 %>
 
-	<link rel="stylesheet" href="/css/pages/home.css" />
-
 	<div class="jumbotron inverse">
 		<div class="wrapper">
 			<h1 class="display-1">Crowdfund a safety net before you need it</h1>
@@ -244,3 +242,7 @@ _locals.bodyClass = 'landing';
 			</div>
 		</div>
 	</section>
+
+<%- contentFor('head') %>
+<meta name="description" content="Crowdfund a safety net before you need it" />
+		<link rel="stylesheet" href="/css/pages/home.css" /><%- contentFor() %>
