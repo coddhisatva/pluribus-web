@@ -1,6 +1,6 @@
 @charset "UTF-8";
 /**
- * CSS Compiled on: 2022-06-30 18:10:05 -07:00
+ * CSS Compiled on: 2022-08-02 18:02:20 -07:00
  * ============================================================================== *
  */
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Display:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap");
@@ -10961,6 +10961,11 @@ body {
     --body-xs: 1.4rem;
   }
 }
+.light {
+  background-color: #fff;
+  color: #717171;
+}
+
 .inverse {
   --bs-bg-opacity: 1;
   background-color: rgba(var(--bs-dark-rgb), var(--bs-bg-opacity));
@@ -11079,7 +11084,7 @@ h2, .h2, *[class~=heading-lg], .heading-lg-medium {
   font-size: var(--heading-md);
 }
 
-.heading-md-weak {
+.card-linked .card-body p, .heading-md-weak {
   font-size: var(--heading-md);
   font-weight: 400;
 }
@@ -11160,6 +11165,23 @@ body > footer {
   margin-top: auto;
 }
 
+.colgrid {
+  display: block;
+}
+
+@media only screen and (min-width: 576px) {
+  .colgrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+  }
+}
+@media only screen and (min-width: 992px) {
+  .colgrid[data-cols="318"] {
+    grid-template-columns: 3fr 7fr;
+    grid-gap: 8.3333333333%;
+  }
+}
 .form-credentials {
   margin-top: 10vh;
   padding: 40px 48px;
@@ -11213,13 +11235,52 @@ body > footer {
   content: url("/images/ui/users/intro-supporter.svg");
 }
 
+.card-linked {
+  background-color: transparent;
+}
+.card-linked .card-body {
+  position: relative;
+}
+.card-linked .card-body p {
+  margin-bottom: 0;
+}
+.card-linked .card-body p a {
+  text-decoration: none;
+}
+.card-linked .card-body p a::before, .card-linked .card-body p a::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  border-radius: 16px;
+}
+.card-linked .card-body p a::after {
+  background-color: #f8f9fa;
+  z-index: -1;
+}
+.card-linked .card-body p a::before {
+  z-index: 10;
+}
+.card-linked .card-body p a:focus, .card-linked .card-body p a:hover {
+  color: #1d1d23;
+  outline: 0;
+}
+.card-linked .card-body p a:focus::after, .card-linked .card-body p a:hover::after {
+  background-color: #fff;
+}
+.card-linked .card-body p a:focus::after {
+  outline: 2px solid black;
+}
+
 .flow > * + * {
   margin-top: 1.5rem;
 }
 
 *[class*=wrapper] {
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 12px;
   width: 100%;
 }
 
@@ -11260,7 +11321,6 @@ figure img {
 }
 
 .video_wrapper {
-  min-width: 480px;
   height: 0;
   margin-bottom: 1.5rem;
   padding-bottom: 56.25%;
@@ -11279,6 +11339,15 @@ figure img {
     min-width: 100%;
   }
 }
+.promo-block {
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+}
+.promo-block-sm {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
 /*****************************************
 / Password visibility toggle for forms.
 /*****************************************/
@@ -11519,7 +11588,7 @@ b, strong {
   top: 0;
   right: 0;
   z-index: 2;
-  padding: 1.25rem 1rem;
+  padding: 0.5625rem 1rem;
 }
 
 .primary-space {
@@ -11542,6 +11611,10 @@ b, strong {
 .card {
   border-radius: 16px;
 }
+.navbar.fixed-top + * {
+  margin-top: 3.375rem;
+}
+
 .color-swatch {
   flex: 1;
   height: 10rem;

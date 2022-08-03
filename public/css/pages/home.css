@@ -1,5 +1,5 @@
 /**
- * CSS Compiled on: 2022-07-03 17:52:41 -07:00
+ * CSS Compiled on: 2022-08-02 18:02:21 -07:00
  * ============================================================================== *
  */
 /*  4. Custom Mixins  */
@@ -101,6 +101,11 @@ body {
 
 .text-neutral-dark {
   color: #e1e3e4;
+}
+
+.light {
+  background-color: #fff;
+  color: #717171;
 }
 
 .inverse, .how-grid-page .content-holder {
@@ -262,16 +267,12 @@ h4, .h4, *[class~=heading-sm], .heading-sm-medium {
 
 body {
   background-color: #fff;
+  padding-top: 0;
 }
 
 h1.display-1 {
   max-width: 1000px;
   margin-bottom: 3rem;
-}
-
-.promo-block {
-  padding-top: 6rem;
-  padding-bottom: 6rem;
 }
 
 .btn-arrow::after {
@@ -356,7 +357,7 @@ h1.display-1 {
 .how-grid-page .inner-content {
   align-items: center;
   display: grid;
-  grid-template-columns: 125px 125px 1fr;
+  grid-template-columns: 192px 192px 1fr;
   grid-template-rows: auto;
 }
 .how-grid-page .inner-content::before {
@@ -365,22 +366,27 @@ h1.display-1 {
   background-size: contain;
   content: "";
   display: block;
-  height: 250px;
-  width: 250px;
+  height: 384px;
+  width: 384px;
   z-index: 5;
 }
 .how-grid-page .content-holder {
   border-radius: 17px 0 0 17px;
   grid-column: 2/-1;
-  padding-left: 155px;
-  padding-right: 12px;
+  padding: 9rem 12px;
+  padding-left: 232px;
 }
 .how-grid-page .content-holder > * {
-  max-width: 500px;
+  max-width: 700px;
   margin-left: auto;
   margin-right: auto;
 }
 
+.animation .columns > * {
+  flex-wrap: wrap;
+  flex-basis: 50%;
+  min-width: 260px;
+}
 .animation small {
   display: block;
   margin-bottom: 1.5rem;
@@ -463,7 +469,7 @@ h1.display-1 {
   flex: 0;
 }
 
-@media only screen and (max-width: 575px) {
+@media only screen and (max-width: 767px) {
   .how-section.promo-block {
     --bs-bg-opacity: 1;
     background-color: rgba(var(--bs-dark-rgb), var(--bs-bg-opacity));
@@ -476,6 +482,8 @@ h1.display-1 {
   .how-section.promo-block .inner-content::before {
     margin-left: auto;
     margin-right: auto;
+    height: 325px;
+    width: 325px;
   }
   .how-section.promo-block .content-holder {
     padding: 1.5rem 12px;
