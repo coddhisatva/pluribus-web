@@ -6,7 +6,7 @@ const auth = require('../utils/auth');
 const { ResultWithContext } = require('express-validator/src/chain');
 
 router.get('/', async function(req, res, next) {
-	var creators = await Creator.findWhere({ publicProfile: true });
+	var creators = await Creator.findAll({ publicProfile: true });
 	res.render('creators/index', { creators });
 });
 
