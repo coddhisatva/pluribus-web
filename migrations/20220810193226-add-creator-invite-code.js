@@ -9,7 +9,8 @@ module.exports = {
     queryInterface.sequelize.query('update Creators set inviteCode = TO_BASE64(RANDOM_BYTES(21));');
     queryInterface.changeColumn('Creators', 'inviteCode', {
       type: Sequelize.STRING({ length: 28 }),
-      allowNulls: false
+      allowNulls: false,
+      unique: true
     });
   },
 
