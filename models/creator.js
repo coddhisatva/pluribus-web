@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     socialProfiles: DataTypes.STRING,
     displaySupporterCount: DataTypes.BOOLEAN,
     publicProfile: DataTypes.BOOLEAN,
+    inviteCode: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Creator',

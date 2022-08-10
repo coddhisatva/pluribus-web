@@ -6,7 +6,7 @@ const auth = require('../utils/auth');
 const { ResultWithContext } = require('express-validator/src/chain');
 
 router.get('/', async function(req, res, next) {
-	var creators = await Creator.findAll();
+	var creators = await Creator.where({ publicProfile: true });
 	res.render('creators/index', { creators });
 });
 
@@ -115,6 +115,7 @@ router.post('/new/policy',
 		var name = req.session.creatorSignup.name || '';
 		var publicProfile = req.session.creatorSignup.publicProfile || false;
 		var userId = res.locals.authUser.id;
+		var inviteCode = new Buffer.from(crypto.randomBytes(21)).toString('base64');
 
 		var creator = await Creator.create({
 			name,
@@ -123,6 +124,7 @@ router.post('/new/policy',
 			userId,
 			displaySupporterCount: true,
 			publicProfile,
+			inviteCode,
 			hasPhoto: false
 		});
 
@@ -154,6 +156,13 @@ router.get('/:id', async function(req, res, next) {
 			isFollowing = true;
 		} 
 	}
+
+	// Don't let users view a Creator's private profile if they're not already following them
+	if(!isFollowing && !creator.publicProfile) {
+		res.status(404).send('Creator not found.');
+		return;
+	}
+
 	res.render('creators/show', { creator, isFollowing });
 });
 
@@ -163,6 +172,13 @@ router.get('/:id', async function(req, res, next) {
  */
 router.post('/:id/follow', auth.authorize, async function(req, res, next) {
 	var creatorId = req.params.id;
+	var creator = await Creator.findByPk(creatorId);
+
+	// Don't allow just anyone to follow a private profile
+	if(!creator.publicProfile) {
+		res.sendStatus(404);
+	}
+
 	var userId = res.locals.authUser.id;
 	await Follow.create({ creatorId,  userId });
 

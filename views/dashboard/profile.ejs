@@ -228,6 +228,14 @@ _locals.nav = 'profile';
 				</div>
 			</div>
 		</div>
+		<div id="inviteOnly">
+			<label class="body-sm-weak text-medium">Use this referral link to invite supporters</label>
+			<div class="input-group w-100">
+				<input type="text" class="form-control" id="inviteLink" readonly value="<%= inviteBase %><%= creator.inviteCode %>" />
+				<button class="btn btn-dark" id="copyInvite">Copy link</button>
+			</div>
+		</div>
+
 	</div><!-- .card-body -->
 </div><!-- .card -->
 
@@ -323,6 +331,25 @@ Note: only include data that up.js will use.
 		model.photo = null;
 		var edit = removeExistingPhoto.closest('[edit]');
 		edit.showView().update();
-	})	
+	});
+
+	var publicProfile = document.getElementById('publicProfile');
+	var inviteOnly = document.getElementById('inviteOnly');
+	function toggleInviteOnly() {
+		inviteOnly.style.display = publicProfile.checked ? 'none' : 'block';
+	}
+	publicProfile.addEventListener('change', toggleInviteOnly)
+	toggleInviteOnly();
+
+	var copyInvite = document.getElementById('copyInvite');
+	var inviteLink = document.getElementById('inviteLink');
+	copyInvite.addEventListener('click', function(e) {
+		inviteLink.select();
+		inviteLink.setSelectionRange(0, inviteLink.value.length);
+		navigator.clipboard.writeText(inviteLink.value);
+		setTimeout(function() {
+			alert('Invite link was copied.')
+		}, 200);
+	})
 	
 </script>

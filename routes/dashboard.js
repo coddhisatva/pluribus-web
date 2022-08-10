@@ -11,6 +11,7 @@ const util = require('../utils/util');
 const sharp = require('sharp');
 const { serialize } = require('v8');
 const credentials = require('../config/credentials');
+const crypto = require('crypto');
 
 router.get('/', auth.authorize, async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
@@ -28,9 +29,10 @@ router.get('/profile', auth.authorizeRole('creator'), async function(req, res, n
 		return;
 	}
 
-	res.render('dashboard/profile', { user, creator });
-});
+	var inviteBase = req.protocol + '://' + req.headers.host + '/invite/';
 
+	res.render('dashboard/profile', { user, creator, inviteBase });
+});
 router.post('/profile', auth.authorizeRole('creator'), upload.single('newPhoto'), async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userId: user.id }});
