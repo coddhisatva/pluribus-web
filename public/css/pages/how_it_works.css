@@ -1,5 +1,5 @@
 /**
- * CSS Compiled on: 2022-08-14 18:57:44 -07:00
+ * CSS Compiled on: 2022-08-15 21:07:14 -07:00
  * ============================================================================== *
  */
 /*  4. Custom Mixins  */
@@ -69,8 +69,13 @@ a:hover {
   display: inline-block;
 }
 
-*[data-icon]::before {
-  content: url("/images/ui/icon_lg_substack.svg");
+*[data-icon=substack]::before {
+  content: "";
+  background-repeat: no-repeat;
+  background-image: url("/images/ui/icon_lg_substack.svg");
+  background-size: 80%;
+  background-position: left bottom;
+  margin-right: 0.15em;
 }
 
 body {
@@ -117,7 +122,6 @@ body {
 
 .light {
   background-color: #fff;
-  color: #717171;
 }
 
 .inverse {
@@ -286,7 +290,7 @@ button.card {
 }
 
 button.card {
-  padding: 0.75rem 24px;
+  padding: 0.75rem 32px;
   white-space: nowrap;
 }
 button.card.active {
@@ -301,7 +305,7 @@ button.card.active {
   }
   .hiw-layout .nav-pills {
     flex-direction: column;
-    gap: 1.5rem 12px;
+    gap: 1.5rem 16px;
   }
 }
 @media only screen and (max-width: 767px) {
@@ -314,9 +318,9 @@ button.card.active {
   .hiw-layout .nav-pills {
     flex-direction: row;
     flex-wrap: nowrap;
-    gap: 1.5rem 12px;
-    overflow: auto;
-    padding: 0.75rem 0;
+    gap: 1.5rem 16px;
+    overflow-x: auto;
+    padding: 1.5rem 0;
   }
 
   button.card {
