@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Creator.belongsTo(models.User);
       Creator.hasMany(models.Follow);
+      Creator.hasMany(models.CreatorCategory);
     }
   }
   Creator.init({

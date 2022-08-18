@@ -2,7 +2,7 @@ var express = require('express');
 const { redirect } = require('express/lib/response');
 const { body, validationResult } = require('express-validator');
 var router = express.Router();
-var { Creator, PrelaunchEmail } = require('../models');
+var { Creator, PrelaunchEmail, Follow } = require('../models');
 
 /**
  * GET /
@@ -70,6 +70,28 @@ router.get('/faq/creators', function(req, res) {
 router.get('/pricing', function(req, res, next) {
 	res.locals.nav = 'pricing';
 	res.render('coming-soon');
+});
+
+router.get('/invite/:code', async function(req, res, next) {
+	if(!req.authUser) {		
+		res.redirect('/users/signup?invite=' + req.params.code);
+		return;
+	}
+
+	let creator = await Creator.findOne({ where: { inviteCode: req.params.code }});
+
+	if(!creator) {
+		res.status(404).send('Invalid invite code.');
+		return;
+	}
+
+	let isFollowing = false;
+	let follow = await Follow.findOne({ where: { userId: req.authUser.id, creatorId: creator.id } });
+	if(follow !== null) {
+		isFollowing = true;
+	}
+
+	res.render('creators/show', { creator, isFollowing, invite: req.params.code });
 });
 
 module.exports = router;

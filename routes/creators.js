@@ -174,9 +174,14 @@ router.post('/:id/follow', auth.authorize, async function(req, res, next) {
 	var creatorId = req.params.id;
 	var creator = await Creator.findByPk(creatorId);
 
-	// Don't allow just anyone to follow a private profile
+	// Don't let just anyone to follow a private profile
 	if(!creator.publicProfile) {
-		res.sendStatus(404);
+		let inviteCode = req.query.invite;
+		let creator = inviteCode ? await Creator.findOne({ where: { inviteCode } }) : null;
+		if(!creator) {
+			res.sendStatus(404);
+			return;
+		}
 	}
 
 	var userId = res.locals.authUser.id;

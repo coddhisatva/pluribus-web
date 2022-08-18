@@ -44,7 +44,7 @@ _locals.nav = 'creators';
 			followBtn.following = true;
 			updateFollowBtnState();
 
-			fetch('/creators/<%= creator.id %>/follow', { method: 'POST' })
+			fetch('/creators/<%= creator.id %>/follow?invite=<%= invite%>', { method: 'POST' })
 				.then(null, () => alert('Error!'));
 
 		} // otherwise, dropdown will be shown to unfollow

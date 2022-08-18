@@ -215,10 +215,20 @@ async function sendActivationEmail(req, user) {
 	await OneTimeCode.create({ userId: user.id, email: user.email, code, expires });
 
 	var link = `${req.protocol}://${req.headers.host}/users/activate/${code}`
+
+	let qs = [];
 	// Check for a continue parameter that's expected, rather than just
 	// allow whatever was in the querystring
 	if(req.query.continue == 'creator') {
-		link += '?continue=creator';
+		qs.push('continue=creator');
+	} else if(req.query.continue == 'supporter') {
+		qs.push('continue=supporter');
+	}
+	if(req.query.invite) {
+		qs.push('invite=' + req.query.invite);
+	}
+	if(qs.length) {
+		link += '?' + qs.join('&');
 	}
 	await email.send(req.app.get('env'), {
 		from: 'noreply@becomepluribus.com',
@@ -354,7 +364,17 @@ router.post('/activate/:code',
 		// Save authentication cookie
 		req.session.authUser = { id: user.id, email: user.email, roles: [ ] };
 
-		res.redirect('/users/choose-path');
+		var redirect = '/users/choose-path';
+
+		if(req.query.continue == 'creator') {
+			redirect = '/creators/new';
+		} else if(req.query.continue == 'supporter') {
+			redirect = '/supporters/new';
+		} else if(req.query.invite) {
+			redirect = '/supporters/new?invite=' + req.query.invite;
+		}
+
+		res.redirect(redirect);
 	});
 
 router.get('/choose-path', auth.authorize, async function(req, res, next) {

@@ -15,11 +15,13 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.Follow);
       User.hasMany(models.OneTimeCode);
       User.hasMany(models.CardPaymentMethod);
+      User.hasMany(models.UserInterest);
     }
   }
   User.init({
     email: DataTypes.STRING,
     password: DataTypes.STRING,
+    name: DataTypes.STRING,
     stripeCustomerId: DataTypes.STRING,
     primaryCardPaymentMethodId: DataTypes.INTEGER
   }, {

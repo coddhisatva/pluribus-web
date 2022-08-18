@@ -1,0 +1,57 @@
+<%
+_locals.title = "Choose interests";
+_locals.noNav = true;
+%>
+
+<div class="row justify-content-center">
+	<div class="col-md-6">
+		<div class="rounded border bg-white p-5 my-4">
+			<h1 class="display-xxs">Choose interests</h1>
+			<div>
+				Choose from the following categories. Below are some of the amazing communities here on Pluribus.
+				This can help you find and support creators that share the same interest. 
+			</div>
+			<form method="post">
+
+				<% for(let interest of ['Art','Podcasts','Writing','Videography','Journalism']) { %>
+					<% var id = 'check' + camelize(interest); %>
+					<div class="form-check my-3">
+						<input class="form-check-input input-lg" type="checkbox" value="<%= interest %>" name="interests" id="<%= id %>" <%= interests.indexOf(interest) != -1 ? 'checked': '' %>>
+						<label class="form-check-label" for="<%= id %>">
+							<%= interest %>
+						</label>
+					</div>
+				<% } %>
+
+				<div class="mt-5">
+					<button class="btn btn-primary w-100 py-3" id="continueBtn" disabled>Continue</button>
+				</div>
+			</form>
+			
+		</div>
+		
+	</div>
+</div>
+
+<script>
+	var interestInputs = document.querySelectorAll('input[name=interests]');
+	var continueBtn = document.getElementById('continueBtn');
+
+	function inputChange(e) {
+		var anythingChecked = false;
+		for(input of interestInputs) {
+			if(input.checked) {
+				anythingChecked = true;
+				break;
+			}
+		}
+		continueBtn.disabled = !anythingChecked;
+	}
+
+	interestInputs.forEach(function(input) {
+		input.addEventListener('change', inputChange);
+	});
+
+	// In case the user went back, check if any boxes were previously selected
+	inputChange();
+</script>
