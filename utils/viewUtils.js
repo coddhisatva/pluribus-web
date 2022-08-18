@@ -66,9 +66,9 @@ var globalFuncs = {
 		const monthNames = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 		if(months < 12) {
 			if(date.getFullYear() == now.getFullYear()) {
-				return monthNames[date.getMonth() - 1] + ' ' + date.getDay();
+				return monthNames[date.getMonth() - 1] + ' ' + date.getDate();
 			}
-			return monthNames[date.getMonth() - 1] + ' ' + date.getDay() + ', ' + date.getFullYear();
+			return monthNames[date.getMonth() - 1] + ' ' + date.getDate() + ', ' + date.getFullYear();
 		}
 
 		return date;
