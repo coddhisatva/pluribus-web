@@ -111,9 +111,9 @@ router.post('/new/policy',
 
 		var policy = req.body.policy;
 
-		var about = req.session.creatorSignup.about || '';
-		var name = req.session.creatorSignup.name || '';
-		var publicProfile = req.session.creatorSignup.publicProfile || false;
+		var about = req.session.creatorSignup?.about || '';
+		var name = req.session.creatorSignup?.name || '';
+		var publicProfile = req.session.creatorSignup?.publicProfile || false;
 		var userId = res.locals.authUser.id;
 		var inviteCode = new Buffer.from(crypto.randomBytes(21)).toString('base64');
 
@@ -129,7 +129,7 @@ router.post('/new/policy',
 		});
 
 		// Categories
-		var categories = (req.session.creatorSignup.categories || []);
+		var categories = (req.session.creatorSignup?.categories || []);
 		for(category of categories) {
 			await CreatorCategory.create({ creatorId: creator.id, category });
 		}
