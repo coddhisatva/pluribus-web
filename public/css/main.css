@@ -1,6 +1,6 @@
 @charset "UTF-8";
 /**
- * CSS Compiled on: 2022-08-15 21:07:14 -07:00
+ * CSS Compiled on: 2022-10-02 21:16:24 -07:00
  * ============================================================================== *
  */
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Display:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap");
@@ -11264,6 +11264,9 @@ body {
 body .main-content {
   margin-bottom: 2.25rem;
 }
+body:has(*[class~=fixed-top]) {
+  padding-top: 3rem;
+}
 body > footer {
   margin-top: auto;
 }
@@ -11679,6 +11682,21 @@ b, strong {
   flex-wrap: wrap;
 }
 
+@media only screen and (max-width: 767px) {
+  .columns.splitter:has(*[class="navbar-nav access"]) {
+    gap: 0.75rem;
+  }
+
+  .navbar-nav.access {
+    border-top: 1px solid #bdbdbd;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 32px;
+    margin-right: auto;
+    padding-top: 0.75rem;
+    width: 100%;
+  }
+}
 .alert {
   color: #1d1d23;
   position: relative;
@@ -11785,8 +11803,71 @@ b, strong {
   border: 1px solid rgba(var(--bs-dark-rgb), var(--bs-bg-opacity));
 }
 
+/* These are CSS tweaks that (probably) need to be integrated back into the master CSS */
+:root {
+  --border-neutral: #e0e0e0;
+  --text-medium: #717171;
+  --text-neutral-dark: #e1e3e4;
+  --fill-neutral-light: #F0F2F3;
+}
+
+.inverse .alert-success {
+  background: #017b00;
+  color: #fff;
+}
+
+.success-msg h1::before, .success-msg .h1::before {
+  background: url("../../images/content/single-planet.svg") no-repeat;
+  background-size: contain;
+}
+
+input.form-check-input[type=checkbox] {
+  width: 24px;
+  height: 24px;
+}
+
+input.form-check-input[type=checkbox] + label.form-check-label {
+  padding-left: 12px;
+  vertical-align: sub;
+}
+
+.form-switch input.form-check-input[type=checkbox] {
+  width: 40px;
+}
+
+.form-floating > label {
+  color: var(--text-medium);
+}
+
+/*
+Fixed navbar tends to cover content, especially at smaller screen sizes.
+Changed this from position: fixed -> position: sticky as a temporary fix.
 .navbar.fixed-top {
   position: sticky;
+}
+*/
+/* Fixes close button for flash messages sitting outside the message border */
+.alert-dismissible .btn-close {
+  padding: 0.6125rem;
+}
+
+.flash {
+  animation: fadeIn forwards 1s;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+body.landing .flash {
+  position: absolute;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .color-swatch {

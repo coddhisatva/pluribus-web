@@ -1,14 +1,14 @@
 /**
- * CSS Compiled on: 2022-08-02 18:02:21 -07:00
+ * CSS Compiled on: 2022-10-02 21:16:25 -07:00
  * ============================================================================== *
  */
 /*  4. Custom Mixins  */
 a {
-  color: #1d1d23;
+  color: var(--text-link-color);
   font-weight: 500;
 }
 a:hover {
-  color: #555af7;
+  color: var(--text-link-hover-color);
 }
 
 @media only screen and (max-width: 575px) {
@@ -61,6 +61,23 @@ a:hover {
     font-size: 2.2rem;
   }
 }
+*[data-icon]::before {
+  content: "";
+  width: 0.75em;
+  height: 0.75em;
+  margin-right: 0.35em;
+  display: inline-block;
+}
+
+*[data-icon=substack]::before {
+  content: "";
+  background-repeat: no-repeat;
+  background-image: url("/images/ui/icon_lg_substack.svg");
+  background-size: 80%;
+  background-position: left bottom;
+  margin-right: 0.15em;
+}
+
 body {
   background-color: #f0f2f3;
 }
@@ -105,7 +122,6 @@ body {
 
 .light {
   background-color: #fff;
-  color: #717171;
 }
 
 .inverse, .how-grid-page .content-holder {
@@ -325,7 +341,7 @@ h1.display-1 {
 }
 
 .graphic-content {
-  gap: 24px;
+  gap: 32px;
   align-items: stretch;
 }
 .graphic-content::after {
@@ -373,7 +389,7 @@ h1.display-1 {
 .how-grid-page .content-holder {
   border-radius: 17px 0 0 17px;
   grid-column: 2/-1;
-  padding: 9rem 12px;
+  padding: 9rem 16px;
   padding-left: 232px;
 }
 .how-grid-page .content-holder > * {
@@ -393,7 +409,7 @@ h1.display-1 {
 }
 .animation small span {
   display: inline-block;
-  padding: 0.1875rem 6px;
+  padding: 0.1875rem 8px;
 }
 
 .getting-cancelled .splitter::before {
@@ -429,7 +445,7 @@ h1.display-1 {
 
 .networked .wrapper {
   border-radius: 17px;
-  padding: 3rem 48px;
+  padding: 3rem 64px;
 }
 
 .tyranny .section-head {
@@ -449,7 +465,7 @@ h1.display-1 {
 }
 .join-us .btn-holder {
   display: flex;
-  gap: 24px;
+  gap: 32px;
 }
 
 .newsletter .columns {
@@ -486,7 +502,7 @@ h1.display-1 {
     width: 325px;
   }
   .how-section.promo-block .content-holder {
-    padding: 1.5rem 12px;
+    padding: 1.5rem 16px;
     border-radius: 0 0 17px 17px;
   }
   .how-section.promo-block .content-holder > * {

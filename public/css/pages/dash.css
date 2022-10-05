@@ -1,14 +1,14 @@
 /**
- * CSS Compiled on: 2022-06-30 18:10:06 -07:00
+ * CSS Compiled on: 2022-10-02 21:16:25 -07:00
  * ============================================================================== *
  */
 /*  4. Custom Mixins  */
 a {
-  color: #1d1d23;
+  color: var(--text-link-color);
   font-weight: 500;
 }
 a:hover {
-  color: #555af7;
+  color: var(--text-link-hover-color);
 }
 
 @media only screen and (max-width: 575px) {
@@ -61,6 +61,23 @@ a:hover {
     font-size: 2.2rem;
   }
 }
+*[data-icon]::before {
+  content: "";
+  width: 0.75em;
+  height: 0.75em;
+  margin-right: 0.35em;
+  display: inline-block;
+}
+
+*[data-icon=substack]::before {
+  content: "";
+  background-repeat: no-repeat;
+  background-image: url("/images/ui/icon_lg_substack.svg");
+  background-size: 80%;
+  background-position: left bottom;
+  margin-right: 0.15em;
+}
+
 body {
   background-color: #f0f2f3;
 }
@@ -101,6 +118,10 @@ body {
 
 .text-neutral-dark {
   color: #e1e3e4;
+}
+
+.light {
+  background-color: #fff;
 }
 
 .inverse {
@@ -280,7 +301,7 @@ h5, .h5, *[class~=heading-xs], .heading-xs-medium {
 .navbar-dash {
   background-color: white;
   border-bottom: 1px solid #e0e0e0;
-  padding: 0.375rem 12px;
+  padding: 0.375rem 16px;
   position: relative;
 }
 
@@ -304,7 +325,7 @@ h5, .h5, *[class~=heading-xs], .heading-xs-medium {
 }
 .notifications .notification {
   display: flex;
-  gap: 24px;
+  gap: 32px;
   margin-top: 3rem;
 }
 .notifications a, .notifications img {
@@ -321,7 +342,24 @@ h5, .h5, *[class~=heading-xs], .heading-xs-medium {
 }
 
 .inner-content {
-  padding: 1.5rem 24px 3rem;
+  padding: 1.5rem 32px 3rem;
+}
+
+.profile-grid {
+  display: grid;
+  max-width: 1000px;
+  margin: 2.25rem auto;
+  grid-template-columns: minmax(588px, 1fr) minmax(282px, 1fr);
+  grid-template-rows: auto;
+  grid-template-areas: "cards meta";
+  gap: 1.5rem 32px;
+}
+.profile-grid > * {
+  grid-area: cards;
+}
+.profile-grid .side-content {
+  grid-area: meta;
+  background-color: pink;
 }
 
 .touch-toggle {
@@ -329,7 +367,7 @@ h5, .h5, *[class~=heading-xs], .heading-xs-medium {
 }
 .touch-toggle button {
   height: 65px;
-  padding: 1.125rem 24px;
+  padding: 1.125rem 32px;
 }
 
 .user-display {
@@ -363,14 +401,14 @@ h5, .h5, *[class~=heading-xs], .heading-xs-medium {
   align-items: center;
   padding: 1.125rem 2rem;
   text-decoration: none;
-  padding: 1.125rem 24px;
+  padding: 1.125rem 32px;
 }
 .controls nav li > *.active {
   background-color: #f0f2f3;
 }
 .controls a > span {
   width: auto;
-  padding-left: 12px;
+  padding-left: 16px;
   white-space: nowrap;
 }
 .controls:hover a span {
@@ -386,7 +424,7 @@ h5, .h5, *[class~=heading-xs], .heading-xs-medium {
 .inner-content {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 24px;
+  gap: 0 32px;
   justify-content: center;
   margin: 0 auto;
   max-width: 1400px;
@@ -526,7 +564,7 @@ h5, .h5, *[class~=heading-xs], .heading-xs-medium {
   }
 
   .inner-content {
-    padding: 60px 24px;
+    padding: 60px 32px;
   }
   .inner-content > * {
     min-width: 100% !important;
