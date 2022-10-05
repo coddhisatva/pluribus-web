@@ -73,6 +73,30 @@ var globalFuncs = {
 
 		return date;
 
+	},
+	// Pre-parse social profiles and add them into socialProfiles_* pseudo properties
+	// for the edit view to use.
+	profileLookups: {
+		Twitter: /twitter.com\/(.*)/,
+		YouTube: /youtube.com\/user\/(.*)/,
+		Instagram: /instagram.com\/(.*)/,
+		Substack: /(?:https?:\/\/)?([^\.]*.substack.com)/,
+	},
+	lookupSocialProfile : function(url) {
+		for(var key in globalFuncs.profileLookups) {
+			var match = url.match(globalFuncs.profileLookups[key]);
+			if(match) {
+				return [key, match[1]];
+			}
+		}
+		return [null, null];
+	},
+
+	ensureUrlHasProtocol: function(url) {
+		if(!/^https?:\/\//.test(url)) {
+			return 'http://' + url;
+		}
+		return url;
 	}
 };
 

@@ -2,20 +2,77 @@
 _locals.title = creator.name;
 _locals.nav = 'creators';
 %>
-<div class="container my-4">
-	<h1><%= creator.name %></h1>
 
-	<%# Follow button %>
-	<div class="my-2">
-		<button id="followBtn" data-following="<%= isFollowing %>" data-bs-toggle="dropdown" aria-expanded="false" class="btn <%= isFollowing ? 'btn-outline-secondary' : 'btn-secondary' %>">
-			<%= isFollowing ? 'Following' : 'Follow' %>
-		</button>
-		<ul class="dropdown-menu" aria-labelledby="followBtn" id="followBtnDropdown">
-			<li><a class="dropdown-item text-danger" href="#" id="unfollowDropdownItem">Unfollow <%= creator.name %></a></li>
-		</ul>
+<div class="main-content" role="main">
+	<div class="profile-grid">
+		<header class="card profile-head">
+			<div class="card-body">
+				<figure class="profile-photo">
+					<img src="/images/uploads/creators/<%= creator.id %>/<%= creator.photo %>" alt="My Face">
+				</figure>
+				<div class="columns spliter">
+				<div class="col">
+					
+					<h1><%= creator.name %></h1>
+					<p class="support">14k Supporters</p>
+				</div>
+				<div class="col">
+					<button id="followBtn" data-following="<%= isFollowing %>" data-bs-toggle="dropdown" aria-expanded="false" class="btn <%= isFollowing ? 'btn-primary' : 'btn-outline' %>">
+						<%= isFollowing ? 'Following' : 'Follow' %>
+					</button>
+					<ul class="dropdown-menu" aria-labelledby="followBtn" id="followBtnDropdown">
+						<li><a class="dropdown-item text-danger" href="#" id="unfollowDropdownItem">Unfollow <%= creator.name %></a></li>
+					</ul>
+				</div>                    
+				</div>
+			</div>
+		</header>
+​
+		<aside class="side-content">
+			<div class="card">
+				<div class="card-body flow">
+					<ul class="social-list">
+					<% for(var socialUrl of creator.socialProfiles.split('||')) {
+						const [ website, handle ] = lookupSocialProfile(socialUrl);
+						%>
+						<li><a href="<%= socialUrl %>" target="_blank" title="<%= website + ': ' + handle %>" class="<%= website.toLowerCase() %>"><span class="visually-hidden"><%= website %></span></a></li>
+					<% } %>
+					</ul>
+					
+					<% if(creator.website) { %>
+					<a href="<%= ensureUrlHasProtocol(creator.website) %>" class="weblink" target="_blank"><%= creator.website %></a>
+					<% } %>
+					<div class="badges">
+					<% for(category of creator.CreatorCategories) { %>
+						<span class="badge"><%= category.category %></span>
+					<% } %>
+					</div>
+				</div>
+			</div>
+		</aside>
+​
+​
+		<section class="card reasons">
+			<div class="card-body">
+				<h2>Title Here</h2>
+				<p>Reason for pledge here</p>
+				<button class="btn btn-primary">Pledge support</button>
+			</div>
+		</section>
+​
+		<section class="card">
+			<div class="flow card-body">
+				<h2>About Me</h2>
+				<p><%= creator.about %></p>
+				<div><a data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">Show More</a></div>
+				<div class="collapse" id="collapseExample">
+					<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor, harum non eaque animi! Ad, a praesentium, placeat explicabo saepe cum odio ratione unde, nam porro harum, non officiis obcaecati maxime.</p>
+					<p>A rem nihil neque tempore, illo facilis error! Adipisci praesentium aut hic similique eos dolores beatae deleniti vel quod laborum totam amet, iusto, veniam ipsum ipsa vitae possimus molestias quia.</p>
+					<p>Porro, iste, necessitatibus consequuntur sit expedita quam similique cumque repellat voluptatibus, error quasi, beatae minus qui ipsam non sint dolores perspiciatis quis nesciunt earum rerum odio omnis in. Aliquid, cum.</p>
+				</div>
+			</div>
+		</section>
 	</div>
-
-	<p><%= creator.about %></p>
 </div>
 
 <script>
@@ -26,15 +83,15 @@ _locals.nav = 'creators';
 
 	function updateFollowBtnState() {
 		if(followBtn.following) {
-			followBtn.classList.remove('btn-secondary');
-			followBtn.classList.add('btn-outline-secondary');
-			followBtn.innerHTML = 'Unfollow';
+			followBtn.classList.remove('btn-outline');
+			followBtn.classList.add('btn-primary');
+			followBtn.innerHTML = 'Following';
 			bootstrap.Dropdown.getOrCreateInstance(followBtn).hide();
 			followBtn.blur();
 
 		} else {
-			followBtn.classList.remove('btn-outline-secondary');
-			followBtn.classList.add('btn-secondary');
+			followBtn.classList.remove('btn-primary');
+			followBtn.classList.add('btn-outline');
 			followBtn.innerHTML = 'Follow';
 		}
 	}
@@ -44,7 +101,7 @@ _locals.nav = 'creators';
 			followBtn.following = true;
 			updateFollowBtnState();
 
-			fetch('/creators/<%= creator.id %>/follow?invite=<%= invite%>', { method: 'POST' })
+			fetch('/creators/<%= creator.id %>/follow?invite=<%= locals.invite || "" %>', { method: 'POST' })
 				.then(null, () => alert('Error!'));
 
 		} // otherwise, dropdown will be shown to unfollow
@@ -61,3 +118,7 @@ _locals.nav = 'creators';
 	});
 
 </script>
+
+
+<%- contentFor('head') %>
+<link rel="stylesheet" href="/css/pages/dash.css" />

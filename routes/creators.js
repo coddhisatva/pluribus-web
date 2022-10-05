@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const crypto = require('crypto');
 const { Creator, CreatorCategory, User, Follow } = require('../models');
 const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
@@ -143,7 +144,7 @@ router.post('/new/policy',
 )
 
 router.get('/:id', async function(req, res, next) {
-	var creator = await Creator.findByPk(req.params.id, { include: User });
+	var creator = await Creator.findByPk(req.params.id, { include: [ User, CreatorCategory ] });
 	if(!creator) {
 		res.status(404).send('Creator not found.');
 		return;

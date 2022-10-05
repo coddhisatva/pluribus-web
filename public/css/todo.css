@@ -182,3 +182,14 @@ input.has-password-visibility.form-control.is-valid + .password-visibility-toggl
     white-space: nowrap;
     overflow: hidden;
 }
+
+/* [href=~=x] didn't seem to work for social profile links */
+.profile-grid a.twitter:before {
+	background-image: url("/images/ui/socialmedia/icon-twitter-dark.svg");
+}
+.profile-grid a.instagram:before {
+	background-image: url("/images/ui/socialmedia/icon-instagram-dark.svg");
+}
+.profile-grid a.youtube:before {
+	background-image: url("/images/ui/socialmedia/icon-youtube-dark.svg");
+}

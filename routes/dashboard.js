@@ -95,7 +95,7 @@ router.post('/profile', auth.authorizeRole('creator'), upload.single('newPhoto')
 		},
 		youtube: {
 			parse: (value) => {
-				var m = /^\s*(?:https?:\/\/)?youtube.com\/user\/(\w+)/i.exec(value);
+				var m = /^\s*(?:https?:\/\/)?(?:www\.)?youtube.com\/user\/(\w+)/i.exec(value);
 				if(m) return m[1];
 				m = /^\s*(\w+)\s*$/i.exec(value);
 				if(m) return m[1];
