@@ -1,5 +1,5 @@
 /**
- * CSS Compiled on: 2022-10-02 21:16:25 -07:00
+ * CSS Compiled on: 2022-10-04 22:39:25 -07:00
  * ============================================================================== *
  */
 /*  4. Custom Mixins  */
@@ -349,19 +349,81 @@ h5, .h5, *[class~=heading-xs], .heading-xs-medium {
   display: grid;
   max-width: 1000px;
   margin: 2.25rem auto;
-  grid-template-columns: minmax(588px, 1fr) minmax(282px, 1fr);
-  grid-template-rows: auto;
-  grid-template-areas: "cards meta";
+  grid-template-columns: minmax(60%, 588px) minmax(40%, 282px);
+  grid-template-rows: repeat(auto-fill, auto);
   gap: 1.5rem 32px;
+  padding: 0 16px;
 }
 .profile-grid > * {
-  grid-area: cards;
+  grid-column: 1/2;
 }
 .profile-grid .side-content {
-  grid-area: meta;
-  background-color: pink;
+  grid-column: 2/3;
+  grid-row: 1/-1;
+}
+.profile-grid .side-content .weblink {
+  display: flex;
+  align-items: center;
+}
+.profile-grid .side-content .weblink::before {
+  background-image: url("../../images/ui/socialmedia/icon-webglobe.svg");
+  content: "";
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  margin-right: 0.35em;
+}
+.profile-grid .side-content .badge {
+  background-color: #f0f2f3;
+  color: #717171;
+}
+.profile-grid .reasons .btn {
+  align-self: flex-start;
+}
+.profile-grid a:before {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+.profile-grid a[href~="twitter.com"]:before {
+  background-image: url("../../images/ui/socialmedia/icon-twitter-dark.svg");
+}
+.profile-grid a[href~="instagram.com"]:before {
+  background-image: url("../../images/ui/socialmedia/icon-instagram-dark.svg");
+}
+.profile-grid a[href~="youtube.com"]:before {
+  background-image: url("../../images/ui/socialmedia/icon-youtube-dark.svg");
 }
 
+.profile-head .spliter {
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.profile-head .spliter > * {
+  flex: 0 1 auto;
+}
+.profile-head .spliter p {
+  margin: 0;
+}
+.profile-head .profile-photo {
+  height: 128px;
+  width: 128px;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.1);
+}
+
+@media only screen and (max-width: 767px) {
+  .profile-grid {
+    display: block;
+  }
+  .profile-grid .card + .card {
+    margin-top: 1.5rem;
+  }
+  .profile-grid .side-content {
+    margin: 1.5rem 0;
+  }
+}
 .touch-toggle {
   display: none;
 }
