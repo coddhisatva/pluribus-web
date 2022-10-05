@@ -1,6 +1,6 @@
 @charset "UTF-8";
 /**
- * CSS Compiled on: 2022-10-02 21:16:24 -07:00
+ * CSS Compiled on: 2022-10-04 22:39:24 -07:00
  * ============================================================================== *
  */
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Display:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap");
@@ -11637,13 +11637,13 @@ header.nonav figure {
   width: 2rem;
   display: block;
 }
-.social-list a[href*="twitter.com"]:before {
+.social-list a[href~="twitter.com"]:before {
   background-image: url("../images/ui/socialmedia/icon-twitter.svg");
 }
-.social-list a[href*="instagram.com"]:before {
+.social-list a[href~="instagram.com"]:before {
   background-image: url("../images/ui/socialmedia/icon-instagram.svg");
 }
-.social-list a[href*="github.com"]:before {
+.social-list a[href~="github.com"]:before {
   background-image: url("../images/ui/socialmedia/icon-github.svg");
 }
 
