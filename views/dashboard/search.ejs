@@ -1,0 +1,25 @@
+<%
+_locals.title = 'Search Pluribus';
+_locals.noSidenav = true;
+%> 
+<h1 class="heading-xl-medium mb-4">Search Pluribus</h1>
+<form>
+	<div class="form-floating">
+		<input type="search" id="searchInput" name="q" class="form-control" placeholder="Search a name or account number" value="<%= query['q'] %>" />
+		<label for="searchInput">Search a name or account number</label>
+	</div>
+</form>
+
+<% if(locals.results != null) { %>
+<div class="border rounded bg-white mt-4 p-3">
+	<% for(var i = 0; i < results.length; i++) {
+		var creator = results[i]; %>
+		<div class="d-flex">
+			<img class="border rounded-circle me-3" style="width:44px;" src="/images/uploads/creators/<%= creator.id %>/<%= creator.photo %>" />
+			<div class="heading-sm-medium">
+				<a href="/creators/<%= creator.id %>" class="text-decoration-none"><%= creator.name %></a>
+			</div>
+		</div>
+	<% } %>
+</div>
+<% } %>

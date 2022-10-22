@@ -47,6 +47,7 @@ app.use(viewUtils);
 // Also include res, so we can do res.app.get('env')
 app.use((req, res, next) => {
 	res.locals.postedValues = req.body;
+	res.locals.query = req.query;
 	res.locals.req = req;
 	next();
 });

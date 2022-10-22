@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
-const { User, Creator, Follow, CardPaymentMethod } = require('../models');
+const { sequelize, User, Creator, Follow, CardPaymentMethod } = require('../models');
+const mysql = require('mysql2');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/tmp' });
 const fs = require('fs/promises');
@@ -315,6 +316,24 @@ router.get('/referrals', async function(req, res, next) {
 	var creator = await Creator.findOne({ where: { userid: user.id }});
 	res.locals.nav = 'referrals';
 	res.render('coming-soon', { user, creator });
+});
+
+router.get('/search', async (req, res) => {
+	let q = req.query['q'];
+	let results = null;
+	if(q) {
+		var terms = q.split(' ');
+		var whereClause = 'where ';
+		for(var i = 0; i < terms.length; i++) {
+			var term = terms[i].replace(/['"']/g, '\\$&');
+			if(i > 0) { whereClause += ' or '};
+			whereClause += "name like '%" + term + "%'";
+		}
+		[ results, metadata ] = await sequelize.query("select * from Creators " + whereClause);
+		console.log(results);
+	}
+
+	res.render('dashboard/search', { results });
 });
 
 module.exports = router;
