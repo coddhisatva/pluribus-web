@@ -15,7 +15,7 @@ _locals.noSidenav = true;
 	<% for(var i = 0; i < results.length; i++) {
 		var creator = results[i]; %>
 		<div class="d-flex">
-			<img class="border rounded-circle me-3" style="width:44px;" src="/images/uploads/creators/<%= creator.id %>/<%= creator.photo %>" />
+			<img class="border rounded-circle me-3" style="width:44px;" src="<%= creator.photo != null ? ('/images/uploads/creators/' + creator.id + '/' + creator.photo) : '/images/ui/avatar-unknown.svg' %>" />
 			<div class="heading-sm-medium">
 				<a href="/creators/<%= creator.id %>" class="text-decoration-none"><%= creator.name %></a>
 			</div>

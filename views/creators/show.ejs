@@ -8,7 +8,7 @@ _locals.nav = 'creators';
 		<header class="card profile-head">
 			<div class="card-body">
 				<figure class="profile-photo">
-					<img src="/images/uploads/creators/<%= creator.id %>/<%= creator.photo %>" alt="My Face">
+					<img src="<%= creator.photo ? '/images/uploads/creators/' + creator.id + '/' + creator.photo : '/images/ui/avatar-unknown.svg' %>" alt="My Face">
 				</figure>
 				<div class="columns spliter">
 				<div class="col">
