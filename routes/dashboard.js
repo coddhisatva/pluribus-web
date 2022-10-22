@@ -323,12 +323,13 @@ router.get('/search', async (req, res) => {
 	let results = null;
 	if(q) {
 		var terms = q.split(' ');
-		var whereClause = 'where ';
+		var whereClause = 'where publicProfile = 1 and (';
 		for(var i = 0; i < terms.length; i++) {
 			var term = terms[i].replace(/['"']/g, '\\$&');
 			if(i > 0) { whereClause += ' or '};
 			whereClause += "name like '%" + term + "%'";
 		}
+		whereClause += ')';
 		[ results, metadata ] = await sequelize.query("select * from Creators " + whereClause);
 		console.log(results);
 	}

@@ -31,6 +31,7 @@ _locals.nav = 'creators';
 		<aside class="side-content">
 			<div class="card">
 				<div class="card-body flow">
+					<% if(creator.socialProfiles) { %>
 					<ul class="social-list">
 					<% for(var socialUrl of creator.socialProfiles.split('||')) {
 						const [ website, handle ] = lookupSocialProfile(socialUrl);
@@ -38,6 +39,7 @@ _locals.nav = 'creators';
 						<li><a href="<%= socialUrl %>" target="_blank" title="<%= website + ': ' + handle %>" class="<%= website.toLowerCase() %>"><span class="visually-hidden"><%= website %></span></a></li>
 					<% } %>
 					</ul>
+					<% } %>
 					
 					<% if(creator.website) { %>
 					<a href="<%= ensureUrlHasProtocol(creator.website) %>" class="weblink" target="_blank"><%= creator.website %></a>
