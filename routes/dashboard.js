@@ -212,6 +212,15 @@ router.get('/payments/card-added', auth.authorize, async function(req, res, next
 	await User.update({ primaryCardPaymentMethodId: cardPaymentMethod.id }, { where: { id: user.id } });
 	
 	req.flash.notice = "Card was added successfully";
+
+	if(req.query.pledge) {
+		// Redirect back to creator pledge
+		const creatorId = req.query.pledge;
+		const amount = req.query.amount;
+		const frequency = req.query.frequency;
+		res.redirect('/creators/' + creatorId + '/pledge?amount=' + amount + '&frequency=' + frequency);
+		return;
+	}
 	res.redirect('/dashboard/payments');
 });
 

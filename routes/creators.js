@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
-const { Creator, CreatorCategory, User, Follow } = require('../models');
+const { Creator, CreatorCategory, User, Follow, CardPaymentMethod } = require('../models');
 const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
+const csrf = require('../utils/csrf');
+const credentials = require('../config/credentials');
 const { ResultWithContext } = require('express-validator/src/chain');
 
 router.get('/', async function(req, res, next) {
@@ -204,6 +206,32 @@ router.post('/:id/follow', auth.authorize, async function(req, res, next) {
 	}
 
 	res.sendStatus(200);
+});
+
+router.get('/:id/pledge', auth.authorize, async (req, res) => {
+	var creator = await Creator.findByPk(req.params.id, { include: [ User, CreatorCategory ] });
+	if(!creator) {
+		res.status(404).send('Creator not found.');
+		return;
+	}
+
+	var user = await User.findByPk(req.authUser.id);
+
+	var stripePublicKey = credentials.stripe.publicKey;
+
+	var cardPaymentMethods = await CardPaymentMethod.findAll({ where: { userId: req.authUser.id }});
+	var primaryCardPaymentMethod = cardPaymentMethods.find(method => method.id == user.primaryCardPaymentMethodId);
+
+	res.render('creators/pledge', { creator, stripePublicKey, cardPaymentMethods, primaryCardPaymentMethod });
+});
+
+router.post('/:id/pledge', auth.authorize, csrf.validateToken, async(req, res) => {
+	// TODO: create the pledge
+	res.redirect('/creators/' + req.params.id + '/pledged');
+});
+
+router.get('/:id/pledged', auth.authorize, async(req, res) => {
+	res.render('creators/pledged');
 });
 
 module.exports = router;

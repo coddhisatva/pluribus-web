@@ -1,0 +1,43 @@
+<!-- Add card modal -->
+<div class="modal" id="addCardModal" tabindex="-1">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content">
+			<form id="addCardForm" class="needs-validation" novalidate>
+			<div class="modal-header">
+				<h5 class="modal-title heading-xl-medium">Credit card</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+			<div class="modal-body p-4">
+				<div class="form-floating mb-4">
+					<input type="text" id="cardNickname" class="form-control" placeholder="Nickname" />
+					<label for="cardNickname">Card nickname (optional)</label>
+				</div>
+				<div class="form-floating mb-4">
+					<input type="text" id="cardFirstName" class="form-control" placeholder="First name" required />
+					<label for="cardFirstName">First name</label>
+					<div class="invalid-feedback">
+						Please enter your first name.
+					</div>
+				</div>
+				<div class="form-floating mb-4">
+					<input type="text" id="cardLastName" class="form-control" placeholder="Last name" required />
+					<label for="cardLastName">Last name</label>
+					<div class="invalid-feedback">
+						Please enter your last name.
+					</div>
+				</div>
+				<div id="stripePaymentElement">
+					<!-- Stripe Elements will create form elements here -->
+				</div>
+				<div id="stripeErrorMessage" class="alert alert-danger visually-hidden mt-3">
+					<!-- Display error message to your customers here -->
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button id="cancelAddCardBtn" class="btn btn-outline-dark heading-md-medium">Cancel</button>
+				<button class="btn bg-black text-white heading-md-medium">Save payment method</button>
+			</div>
+			</form>
+		</div>
+	</div>
+</div>
