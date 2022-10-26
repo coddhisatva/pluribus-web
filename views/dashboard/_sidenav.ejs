@@ -1,6 +1,6 @@
 <% 
-var name = user.email.split('@')[0];
-if(creator && creator.name) {
+var name = locals.user?.email.split('@')[0];
+if(locals.creator && locals.creator.name) {
 	name = creator.name;
 }
 locals.name = name;

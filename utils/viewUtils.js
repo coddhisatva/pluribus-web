@@ -97,6 +97,11 @@ var globalFuncs = {
 			return 'http://' + url;
 		}
 		return url;
+	},
+
+	truncate: function(text, length) {
+		if(text.length < length) return text;
+		return text.substring(0, length) + '…';
 	}
 };
 

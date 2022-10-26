@@ -1,7 +1,27 @@
 <%
 _locals.title = 'Search Pluribus';
 _locals.noSidenav = true;
-%> 
+%>
+<style>
+	/* Temporary styling - delete once John has done it properly ! */
+	.result {
+		display: flex;
+		padding: 16px;
+	}
+	.result figure {
+		margin-right: 24px;
+		width: 52px;
+		height: 52px;
+		overflow: hidden;
+	}
+
+	.result > div a {
+		display: block;
+		font-size: var(--heading-sm);
+    	font-weight: 500;
+	}
+
+</style>
 <h1 class="heading-xl-medium mb-4">Search Pluribus</h1>
 <form>
 	<div class="form-floating">
@@ -14,11 +34,15 @@ _locals.noSidenav = true;
 <div class="border rounded bg-white mt-4 p-3">
 	<% for(var i = 0; i < results.length; i++) {
 		var creator = results[i]; %>
-		<div class="d-flex">
-			<img class="border rounded-circle me-3" style="width:44px;" src="<%= creator.photo != null ? ('/images/uploads/creators/' + creator.id + '/' + creator.photo) : '/images/ui/avatar-unknown.svg' %>" />
-			<div class="heading-sm-medium">
+		<div class="result">
+			<figure class="border rounded-circle">
+				<img src="<%= creator.photo != null ? ('/images/uploads/creators/' + creator.id + '/' + creator.photo) : '/images/ui/avatar-unknown.svg' %>" />
+			</figure>
+			<div>
 				<a href="/creators/<%= creator.id %>" class="text-decoration-none"><%= creator.name %></a>
+				<div class="result-about"><%= truncate(creator.about, 50) %></div>
 			</div>
+			
 		</div>
 	<% } %>
 </div>
