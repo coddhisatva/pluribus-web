@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
-const { Creator, CreatorCategory, User, Follow, CardPaymentMethod } = require('../models');
+const { Creator, CreatorCategory, User, Follow, CardPaymentMethod, Pledge } = require('../models');
 const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
 const csrf = require('../utils/csrf');
@@ -226,7 +226,54 @@ router.get('/:id/pledge', auth.authorize, async (req, res) => {
 });
 
 router.post('/:id/pledge', auth.authorize, csrf.validateToken, async(req, res) => {
-	// TODO: create the pledge
+	const userId = req.authUser.id;
+	const creatorId = req.params.id;
+	const creator = await Creator.findByPk(creatorId);
+	if(!creator) {
+		res.status(400).send('Invalid pledge.');
+		return;
+	}
+
+	// Don't allow pledging to non-public profile unless the user follows this creator 
+	if(!creator.publicProfile) {
+		var follow = await Follow.findOne({ where: { userId, creatorId } });
+		if(!follow) {
+			res.status(400).send('Invalid pledge.');
+			return;
+		}
+	}
+
+	// Note: DB constraint will disallow multiple pledges by a user to the same creator
+
+	const frequency = req.body.frequency;
+	const amount = Number(req.body.amount);
+
+	switch(frequency) {
+		case 'once':
+			break;
+		default:
+			res.status(400).send('Invalid frequency: ' + frequency);
+	}
+
+	if(isNaN(amount) || amount < 5) {
+		res.status(400).send('Invalid amount: ' + amount + '. Must be 5 or greater.');
+	}
+
+	try {
+		await Pledge.create({
+			userId,
+			creatorId,
+			frequency,
+			amount
+		});
+	} catch(err) {
+		if(err.name == "SequelizeUniqueConstraintError") {
+			res.status(400).send('You have already pledged to this creator.');
+			return;
+		}
+		throw err;		
+	}
+
 	res.redirect('/creators/' + req.params.id + '/pledged');
 });
 

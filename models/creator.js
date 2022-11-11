@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       Creator.belongsTo(models.User);
       Creator.hasMany(models.Follow);
       Creator.hasMany(models.CreatorCategory);
+      Creator.hasMany(models.Pledge);
     }
   }
   Creator.init({
