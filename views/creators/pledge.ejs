@@ -142,7 +142,7 @@ const amounts = [ 25, 250, 500 ]
 		btn.addEventListener('click', function(e) {
 			document.querySelector('#pledgeFrequencies .selection.selected')?.classList.remove('selected');			
 			pledge.frequency = btn.dataset['frequency'];
-			hiddenFrequency = pledge.frequency;
+			hiddenFrequency.value = pledge.frequency;
 			btn.classList.add('selected');
 			updateSummary();
 		});

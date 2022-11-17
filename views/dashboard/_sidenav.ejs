@@ -26,6 +26,12 @@ locals.name = name;
 						<span>Home</span>
 					</a>
 				</li>
+				<li>
+					<a href="/dashboard/pledges" class="<%= _locals.nav == 'pledges' ? 'active' : '' %>">
+						<svg><use href="/images/ui/icons.svg#heart"></use></svg>
+						<span>Pledges</span>
+					</a>
+				</li>
 				<% if(authUser.roles.indexOf('creator') != -1) { %>
 				<li>
 					<a href="/dashboard/profile" class="<%= _locals.nav == 'profile' ? 'active' : '' %>">

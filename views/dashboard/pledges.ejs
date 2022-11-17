@@ -1,0 +1,107 @@
+<%
+_locals.title = 'Pledges';
+_locals.nav = 'pledges';
+
+const dtFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
+%>
+
+<style>
+	/* responsive pledge table */
+	.table > :not(:first-child) {
+		border-top: 1px solid var(--border-neutral);
+	}
+	th {
+		font-weight: 500;
+	}
+	td {
+		border-bottom: none;
+	}
+
+	@media screen and (max-width: 767px) {
+		thead {
+			display: none;
+		}
+		.table > :not(:first-child) {
+			border-top: none;
+		}
+	}
+</style>
+
+<h1>Pledges</h1>
+
+<div class="card">
+	<div class="card-body">
+		<% if(creator) { %>
+			<ul class="nav nav-tabs mb-3" role="tablist">
+				<li class="nav-item" role="presentation">
+					<button class="nav-link active" id="made-tab" data-bs-toggle="tab" data-bs-target="#made" type="button" role="tab" aria-controls="made" aria-selected="true">Made</button>
+				</li>
+				<li class="nav-item" role="presentation">
+					<button class="nav-link" id="received-tab" data-bs-toggle="tab" data-bs-target="#received" type="button" role="tab" aria-controls="received" aria-selected="false">Received</button>
+				</li>
+			</ul>
+		<% } %>
+		
+		<div class="tab-content">
+		
+			<div class="tab-pane active show pt-3" id="made" type="button" role="tab" aria-controls="made" aria-selected="true">
+				<% if(pledgesMade) { %>
+					<h2>Your pledges</h2>
+					<table class="table">
+						<thead>
+							<tr>
+								<th class="d-none d-md-table-cell">Date</th>
+								<th>Name</th>
+								<th class="text-end">Amount</th>
+							</tr>
+						</thead>
+						<% for(var pledge of pledgesMade) { %>
+						<tr>
+							<td class="d-none d-md-table-cell"><%= dtFormat.format(pledge.createdAt) %></td>
+							<td>
+								<%= pledge.Creator.name || pledge.Creator.email %>
+								<div class="d-md-none text-medium"><%= dtFormat.format(pledge.createdAt) %></div>
+							</td>
+							<td class="text-end">$<%= pledge.amount %></td>
+						</tr>
+						<% } %>
+					</table>
+				<% } else { %>
+					<p>You have not received any pledges yet.</p>
+				<% } %>
+			</div>
+
+			<% if(creator) { %>
+				<div class="tab-pane pt-3" id="received" type="button" role="tab" aria-controls="received" aria-selected="true">
+					<% if(pledgesReceived) { %>
+						<h2>Pledge history</h2>
+						<table class="table">
+							<thead>
+								<tr>
+									<th class="d-none d-md-table-cell">Date</th>
+									<th>Name</th>
+									<th class="text-end">Amount</th>
+								</tr>
+							</thead>
+							<% for(var pledge of pledgesReceived) { %>
+							<tr>
+								<td class="d-none d-md-table-cell"><%= dtFormat.format(pledge.createdAt) %></td>
+								<td>
+									<%= pledge.User.name || pledge.User.email %>
+									<div class="d-md-none text-medium"><%= dtFormat.format(pledge.createdAt) %></div>
+								</td>
+								<td class="text-end">$<%= pledge.amount %></td>
+							</tr>
+							<% } %>
+						</table>
+					<% } else { %>
+						<p>You have not received any pledges yet.</p>
+					<% } %>
+				<% } %>
+			</div><!-- .tab-pane#received -->
+
+		</div><!-- .tab-content -->
+
+	</div>
+	
+</div>

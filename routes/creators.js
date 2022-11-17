@@ -271,7 +271,7 @@ router.post('/:id/pledge', auth.authorize, csrf.validateToken, async(req, res) =
 			res.status(400).send('You have already pledged to this creator.');
 			return;
 		}
-		throw err;		
+		throw err; // unexpected error
 	}
 
 	res.redirect('/creators/' + req.params.id + '/pledged');

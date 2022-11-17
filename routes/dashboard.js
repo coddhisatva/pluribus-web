@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
-const { sequelize, User, Creator, Follow, CardPaymentMethod } = require('../models');
+const { sequelize, User, Creator, Follow, CardPaymentMethod, Pledge } = require('../models');
 const mysql = require('mysql2');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/tmp' });
@@ -344,6 +344,16 @@ router.get('/search', async (req, res) => {
 	}
 
 	res.render('dashboard/search', { results });
+});
+
+router.get('/pledges', auth.authorize, async (req, res) => {
+	const user = await User.findByPk(req.authUser.id);
+	const creator = await Creator.findOne({ where: { userid: user.id }});
+
+	const pledgesMade = await Pledge.findAll({ where: { userId: user.id }, include: Creator });
+	const pledgesReceived = creator ? await Pledge.findAll({ where: { creatorId: creator.id  }, include: User}) : null;
+
+	res.render('dashboard/pledges', { creator, pledgesMade, pledgesReceived });
 });
 
 module.exports = router;
