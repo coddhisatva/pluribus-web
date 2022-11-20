@@ -27,17 +27,19 @@ const dtFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
 	}
 </style>
 
-<h1>Pledges</h1>
+<header>
+	<h1 class="display-xxs">Pledge history</h1>
+</header>
 
 <div class="card">
 	<div class="card-body">
 		<% if(creator) { %>
-			<ul class="nav nav-tabs mb-3" role="tablist">
+			<ul class="nav nav-pills mb-3" role="tablist">
 				<li class="nav-item" role="presentation">
-					<button class="nav-link active" id="made-tab" data-bs-toggle="tab" data-bs-target="#made" type="button" role="tab" aria-controls="made" aria-selected="true">Made</button>
+					<button class="nav-link active" id="made-tab" data-bs-toggle="tab" data-bs-target="#made" type="button" role="tab" aria-controls="made" aria-selected="true">Pledges made</button>
 				</li>
 				<li class="nav-item" role="presentation">
-					<button class="nav-link" id="received-tab" data-bs-toggle="tab" data-bs-target="#received" type="button" role="tab" aria-controls="received" aria-selected="false">Received</button>
+					<button class="nav-link" id="received-tab" data-bs-toggle="tab" data-bs-target="#received" type="button" role="tab" aria-controls="received" aria-selected="false">Pledges received</button>
 				</li>
 			</ul>
 		<% } %>
@@ -46,13 +48,13 @@ const dtFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
 		
 			<div class="tab-pane active show pt-3" id="made" type="button" role="tab" aria-controls="made" aria-selected="true">
 				<% if(pledgesMade) { %>
-					<h2>Your pledges</h2>
 					<table class="table">
 						<thead>
 							<tr>
 								<th class="d-none d-md-table-cell">Date</th>
 								<th>Name</th>
-								<th class="text-end">Amount</th>
+								<th>Amount</th>
+								<th class="d-none d-md-table-cell">Status</th>
 							</tr>
 						</thead>
 						<% for(var pledge of pledgesMade) { %>
@@ -62,7 +64,13 @@ const dtFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
 								<%= pledge.Creator.name || pledge.Creator.email %>
 								<div class="d-md-none text-medium"><%= dtFormat.format(pledge.createdAt) %></div>
 							</td>
-							<td class="text-end">$<%= pledge.amount %></td>
+							<td>
+								$<%= pledge.amount %>
+								<div class="d-md-none text-medium"><div class="text-primary">Pledged</div></div>
+							</td>
+							<td class="d-none d-md-table-cell">
+								<div class="text-primary">Pledged</div>
+							</td>
 						</tr>
 						<% } %>
 					</table>
@@ -74,13 +82,13 @@ const dtFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
 			<% if(creator) { %>
 				<div class="tab-pane pt-3" id="received" type="button" role="tab" aria-controls="received" aria-selected="true">
 					<% if(pledgesReceived) { %>
-						<h2>Pledge history</h2>
 						<table class="table">
 							<thead>
 								<tr>
 									<th class="d-none d-md-table-cell">Date</th>
 									<th>Name</th>
-									<th class="text-end">Amount</th>
+									<th>Amount</th>
+									<th class="d-none d-md-table-cell">Status</th>
 								</tr>
 							</thead>
 							<% for(var pledge of pledgesReceived) { %>
@@ -90,7 +98,13 @@ const dtFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
 									<%= pledge.User.name || pledge.User.email %>
 									<div class="d-md-none text-medium"><%= dtFormat.format(pledge.createdAt) %></div>
 								</td>
-								<td class="text-end">$<%= pledge.amount %></td>
+								<td>
+									$<%= pledge.amount %>
+									<div class="d-md-none text-medium"><div class="text-primary">Pledged</div></div>
+								</td>
+								<td class="d-none d-md-table-cell">
+									<div class="text-primary">Pledged</div>
+								</td>
 							</tr>
 							<% } %>
 						</table>
@@ -102,6 +116,11 @@ const dtFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
 
 		</div><!-- .tab-content -->
 
-	</div>
+	</div><!-- .card-body -->
 	
-</div>
+</div><!-- .card -->
+
+<%- contentFor('aside') %>
+<svg width="36" height="36" class="text-strong"><use href="/images/ui/icons.svg#heart" /></svg>
+<h3 class="body-sm-medium text-strong mt-0">Your pledge history</h3>
+<div class="mt-0">Thanks for your support, by pledging you play a part in creating a social safety net.</div>

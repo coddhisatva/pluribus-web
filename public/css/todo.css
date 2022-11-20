@@ -4,6 +4,8 @@
 	--text-medium: #717171;
 	--text-neutral-dark: #e1e3e4;
 	--fill-neutral-light: #F0F2F3;
+	--fill-black: #1D1D23;
+	--text-strong: #1D1D23;
 }
 
 .inverse .alert-success {
@@ -193,3 +195,13 @@ input.has-password-visibility.form-control.is-valid + .password-visibility-toggl
 .profile-grid a.youtube:before {
 	background-image: url("/images/ui/socialmedia/icon-youtube-dark.svg");
 }
+
+/* Black for nav-pills (used on Dashboard > Pledges) */
+.nav-pills .nav-link {
+	color: var(--text-strong);
+}
+.nav-pills .nav-link.active {
+	background-color: var(--fill-black);
+}
+
+
