@@ -253,10 +253,12 @@ router.post('/:id/pledge', auth.authorize, csrf.validateToken, async(req, res) =
 			break;
 		default:
 			res.status(400).send('Invalid frequency: ' + frequency);
+			return;
 	}
 
 	if(isNaN(amount) || amount < 5) {
 		res.status(400).send('Invalid amount: ' + amount + '. Must be 5 or greater.');
+		return;
 	}
 
 	try {
