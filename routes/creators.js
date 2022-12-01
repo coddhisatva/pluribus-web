@@ -278,7 +278,11 @@ router.post('/:id/pledge', auth.authorize, csrf.validateToken, async(req, res) =
 });
 
 router.get('/:id/pledged', auth.authorize, async(req, res) => {
-	res.render('creators/pledged');
+	let creator = await Creator.findByPk(req.params.id);
+	if(!creator) {
+		res.status(404).send('Creator not found.');
+	}
+	res.render('creators/pledged', { creator });
 });
 
 module.exports = router;
