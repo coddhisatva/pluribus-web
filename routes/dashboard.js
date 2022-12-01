@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
-const { sequelize, User, Creator, Follow, CardPaymentMethod, Pledge } = require('../models');
+const { sequelize, User, Creator, Follow, CardPaymentMethod, Pledge, PolicyExecution, PolicyExecutionSupporter } = require('../models');
 const mysql = require('mysql2');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/tmp' });
@@ -13,13 +13,16 @@ const sharp = require('sharp');
 const { serialize } = require('v8');
 const credentials = require('../config/credentials');
 const crypto = require('crypto');
+const creator = require('../models/creator');
 
 router.get('/', auth.authorize, async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userId: user.id }});
 	var following = await Follow.findAll({ where: { userId: user.id }, include: Creator });
 
-	res.render('dashboard/index', { user, creator, following });
+	var executed = await PolicyExecutionSupporter.findAll({ where: { userId: user.id, agree: null }, include: { model: PolicyExecution, include: Creator } });
+
+	res.render('dashboard/index', { user, creator, following, executed });
 });
 
 router.get('/profile', auth.authorizeRole('creator'), async function(req, res, next) {
@@ -287,23 +290,124 @@ router.post('/policy',
 );
 
 router.get('/execute-policy', auth.authorizeRole('creator'), async function(req, res, next) {
+	const user = await User.findOne({ where: { id: req.authUser.id }});
+	const creator = await Creator.findOne({ where: { userId: user.id }});
+
+	// TODO: de-duplicate in all /execute-policy routes
+	var active = await PolicyExecution.findAll({ where: { creatorId: creator.id, processedAt: null }});
+	if(active && active.length) {
+		res.send("You already have an active policy execution!");
+		return;
+	}
+
 	res.redirect('/dashboard/execute-policy/1');
 });
 
 router.get('/execute-policy/1', auth.authorizeRole('creator'), async function(req, res, next) {
+	const user = await User.findOne({ where: { id: req.authUser.id }});
+	const creator = await Creator.findOne({ where: { userId: user.id }});
+
+	// TODO: de-duplicate in all /execute-policy routes
+	var active = await PolicyExecution.findAll({ where: { creatorId: creator.id, processedAt: null }});
+	if(active && active.length) {
+		res.send("You already have an active policy execution!");
+		return;
+	}
+
 	res.render('dashboard/execute-policy-step1');
 });
 router.get('/execute-policy/2', auth.authorizeRole('creator'), async function(req, res, next) {
+	const user = await User.findOne({ where: { id: req.authUser.id }});
+	const creator = await Creator.findOne({ where: { userId: user.id }});
+
+	// TODO: de-duplicate in all /execute-policy routes
+	var active = await PolicyExecution.findAll({ where: { creatorId: creator.id, processedAt: null }});
+	if(active && active.length) {
+		res.send("You already have an active policy execution!");
+		return;
+	}
+
 	res.render('dashboard/execute-policy-step2');
 });
 router.post('/execute-policy/3', auth.authorizeRole('creator'), async function(req, res, next) {
-	var reason = req.body.reason;
-	var user = await User.findOne({ where: { id: req.authUser.id }});
-	var creator = await Creator.findOne({ where: { userId: user.id }});
+	const user = await User.findOne({ where: { id: req.authUser.id }});
+	const creator = await Creator.findOne({ where: { userId: user.id }});
+
+	// TODO: de-duplicate in all /execute-policy routes
+	var active = await PolicyExecution.findAll({ where: { creatorId: creator.id, processedAt: null }});
+	if(active && active.length) {
+		res.send("You already have an active policy execution!");
+		return;
+	}
+
+	const reason = req.body.reason;
+	req.session.policyExecution = { reason };
 	res.render('dashboard/execute-policy-step3', { reason, creator });
 });
+
 router.get('/execute-policy/executed', auth.authorizeRole('creator'), async function(req, res, next) {
+	const user = await User.findOne({ where: { id: req.authUser.id }});
+	const creator = await Creator.findOne({ where: { userId: user.id }});
+
+	// TODO: de-duplicate in all /execute-policy routes
+	var active = await PolicyExecution.findAll({ where: { creatorId: creator.id, processedAt: null }});
+	if(active && active.length) {
+		res.send("You already have an active policy execution!");
+		return;
+	}
+
+	// Save the policy execution to DB
+	const reason = req.session.policyExecution.reason;
+	const executedAt = new Date();
+	let execution = await PolicyExecution.create({ creatorId: creator.id, reason, executedAt });
+
+	const pledges = await Pledge.findAll({ where: { creatorId: creator.id }});
+	for await(pledge of pledges) {
+		const executionSupporter = await PolicyExecutionSupporter.create({
+			policyExecutionId: execution.id,
+			userId: pledge.userId,
+			pledgeId: pledge.id,
+		});
+	}
+
+	// TODO: Notify supporters via email
+
 	res.render('dashboard/execute-policy-executed');
+});
+
+router.post('/policy-execution-response/:id', auth.authorize, async (req, res) => {
+	const response = req.body.response;
+
+	const user = await User.findByPk(req.authUser.id);
+	const policyExecution = await PolicyExecution.findByPk(req.params.id);
+	if(!policyExecution) {
+		res.status(404).send('Policy execution not found');
+		return;
+	}
+
+	const policyExecutionSupporter = await PolicyExecutionSupporter.findOne({ where: { policyExecutionId: policyExecution.id, userId: user.id }});
+	if(!policyExecutionSupporter) {
+		res.status(404).send('You can not respond to this policy');
+		return;
+	}
+
+	switch(response) {
+		case 'agree':
+			policyExecutionSupporter.agree = true;
+			policyExecutionSupporter.respondedAt = new Date();
+			await policyExecutionSupporter.save();
+			res.render('dashboard/policy-execution-response-agreed');
+			return;
+		case 'disagree':
+			policyExecutionSupporter.agree = false;
+			policyExecutionSupporter.respondedAt = new Date();
+			await policyExecutionSupporter.save();
+			res.render('dashboard/policy-execution-response-disagreed');
+			return;
+		default:
+			res.status(400).send('Invalid response');
+			return;
+	}
 });
 
 router.get('/security', async function(req, res, next) {

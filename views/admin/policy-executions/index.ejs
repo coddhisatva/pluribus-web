@@ -1,0 +1,22 @@
+<h1>Policy Executions</h1>
+
+<table class="table">
+	<thead>
+		<tr>
+			<td>Creator</td>
+			<td></td>
+			<td>Executed</td>
+			<td>Processed</td>
+		</tr>
+	</thead>
+	<% for(execution of executions) { %>
+	<tr>
+		<td>
+			<a href="/admin/creators/<%= execution.creatorId %>"><%= execution.Creator.name || execution.Creator.User.email %></a>
+		</td>
+		<td><a href="/admin/policy-executions/<%= execution.id %>">Detail</a></td>
+		<td><%= when(execution.executedAt) %></td>
+		<td><%= execution.processedAt ? when(execution.processedAt) : 'unprocessed' %></td>
+	</tr>
+	<% } %>
+</table>

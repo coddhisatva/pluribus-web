@@ -4,7 +4,7 @@ const auth = require('../utils/auth');
 const csrf = require('../utils/csrf');
 const credentials = require('../config/credentials');
 const email = require('../utils/email');
-const { Creator, User, sequelize } = require('../models');
+const { Creator, User, sequelize, PolicyExecution } = require('../models');
 
 router.all('*', (req, res, next) => {
 	if(!/log(?:in|out)?/.test(req.path)) {
@@ -119,6 +119,11 @@ router.post('/users/:id/delete', csrf.validateToken, async function(req, res, ne
 	
 	req.flash.notice = `${user.email} was deleted successfully.`;
 	res.redirect('/admin/users');
+});
+
+router.get('/policy-executions', async (req, res) => {
+	const executions = await PolicyExecution.findAll({ include: Creator });
+	res.render('admin/policy-executions/index', { executions });
 });
 
 //#########################################################################

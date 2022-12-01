@@ -2,12 +2,55 @@
 	_locals.title = 'Dashboard';
 	_locals.nav = 'home';
 %> 
+<style>
+	/* temporary styles until John implements. */
+	.execution figure {
+		width: 80px;
+		height: 80px;
+		margin-right: 16px;
+		overflow: hidden;
+	}
+</style>
 <header>
-	<h1>Dashboard</h1>
+	<h1>Home</h1>
 </header>
 
 <div class="card">
 	<div class="card-body">
+	<% if(executed && executed.length) { %>
+		<% executed.forEach(execution => { %>
+			<div class="execution card mb-3">
+				<div class="card-body">
+					<div>
+						<div class="d-flex">
+							<figure class="border rounded-circle">
+								<img src="<%= execution.PolicyExecution.Creator.photo != null ? ('/images/uploads/creators/' + execution.PolicyExecution.Creator.id + '/' + execution.PolicyExecution.Creator.photo) : '/images/ui/avatar-unknown.svg' %>" />
+							</figure>
+							<div>
+								<div>
+									<span class="text-primary heading-sm-medium"><%= execution.PolicyExecution.Creator.name %></span>
+									policy execution
+								</div>
+								<div class="heading-xs-weak text-medium">
+									Executed <%= when(execution.PolicyExecution.executedAt) %>.
+								</div>
+							</div>
+						</div>
+						<blockquote class="text-strong">
+							"<%= execution.PolicyExecution.reason %>"
+						</blockquote>
+					</div>
+				</div><!-- .card-body -->
+				<div class="card-footer bg-transparent p-4 d-flex align-items-center justify-content-between">
+					<div class="heading-xs-medium text-strong">Does this meet the criteria you agreed to when you donated?</div>
+					<form method="post" action="/dashboard/policy-execution-response/<%= execution.id %>">
+						<button name="response" value="disagree" class="btn btn-outline px-4 me-2">No</a>
+						<button name="response" value="agree" class="btn btn-primary px-4">Yes</a>
+					</form>
+				</div>
+			</div>
+		<% }) %>
+	<% } %>
 	<% if(following && following.length) { %>
 		<h3>Following</h3>
 		<ul>
@@ -24,3 +67,6 @@
 	<% } %>
 	</div>
 </div>
+
+<%- contentFor('aside') %>
+TODO: aside
