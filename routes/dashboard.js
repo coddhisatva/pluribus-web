@@ -98,8 +98,16 @@ router.post('/profile', auth.authorizeRole('creator'), upload.single('newPhoto')
 			format: value => 'https://twitter.com/' + value
 		},
 		youtube: {
+			// TODO: we need to handle these formats
+			// https://www.youtube.com/@CoryWongMusic ✅
+			// https://www.youtube.com/user/CoryWongMusic ✅
+			// https://www.youtube.com/c/CoryWongMusic ✅
+			// https://www.youtube.com/c/CoryWongMusic/videos
+			// https://www.youtube.com/CoryWongMusic 
+			// https://www.youtube.com/channel/UCQqC08JWnJGJIgw43XJ0GXw
+			
 			parse: (value) => {
-				var m = /^\s*(?:https?:\/\/)?(?:www\.)?youtube.com\/(?:user\/|@)(\w+)/i.exec(value);
+				var m = /^\s*(?:https?:\/\/)?(?:www\.)?youtube.com\/(?:user\/|c\/|@)(\w+)/i.exec(value);
 				if(m) return m[1];
 				m = /^\s*(\w+)\s*$/i.exec(value);
 				if(m) return m[1];
@@ -109,7 +117,7 @@ router.post('/profile', auth.authorizeRole('creator'), upload.single('newPhoto')
 		},
 		instagram: {
 			parse: (value) => {
-				var m = /^\s*(?:https?:\/\/)?instagram.com\/([a-z0-9_]+)/i.exec(value);
+				var m = /^\s*(?:https?:\/\/)?(?:www\.)?instagram.com\/([a-z0-9_]+)/i.exec(value);
 				if(m) return m[1];
 				m = /^\s*([a-z0-9_]+)\s*$/i.exec(value);
 				if(m) return m[1];
