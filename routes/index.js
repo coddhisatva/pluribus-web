@@ -3,6 +3,8 @@ const { redirect } = require('express/lib/response');
 const { body, validationResult } = require('express-validator');
 var router = express.Router();
 var { Creator, PrelaunchEmail, Follow } = require('../models');
+const csrf = require('../utils/csrf');
+const credentials = require('../config/credentials');
 
 /**
  * GET /
@@ -92,6 +94,54 @@ router.get('/invite/:code', async function(req, res, next) {
 	}
 
 	res.render('creators/show', { creator, isFollowing, invite: req.params.code });
+});
+
+router.get('/support', function(req, res, next) {
+	res.render('support');
+});
+
+router.get('/support/card', function(req, res, next) {
+	res.render('support-card');
+});
+
+router.get('/support/card/init', (req, res) => {
+	// in case user loads this page manually, redirect back to the start
+	res.redirect('/support/card');
+});
+
+router.post('/support/card/init', csrf.validateToken, async (req, res, next) => {
+	// create a payment intent
+	const stripe = require('stripe')(credentials.stripe.secretKey);
+
+	let amountCents = new Number(req.body.amount) * 100;
+
+	const paymentIntent = await stripe.paymentIntents.create({
+		amount: amountCents,
+		currency: 'usd',
+		payment_method_types: [ 'card' ],
+		metadata: {
+			email: req.body.email,
+			contactable: req.body.contactable == '1',
+		}
+	});
+
+	res.render('support-card-init', { paymentIntent, stripePublicKey: credentials.stripe.publicKey });
+});
+
+router.post('/support/card/update', async(req, res) => {
+	const intent = await stripe.paymentIntents.update(
+		'{{PAYMENT_INTENT_ID}}',
+		{amount: 1499}
+	);
+	res.json({status: intent.status});
+});
+
+router.get('/support/card/complete', async (req, res) => {
+	res.render('support-card-complete', { stripePublicKey: credentials.stripe.publicKey });
+});
+
+router.get('/support/crypto', async (req, res) => {
+	res.render('support-crypto');
 });
 
 module.exports = router;

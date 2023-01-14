@@ -1,0 +1,62 @@
+<%
+_locals.title = "Support";
+_locals.nav = "support";
+%>
+<style>
+	.crypto-info {
+		display: none;
+	}
+
+	.crypto-info.show {
+		display: block;
+	}
+</style>
+<div class="wrapper-half main-content" role="main">
+	<div class="form-credentials card">
+		<div class="card-body">
+			<div class="flow">
+				<h2 class="text-strong display-xxs">Cryptocurrency</h1>
+
+				<div class="form-floating mb-4">
+					<select id="type" class="form-select" placeholder="Select cryptocurrency">
+						<option selected>Select cryptocurrency</option>
+						<option value="btc">Bitcoin</option>
+						<option value="eth">Etherium</option>
+					</select>
+					<label for="type">Cryptocurrency</label>
+				</div>
+
+				<div id="info-btc" class="crypto-info">
+					<p class="text-strong">
+						Open your crypto wallet and scan the QR code, or copy the address below to make a payment.
+					</p>
+
+					<label>BTC Address</label>
+					<div>TODO: address</div>
+				</div>
+
+				<div id="info-eth" class="crypto-info">
+					<p class="text-strong">
+						Open your crypto wallet and scan the QR code, or copy the address below to make a payment.
+					</p>
+
+					<label>ETH Address</label>
+					<div>TODO: address</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	const type = document.getElementById('type');
+	type.addEventListener('change', function() {
+		document.querySelectorAll('.crypto-info.show').forEach(function(el) {
+			el.classList.remove('show');
+		});
+		let info = document.getElementById('info-' + type.value);
+		if(info) {
+			info.classList.add('show');
+		}
+	});
+</script>

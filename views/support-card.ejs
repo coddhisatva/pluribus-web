@@ -1,0 +1,41 @@
+<%
+	_locals.title="Support";
+	_locals.nav='support';
+%>
+
+<div class="wrapper-half main-content" role="main">
+	<div class="form-credentials card">
+		<div class="card-body">
+			<form method="post" action="/support/card/init">
+				<%- csrfToken() %>
+				<div class="flow">
+					<h1 class="display-xxs text-dark">Card info</h1>
+
+					<div class="form-floating mb-4">
+						<input type="number" id="amount" name="amount" class="form-control" placeholder="Tip amount" required min="3" />
+						<label for="amount">Tip amount</label>
+						<div class="form-text">$3 tip minimum</div>
+						<div class="invalid-feedback">
+							Please enter a tip amount
+						</div>
+					</div>
+
+					<div class="form-floating mb-4">
+						<input type="text" id="email" class="form-control" placeholder="Email" name="email" />
+						<label for="email">Email</label>
+					</div>
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" value="1" id="contactable" name="contactable">
+						<label class="form-check-label" for="contactable">
+							It's ok to contact me in future
+						</label>
+					</div>
+
+					<div>
+						<button class="btn bg-black text-white heading-md-medium">Continue</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,47 @@
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+	const stripe = Stripe('<%= stripePublicKey %>');
+
+	// Retrieve the "payment_intent_client_secret" query parameter appended to
+	// your return_url by Stripe.js
+	const clientSecret = new URLSearchParams(window.location.search).get(
+	'payment_intent_client_secret'
+	);
+
+	// Retrieve the PaymentIntent
+	stripe.retrievePaymentIntent(clientSecret).then(({paymentIntent}) => {
+	const message = document.querySelector('#message');
+
+	switch (paymentIntent.status) {
+		case 'succeeded':
+			message.innerText = 'Success! Payment received.';
+			break;
+
+		case 'processing':
+			message.innerText = "Payment processing. We'll update you when payment is received.";
+			break;
+
+		case 'requires_payment_method':
+			message.innerText = 'Payment failed. Please try another payment method.';
+			document.getElementById('back').style.display = '';
+			break;
+
+		default:
+			message.innerText = 'Something went wrong.';
+			document.getElementById('back').style.display = '';
+			break;
+	}
+	});
+</script>
+<div class="wrapper-half main-content" role="main">
+	<div class="form-credentials card">
+		<div class="card-body">
+			<div class="flow text-center">
+				<img src="/images/content/symbols/Networked.svg" alt="" style="max-width:200px" />
+
+				<h2 id="message" class="text-strong"></h1>
+				<a id="back" style="display:none" href="/support/card">Try again</a>
+			</div>
+		</div>
+	</div>
+</div>

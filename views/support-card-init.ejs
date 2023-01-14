@@ -1,0 +1,105 @@
+<%
+	_locals.title="Support";
+	_locals.nav='support';
+%>
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+	const stripe = Stripe('<%= stripePublicKey %>');
+	const options = {
+		clientSecret: '<%= paymentIntent.client_secret %>',
+		fonts: [
+			{ cssSrc: 'https://fonts.googleapis.com/css2?family=Rubik:wght@400' }
+		],
+		appearance: {
+			variables: {
+				fontFamily: 'Rubik, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
+				fontSizeBase: '16px',
+				colorPrimary: '#555af7',
+				colorText: '#212529',
+				spacingGridRow: '24px'
+			},
+			rules: {
+				'.Input': {
+					borderColor: '#ced4da',
+					lineHeight: '1.25',
+					padding: '8px',
+					boxShadow: 'none'
+				},
+				'.Input:focus': {
+					boxShadow: '0 0 0 0.25rem rgba(85,90,247,0.25)'
+				},
+				'.Label--resting': {
+					color: '#717171'
+				}
+			},
+			labels: 'floating',
+		}
+	};
+
+	// Set up Stripe.js and Elements to use in checkout form, passing the client secret obtained in step 3
+	const elements = stripe.elements(options);
+
+	// Create and mount the Payment Element
+	const paymentElement = elements.create('payment');
+	paymentElement.mount('#payment-element');
+
+	const form = document.getElementById('payment-form');
+	form.addEventListener('submit', async (event) => {
+		event.preventDefault();
+
+		const {error} = await stripe.confirmPayment({
+			elements,
+			confirmParams: {
+				return_url: '<%= `${req.protocol}://${req.headers.host}/support/card/complete` %>',
+			},
+		});
+
+		if (error) {
+			const messageContainer = document.querySelector('#error-message');
+			messageContainer.textContent = error.message;
+		}
+	});
+
+</script>
+
+<div class="wrapper-half main-content" role="main">
+	<div class="form-credentials card">
+		<div class="card-body">
+			<form id="payment-form" method="post" data-secret="<%= paymentIntent.client_secret %>">
+				<%- csrfToken() %>
+				<div class="flow">
+					<h1 class="display-xxs text-dark">Card info</h1>
+
+					<div class="form-floating mb-4">
+						<input type="text" readonly class="form-control" value="<%= paymentIntent.amount / 100 %>" />
+						<label for="amount">Tip amount</label>
+						<div class="form-text">$3 tip minimum</div>
+					</div>
+
+					<div class="form-floating mb-4">
+						<input type="text" readonly class="form-control" value="<%= paymentIntent.metadata.email %>" />
+						<label for="email">Email</label>
+					</div>
+					<div class="form-check">
+						<input class="form-check-input" readonly type="checkbox" <%= paymentIntent.metadata.contactable ? "checked": "" %>>
+						<label class="form-check-label" for="contactable">
+							It's ok to contact me in future
+						</label>
+					</div>
+
+					<div id="payment-element">
+						<!-- Elements will create form elements here -->
+					</div>					
+					
+					<div>
+						<button class="btn btn-primary heading-md-medium">Submit $<%= paymentIntent.amount / 100 %> tip</button>
+					</div>
+
+					<div id="error-message">
+						<!-- Display error message to your customers here -->
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

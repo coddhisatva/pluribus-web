@@ -1,0 +1,53 @@
+<%
+	_locals.title="Support";
+	_locals.nav='support';
+%>
+<style>
+	a.selection {
+		transition: box-shadow .1s, color .1s;
+		flex-grow: 1;
+		outline: 1px solid var(--bs-gray-300);
+	}
+
+	a.selection svg {
+		height: 24px;
+		width: 24px;
+		float: right;
+	}
+	
+	a.selection:hover {
+		outline-color: var(--bs-primary) !important;
+		outline-width: 2px;
+		box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.12) !important;
+	}
+</style>
+
+<div class="wrapper-half main-content" role="main">
+	<div class="form-credentials card">
+		<div class="card-body">
+			<div class="flow">
+				<h1 class="display-xxs text-dark">Support Pluribus</h1>
+
+				<p class="body-sm-weak">
+					You can help to build a stronger, more vibrant community. We are providing a gathering
+					place for people to come together and connect.
+				</p>
+
+				<div>
+					<h3 class="heading-lg-medium text-strong">Ways to give</h3>
+					<div class="d-flex">
+						<a class="selection rounded bg-white p-4 mb-2 text-decoration-none text-strong heading-sm-weak me-2" href="/support/card">
+							Credit/Debit card
+							<svg><use href="/images/ui/icons.svg#credit-card"></use></svg>
+						</a>
+				
+						<a class="selection rounded bg-white p-4 mb-2 text-decoration-none text-strong heading-sm-weak ms-2" href="/support/crypto">
+							Cryptocurrency
+							<svg><use href="/images/ui/icons.svg#bitcoin"></use></svg>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
