@@ -46,6 +46,7 @@
 	const form = document.getElementById('payment-form');
 	form.addEventListener('submit', async (event) => {
 		event.preventDefault();
+		document.body.classList.add('page-loading');
 
 		const {error} = await stripe.confirmPayment({
 			elements,
@@ -57,6 +58,7 @@
 		if (error) {
 			const messageContainer = document.querySelector('#error-message');
 			messageContainer.textContent = error.message;
+			document.body.classList.remove('page-loading');
 		}
 	});
 
@@ -81,7 +83,7 @@
 						<label for="email">Email</label>
 					</div>
 					<div class="form-check">
-						<input class="form-check-input" readonly type="checkbox" <%= paymentIntent.metadata.contactable ? "checked": "" %>>
+						<input class="form-check-input" disabled type="checkbox" <%= paymentIntent.metadata.contactable == 'true' ? "checked": "" %>>
 						<label class="form-check-label" for="contactable">
 							It's ok to contact me in future
 						</label>
