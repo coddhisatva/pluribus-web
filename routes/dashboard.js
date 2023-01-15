@@ -353,7 +353,7 @@ router.post('/execute-policy/3', auth.authorizeRole('creator'), async function(r
 	res.render('dashboard/execute-policy-step3', { reason, creator });
 });
 
-router.get('/execute-policy/executed', auth.authorizeRole('creator'), async function(req, res, next) {
+router.get('/execute-policy/execute', auth.authorizeRole('creator'), async function(req, res, next) {
 	const user = await User.findOne({ where: { id: req.authUser.id }});
 	const creator = await Creator.findOne({ where: { userId: user.id }});
 
@@ -380,6 +380,10 @@ router.get('/execute-policy/executed', auth.authorizeRole('creator'), async func
 
 	// TODO: Notify supporters via email
 
+	res.redirect('/dashboard/execute-policy/executed');
+});
+
+router.get('/execute-policy/executed', (req, res) => {
 	res.render('dashboard/execute-policy-executed');
 });
 
