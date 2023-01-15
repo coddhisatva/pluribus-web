@@ -78,7 +78,7 @@ var globalFuncs = {
 	// for the edit view to use.
 	profileLookups: {
 		Twitter: /twitter.com\/(.*)/,
-		YouTube: /youtube.com\/user\/(.*)/,
+		YouTube: /youtube.com\/(?:user\/|c\/|@)(.*)/,
 		Instagram: /instagram.com\/(.*)/,
 		Substack: /(?:https?:\/\/)?([^\.]*.substack.com)/,
 	},

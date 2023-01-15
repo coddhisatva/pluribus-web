@@ -64,12 +64,14 @@ locals.name = name;
 						<span>Referral program</span>
 					</a>
 				</li>
+				<% if(authUser.roles.indexOf('creator') != -1) { %>
 				<li>
 					<a href="/dashboard/policy" class="<%= _locals.nav == 'policy' ? 'active' : '' %>">
 						<svg><use href="/images/ui/icons.svg#website"></use></svg>
 						<span>Policy</span>
 					</a>
 				</li>
+				<% } %>
 				<li>
 					<a href="/users/logout">
 						<svg><use href="/images/ui/icons.svg#log-out"></use></svg>
