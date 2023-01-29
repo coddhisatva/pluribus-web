@@ -472,4 +472,18 @@ router.get('/pledges', auth.authorize, async (req, res) => {
 	res.render('dashboard/pledges', { creator, pledgesMade, pledgesReceived });
 });
 
+router.get('/subscription', auth.authorize, async (req, res) => {
+	const user = await User.findByPk(req.authUser.id);
+	const creator = await Creator.findOne({ where: { userid: user.id }});
+
+	res.render('dashboard/subscription', { });
+});
+
+router.get('/subscribe', auth.authorize, async (req, res) => {
+	const user = await User.findByPk(req.authUser.id);
+	const creator = await Creator.findOne({ where: { userid: user.id }});
+
+	res.render('dashboard/subscribe', { });
+});
+
 module.exports = router;

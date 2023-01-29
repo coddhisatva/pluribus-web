@@ -27,7 +27,10 @@ module.exports = (sequelize, DataTypes) => {
     socialProfiles: DataTypes.STRING,
     displaySupporterCount: DataTypes.BOOLEAN,
     publicProfile: DataTypes.BOOLEAN,
-    inviteCode: DataTypes.STRING
+    inviteCode: DataTypes.STRING,
+    stripeSubscriptionId: DataTypes.STRING,
+    subscriptionAmount: DataTypes.INTEGER,
+    subscriptionCreated: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'Creator',

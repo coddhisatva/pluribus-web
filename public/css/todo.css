@@ -6,6 +6,7 @@
 	--fill-neutral-light: #F0F2F3;
 	--fill-black: #1D1D23;
 	--text-strong: #1D1D23;
+	--text-primary: #5257F7;
 }
 
 .inverse .alert-success {
