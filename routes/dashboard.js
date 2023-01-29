@@ -181,7 +181,7 @@ router.post('/payments/beginAddCreditCard', auth.authorize, async function(req, 
 
 	// Ensure we have a Stripe customer for this user.
 	if(!user.stripeCustomerId) {
-		const customer = await stripe.customers.create();
+		const customer = await stripe.customers.create({ email: user.email });
 		user.stripeCustomerId = customer.id;
 		await User.update({ stripeCustomerId: user.stripeCustomerId }, { where: { id: user.id } });
 	}
