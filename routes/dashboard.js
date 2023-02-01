@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
+const csrf = require('../utils/csrf');
 const { sequelize, User, Creator, Follow, CardPaymentMethod, Pledge, PolicyExecution, PolicyExecutionSupporter } = require('../models');
 const mysql = require('mysql2');
 const multer = require('multer');
@@ -12,8 +13,7 @@ const util = require('../utils/util');
 const sharp = require('sharp');
 const { serialize } = require('v8');
 const credentials = require('../config/credentials');
-const crypto = require('crypto');
-const creator = require('../models/creator');
+const settings = require('../config/settings');
 
 router.get('/', auth.authorize, async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
@@ -232,6 +232,13 @@ router.get('/payments/card-added', auth.authorize, async function(req, res, next
 		res.redirect('/creators/' + creatorId + '/pledge?amount=' + amount + '&frequency=' + frequency);
 		return;
 	}
+
+	if(req.query.subscribe) {
+		// Redirect back to subscribe
+		res.redirect('/dashboard/subscribe');
+		return;
+	}
+	
 	res.redirect('/dashboard/payments');
 });
 
@@ -476,14 +483,103 @@ router.get('/subscription', auth.authorize, async (req, res) => {
 	const user = await User.findByPk(req.authUser.id);
 	const creator = await Creator.findOne({ where: { userid: user.id }});
 
-	res.render('dashboard/subscription', { });
+	res.render('dashboard/subscription', { creator });
 });
 
 router.get('/subscribe', auth.authorize, async (req, res) => {
 	const user = await User.findByPk(req.authUser.id);
+
 	const creator = await Creator.findOne({ where: { userid: user.id }});
 
-	res.render('dashboard/subscribe', { });
+	if(creator.stripeSubscriptionId) {
+		req.flash.alert = 'You already have a subscription';
+		res.redirect('/dashboard/subscription');
+		return;
+	}
+	var stripePublicKey = credentials.stripe.publicKey;
+
+	const stripe = require('stripe')(credentials.stripe.secretKey);
+	const product = await stripe.products.retrieve(
+		settings.stripe.products.standardSubscription,
+		{ expand: [ 'default_price' ]}
+	);
+
+	var cardPaymentMethods = await CardPaymentMethod.findAll({ where: { userId: req.authUser.id }});
+	var primaryCardPaymentMethod = cardPaymentMethods.find(method => method.id == user.primaryCardPaymentMethodId);
+
+	res.render('dashboard/subscribe', {
+		creator,
+		stripePublicKey,
+		cardPaymentMethods,
+		primaryCardPaymentMethod,
+		amount: product.default_price.unit_amount / 100
+	});
+});
+
+router.post('/subscribe', auth.authorize, csrf.validateToken, async(req, res) => {
+	const cardId = req.body.card;
+
+	const user = await User.findByPk(req.authUser.id);
+
+	const card = await CardPaymentMethod.findOne({ where: { id: cardId }});
+
+	const stripe = require('stripe')(credentials.stripe.secretKey);
+
+	const product = await stripe.products.retrieve(settings.stripe.products.standardSubscription);
+
+	const subscription = await stripe.subscriptions.create({
+		customer: user.stripeCustomerId,
+		default_payment_method: card.stripePaymentMethodId,
+		items: [
+			{ price: product.default_price },
+		],
+	});
+
+	let creator = await Creator.findOne({ where: { userid: user.id }});
+	creator.stripeSubscriptionId = subscription.id;
+	creator.subscriptionAmount = subscription.items.data[0].price.unit_amount;
+	creator.subscriptionCreated = new Date(subscription.created * 1000);
+	creator.save();
+
+	req.flash.notice = 'Subscription was created successfully';
+
+	return res.redirect('/dashboard/subscription');
+});
+
+router.get('/cancel-subscription', auth.authorize, async(req, res) => {
+	const user = await User.findByPk(req.authUser.id);
+	const creator = await Creator.findOne({ where: { userid: user.id }});
+	if(!creator.stripeSubscriptionId) {
+		req.flash.alert = 'You don\'t have an active subscription';
+		res.redirect('/dashboard/subscription');
+		return;
+	}
+
+	res.render('dashboard/subscription-cancel', { creator });
+});
+
+router.post('/cancel-subscription', auth.authorize, csrf.validateToken, async(req, res) => {
+	const user = await User.findByPk(req.authUser.id);
+	let creator = await Creator.findOne({ where: { userid: user.id }});
+
+	if(!creator.stripeSubscriptionId) {
+		req.flash.alert = 'You don\'t have an active subscription';
+		res.redirect('/dashboard/subscription');
+		return;
+	}
+
+	const stripe = require('stripe')(credentials.stripe.secretKey);
+	await stripe.subscriptions.del(
+		creator.stripeSubscriptionId
+	);
+
+	creator.stripeSubscriptionId = null;
+	creator.subscriptionAmount = null;
+	creator.subscriptionCreated = null;
+	creator.save();
+
+	req.flash.notice = 'Your subscription was successfully cancelled.';
+	res.redirect('/dashboard/subscription');
 });
 
 module.exports = router;

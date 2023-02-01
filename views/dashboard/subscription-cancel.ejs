@@ -1,0 +1,37 @@
+<%
+_locals.title = 'Cancel Subscription';
+_locals.nav = 'subscription';
+%>
+
+<header>
+	<h1 class="display-xxs">Cancel Subscription</h1>
+</header>
+
+<form id="cancelForm" method="post">
+	<%- csrfToken() %>
+	<div class="card rounded-4">
+		<div class="card-body">
+			<div class="text-danger">
+				Are you sure you want to cancel your subscription?
+			</div>
+
+		</div><!-- .card-body -->
+		
+		<div class="card-footer text-end">
+			<a class="btn heading-md-medium btn-lg" href="/dashboard/subscription">Go back</a>
+			<button class="btn btn-lg bg-black text-white">Yes, cancel my subscription</button>
+			
+		</div>
+
+	</div><!-- .card -->
+</form>
+
+<script>
+	var cancelForm = document.getElementById('cancelForm');
+	cancelForm.addEventListener('submit', function() {
+		document.body.classList.add('page-loading');
+	})
+</script>
+
+<%- contentFor('aside') %>
+<div class="mt-0">Cancelling your subscription will mean your followers can no longer support you through Pluribus.</div>

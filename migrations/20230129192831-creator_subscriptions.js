@@ -22,7 +22,7 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.removeColumn('Creators', 'stripeSubcriptionId');
+    await queryInterface.removeColumn('Creators', 'stripeSubscriptionId');
     await queryInterface.removeColumn('Creators', 'subscriptionAmount');
     await queryInterface.removeColumn('Creators', 'subscriptionCreated');
   }

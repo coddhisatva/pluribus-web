@@ -7,6 +7,7 @@
 	--fill-black: #1D1D23;
 	--text-strong: #1D1D23;
 	--text-primary: #5257F7;
+	--bs-danger-rgb: 204, 0, 0;
 }
 
 .inverse .alert-success {
@@ -123,6 +124,7 @@ input.has-password-visibility.form-control.is-valid + .password-visibility-toggl
 	width:100%;
 	height: 100%;
 	background-color: rgba(255,255,255,0.4);
+	z-index: 1600;
 }
 
 #loading-svg {
@@ -137,7 +139,7 @@ input.has-password-visibility.form-control.is-valid + .password-visibility-toggl
 
 .page-loading #loading-svg {
 	display: block;
-	z-index: 1;
+	z-index: 2000;
 }
 
 #page-loading circle {
@@ -205,4 +207,16 @@ input.has-password-visibility.form-control.is-valid + .password-visibility-toggl
 	background-color: var(--fill-black);
 }
 
+/* Cards */
+.card-footer {
+	background-color: white;
+	padding: 16px;
+}
 
+.rounded-4 {
+    border-radius: 0.5rem !important;
+}
+
+.card.rounded-4 .card-footer:last-child {
+	border-radius: 0 0 0.5rem 0.5rem;
+}

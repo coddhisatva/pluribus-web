@@ -7,15 +7,32 @@ _locals.nav = 'subscription';
 	<h1 class="display-xxs">Subscription</h1>
 </header>
 
-<div class="card">
+<div class="card rounded-4">
 	<div class="card-body">
-		TODO: Monthly subscription
+		<div>
+			<% if(creator.stripeSubscriptionId) { %>
+				<h3 class="heading-sm-medium text-strong">Monthly subscription</h3>
+				<div class="body-sm-weak text-muted">
+					$<%= creator.subscriptionAmount / 100 %>/month, starting <%= creator.subscriptionCreated.toLocaleString('en-US', { timeZone: 'UTC', day: 'numeric', month: 'short', year: 'numeric'}) %>
+				</div>
+			<% } else { %>
+				You don't have an active subscription.
+			<% } %>
+		</div>
 
 	</div><!-- .card-body -->
+	
+	<div class="card-footer text-end">
+		<% if(creator.stripeSubscriptionId) { %>
+			<a href="/dashboard/cancel-subscription" class="text-danger text-decoration-none">Cancel Subscription</a>
+		<% } else { %>
+			<a href="/dashboard/subscribe" class="btn btn-lg btn-primary">Subscribe now</a>
+		<% } %>
+	</div>
 	
 </div><!-- .card -->
 
 <%- contentFor('aside') %>
 <svg width="36" height="36" class="text-strong"><use href="/images/ui/icons.svg#heart" /></svg>
-<h3 class="body-sm-medium text-strong mt-0">Your pledge history</h3>
-<div class="mt-0">Thanks for your support, by pledging you play a part in creating a social safety net.</div>
+<h3 class="body-sm-medium text-strong mt-0">Creator Subscription</h3>
+<div class="mt-0">Your creator subscription allows your followers to support you through Pluribus.</div>

@@ -1,21 +1,177 @@
 <%
 _locals.title = 'Subscription';
 _locals.nav = 'subscription';
+_locals.headScripts = [ 'https://js.stripe.com/v3/' ];
 %>
 
 <header>
-	<h1 class="display-xxs">Subscription</h1>
+	<h1 class="display-xxs">Subscribe</h1>
 </header>
 
-<div class="card">
-	<div class="card-body">
-		TODO: Subscribe
+<form method="post" id="subscribeForm">
+	<%- csrfToken() %>
+	<div class="card rounded-4">
+		<div class="card-body p-4">
+			<div>
+				<h3 class="heading-lg-medium text-strong">Pay with</h3>
+				<div>
+					<select id="selectCard" name="card" class="form-select">
+						<option>Select...</option>
+						<% for(var cardPaymentMethod of cardPaymentMethods) { %>
+							<option value="<%= cardPaymentMethod.id %>" <%= cardPaymentMethod.id == primaryCardPaymentMethod.id ? 'selected': ''%>>
+								<%= camelize(cardPaymentMethod.cardType) %>—***<%= cardPaymentMethod.last4 %>
+							</option>
+						<% }%>
+						<option value="new">Add a payment method...</option>
+					</select>
+					<div class="form-text">Your card will be billed immediately, recurring every month unless you cancel.</div>
+				</div>
+			</div>
+		</div><!-- .card-body -->
 
-	</div><!-- .card-body -->
-	
-</div><!-- .card -->
+		<div class="card-footer text-end bg-transparent">
+			<input type="hidden" name="amount" id="hiddenAmount" />
+			<input type="hidden" name="frequency" id="hiddenFrequency" />
+			<a href="javascript:history.go(-1);" class="btn heading-md-medium btn-lg">Cancel</a>
+			<button class="btn btn-primary btn-lg" id="submitBtn">Subscribe for $<%= amount %>/month</button>
+		</div>
+		
+	</div><!-- .card -->
+
+</form>
+
+<%- include('../_add-card-modal.ejs') %>
+
+<script>
+
+	var selectCard = document.getElementById('selectCard');
+	selectCard.addEventListener('change', function(e) {
+		if(selectCard.value == 'new') {
+			addCardModal.show();
+			addCardModalShown = true;
+		}
+	});	
+
+	var addCardModal = new bootstrap.Modal(document.getElementById('addCardModal'));
+	var addCardForm = document.getElementById('addCardForm');
+	var stripeErrorMessage = document.getElementById('stripeErrorMessage');
+	var addCardModalShown = false;
+
+	// Prepare Stripe ahead of time
+	const stripe = Stripe('<%= stripePublicKey %>');
+	var stripeElements;
+	fetch('/dashboard/payments/beginAddCreditCard', { method: 'post' })
+		.then(function(response) {
+			response.json().then(function(json) {
+				var secret = json.clientSecret;
+
+				// Set up credit card form
+				const options = {
+					clientSecret: secret,
+					fonts: [
+						{ cssSrc: 'https://fonts.googleapis.com/css2?family=Rubik:wght@400' }
+					],
+					appearance: {
+						variables: {
+							fontFamily: 'Rubik, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
+							fontSizeBase: '16px',
+							colorPrimary: '#555af7',
+							colorText: '#212529',
+							spacingGridRow: '24px'
+						},
+						rules: {
+							'.Input': {
+								borderColor: '#ced4da',
+								lineHeight: '1.25',
+								padding: '8px',
+								boxShadow: 'none'
+							},
+							'.Input:focus': {
+								boxShadow: '0 0 0 0.25rem rgba(85,90,247,0.25)'
+							},
+							'.Label--resting': {
+								color: '#717171'
+							}
+						},
+						labels: 'floating',
+					}
+				};
+				
+				stripeElements = stripe.elements(options);
+				const paymentElement = stripeElements.create('payment', { business: { name: 'Pluribus' }});
+
+				// Stripe will not be able to compute styles for floating labels correctly when the modal is not displayed
+				// So we display it temporarily (while hidden) to allow Stripe to compute layout, then hide it again.
+				// We need to wait a while for Stripe to 'mount', so we wait 1s before resetting modal back to normal. 
+				addCardModal._element.style.visibility = 'hidden';
+				addCardModal._element.style.display = 'block';
+				
+				paymentElement.mount('#stripePaymentElement');
+				setTimeout(function() {
+					// We don't want to hide the modal if it has been opened in the time elapsed since we
+					// started waiting for stripe to mount.
+					if(!addCardModalShown) {
+						addCardModal._element.style.display = null;
+					}
+					addCardModal._element.style.visibility = null;
+				}, 1000);
+
+				paymentElement.on('change', () => stripeErrorMessage.classList.add('visually-hidden') );
+			});
+		});
+
+	addCardForm.addEventListener('submit', async function(event) {
+		event.preventDefault();
+
+		var nickname = document.getElementById('cardNickname').value;
+		var firstName = document.getElementById('cardFirstName').value;
+		var lastName = document.getElementById('cardLastName').value;
+
+		// Validate our fields first
+		if(!addCardForm.checkValidity()) {
+			addCardForm.classList.add('was-validated');
+			return;
+		}
+
+		document.body.classList.add('page-loading');
+
+		const {error} = await stripe.confirmSetup({
+			elements: stripeElements,
+			confirmParams: {
+				return_url: '<%= `${req.protocol}://${req.headers.host}/dashboard/payments/card-added` %>?subscribe=1',
+				payment_method_data: {
+					metadata: {
+						nickname,
+						firstName,
+						lastName
+					}
+				}
+			}
+		})
+
+		if(error) { 
+			stripeErrorMessage.textContent = error.message;
+			stripeErrorMessage.classList.remove('visually-hidden');
+
+			document.body.classList.remove('page-loading');
+		}		
+	});
+
+	// We need to do this rather than just use [data-bs-dismiss="modal"] because
+	// the button is inside a form and we need to prevent the form submitting.
+	var cancelAddCardBtn = document.getElementById('cancelAddCardBtn');
+	cancelAddCardBtn.addEventListener('click', e => {
+		e.preventDefault();
+		addCardModal.hide();
+	})
+
+	var subscribeForm = document.getElementById('subscribeForm');
+	subscribeForm.addEventListener('submit', function() {
+		document.body.classList.add('page-loading');
+	})
+</script>
 
 <%- contentFor('aside') %>
 <svg width="36" height="36" class="text-strong"><use href="/images/ui/icons.svg#heart" /></svg>
-<h3 class="body-sm-medium text-strong mt-0">Your pledge history</h3>
-<div class="mt-0">Thanks for your support, by pledging you play a part in creating a social safety net.</div>
+<h3 class="body-sm-medium text-strong mt-0">Creator Subscription</h3>
+<div class="mt-0">Your creator subscription allows your followers to support you through Pluribus.</div>
