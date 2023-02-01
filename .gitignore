@@ -3,5 +3,6 @@
 /data
 /public/images/uploads
 /config/credentials.js
+/config/settings.js
 
 .DS_Store
