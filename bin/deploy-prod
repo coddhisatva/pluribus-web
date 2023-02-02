@@ -16,16 +16,27 @@ npm install
 NODE_ENV=production npx sequelize db:migrate
 
 # Restart the server
-pkill -f NODE_ENV=production pm2 /root/prod/bin/www
-screen -S prod -X stuff 'cd /root/prod\n'
-screen -S prod -X stuff 'NODE_ENV=production pm2 /root/prod/bin/www\n'
+pm2 restart pluribus
 
 exit
 ENDSSH
 
+# Note: if starting from scratch, in order for Git credentials to work you need to run:
+# git config credential.helper store
+
 # Note to restart server:
 # screen -r prod
-# (Press Ctrl-C) or run `pkill -f /root/prod/bin/www`
-# node /root/prod/bin/www
+#
+# Run one of these to see what the pm2 process is doing:
+# pm2 show pluribus
+# -or-
+# pm2 list
+# 
+# If you need to start a new pm2 process:
+# NODE_ENV=production PORT=3001 pm2 start /root/prod/bin/www  --name pluribus
+#
+# Or, if you need to restart the existing pm2 process:
+# pm2 restart pluribus
+# 
 # (To detach from screen press Ctrl-A then Ctrl-D)
 # (If prod screen not there, you can start one with screen -R prod)
