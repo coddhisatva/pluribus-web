@@ -8,6 +8,7 @@ const logger = require('morgan');
 const auth = require('./utils/auth');
 const flash = require('./utils/flash');
 const viewUtils = require('./utils/viewUtils');
+const fs = require('fs');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -83,6 +84,18 @@ app.use(function(err, req, res, next) {
 	// render the error page
 	res.status(err.status || 500);
 	res.render('error', { layout: false });
+
+	// Log to /logs/error.log
+	const logDir = path.join(__dirname, 'logs');
+	const logPath = path.join(logDir, 'error.log');
+	if(!fs.existsSync(logDir)){
+		fs.mkdirSync(logDir);
+	}
+	fs.appendFile(logPath, new Date().toISOString() + ": " + err.message + "\n" + err.stack + "\n\n", err => {
+		if(err) {
+			console.error(err);
+		}
+	});
 });
 
 app.locals.validationMessage = function(paramName) {
