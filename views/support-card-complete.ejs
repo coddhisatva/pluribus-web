@@ -11,14 +11,17 @@
 	// Retrieve the PaymentIntent
 	stripe.retrievePaymentIntent(clientSecret).then(({paymentIntent}) => {
 	const message = document.querySelector('#message');
+	const shareIcons = document.getElementById('shareIcons');
 
 	switch (paymentIntent.status) {
 		case 'succeeded':
 			message.innerText = 'Success! Payment received.';
+			shareIcons.style.display = '';
 			break;
 
 		case 'processing':
 			message.innerText = "Payment processing. We'll update you when payment is received.";
+			shareIcons.style.display = '';
 			break;
 
 		case 'requires_payment_method':
@@ -33,6 +36,7 @@
 	}
 	});
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sharer.js@latest/sharer.min.js"></script>
 <div class="wrapper-half main-content" role="main">
 	<div class="form-credentials card">
 		<div class="card-body">
@@ -40,6 +44,11 @@
 				<img src="/images/content/symbols/Networked.svg" alt="" style="max-width:200px" />
 
 				<h2 id="message" class="text-strong"></h1>
+				<div id="shareIcons" class="d-flex flex-wrap justify-content-center" style="display:none">
+					<button class="btn btn-primary m-1" data-sharer="twitter" data-title="I just supported Pluribus!" data-hashtags="cancellationinsurance" data-url="<%= req.protocol %>://<%= req.hostname %>"><img src="/images/ui/socialmedia/icon-twitter.svg"/> Share on Twitter</button>
+					<button class="btn btn-primary m-1" data-sharer="facebook" data-hashtag="cancellationinsurance" data-url="<%= req.protocol %>://<%= req.hostname %>"><img src="/images/ui/socialmedia/icon-facebook.svg"/> Share on Facebook</button>
+					<button class="btn btn-dark m-1" data-sharer="email" data-title="Pluribus" data-url="<%= req.protocol %>://<%= req.hostname %>" data-subject="Hey! Check out Pluribus" data-to="some@email.com">Share via Email</button>
+				</div>
 				<a id="back" style="display:none" href="/support/card">Try again</a>
 			</div>
 		</div>

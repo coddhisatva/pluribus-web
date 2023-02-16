@@ -58,6 +58,7 @@
 		if (error) {
 			const messageContainer = document.querySelector('#error-message');
 			messageContainer.textContent = error.message;
+			messageContainer.classList.remove('d-none');
 			document.body.classList.remove('page-loading');
 		}
 	});
@@ -97,7 +98,7 @@
 						<button class="btn btn-primary heading-md-medium">Submit $<%= paymentIntent.amount / 100 %> tip</button>
 					</div>
 
-					<div id="error-message">
+					<div id="error-message" class="d-none alert alert-danger">
 						<!-- Display error message to your customers here -->
 					</div>
 				</div>
