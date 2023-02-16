@@ -245,7 +245,7 @@ router.post('/:id/pledge', auth.authorize, csrf.validateToken, async(req, res) =
 
 	// Note: DB constraint will disallow multiple pledges by a user to the same creator
 
-	const frequency = req.body.frequency;
+	const frequency = 'once'; //req.body.frequency;
 	const amount = Number(req.body.amount);
 
 	switch(frequency) {
