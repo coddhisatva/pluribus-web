@@ -1,6 +1,6 @@
 @charset "UTF-8";
 /**
- * CSS Compiled on: 2022-10-04 22:39:24 -07:00
+ * CSS Compiled on: 2023-03-25 19:25:37 -07:00
  * ============================================================================== *
  */
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Display:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap");
@@ -10890,6 +10890,12 @@ a:hover {
   margin-right: 0.15em;
 }
 
+.eclipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 body {
   background-color: #f0f2f3;
 }
@@ -11645,6 +11651,29 @@ header.nonav figure {
 }
 .social-list a[href~="github.com"]:before {
   background-image: url("../images/ui/socialmedia/icon-github.svg");
+}
+
+.newsletter {
+  padding: 2.25rem 0;
+}
+.newsletter p {
+  margin: 0;
+}
+.newsletter .columns {
+  align-items: center;
+}
+.newsletter .columns > * {
+  flex: 1;
+}
+.newsletter .content-holder {
+  max-width: 550px;
+}
+.newsletter .form-holder {
+  max-width: 480px;
+}
+.newsletter .btn {
+  white-space: nowrap;
+  flex: 0;
 }
 
 *[data-state=warning] *:first-child::before {
