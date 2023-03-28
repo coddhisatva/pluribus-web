@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-GITGUD_CREDS=`echo 'host=gitgud.io\n\n' | git credential-osxkeychain get`
+GITGUD_CREDS=`echo 'protocol=https\nhost=gitgud.io\n\n' | git credential fill`
 GITGUD_USERNAME=`echo $GITGUD_CREDS | sed -ne 's/username=//p'`
 GITGUD_PASSWORD=`echo $GITGUD_CREDS | sed -ne 's/password=//p'`
 
