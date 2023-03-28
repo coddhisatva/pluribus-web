@@ -220,3 +220,20 @@ input.has-password-visibility.form-control.is-valid + .password-visibility-toggl
 .card.rounded-4 .card-footer:last-child {
 	border-radius: 0 0 0.5rem 0.5rem;
 }
+
+/* Social icons */
+.social-list a[href^="https://twitter.com/"]:before {
+	background-image: url("../images/ui/socialmedia/icon-twitter.svg");
+}
+.social-list a[href^="https://discord.gg/"]:before {
+	background-image: url("../images/ui/socialmedia/icon-discord.svg");
+}
+.social-list a[href^="https://t.me/"]:before {
+	background-image: url("../images/ui/socialmedia/icon-telegram.svg");
+}
+.social-list a[href$=".substack.com/"]:before {
+	background-image: url("../images/ui/socialmedia/icon-substack.svg");
+}
+.social-list a[href^="https://www.youtube.com"]:before {
+	background-image: url("../images/ui/socialmedia/icon-youtube.svg");
+}
