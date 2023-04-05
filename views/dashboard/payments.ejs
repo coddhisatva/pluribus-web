@@ -10,6 +10,27 @@ _locals.headScripts = [ 'https://js.stripe.com/v3/' ];
 
 <div class="card">
 	<div class="card-body">
+		<% if(authUser.roles.indexOf('creator') != -1) { %>
+		<div class="row">
+			<% if(creator.stripeConnectedAccountOnboarded) { %>
+				<div class="col">
+					<h3>Stripe</h3>
+					<p class="fs-6">Your Stripe account is connected and ready to accept payouts.</p>
+				</div>
+			<% } else { %>
+				<div class="col">
+					<h3>Set up Stripe</h3>
+					<p class="fs-6">Takes about 5 minutes. This is how money from supporters gets into your bank account.</p>
+				</div>
+				<div class="col text-end">
+					<a class="btn btn-primary" href="/dashboard/payments/connect-stripe-account" id="connectStripeAccountBtn">Connect with Stripe</a>
+				</div>			
+			
+			<% } %>
+		</div>
+		<hr />
+		<% } %>
+
 		<h3 class="heading-sm-weak">
 			Payment history
 			<a href="#" class="text-medium float-end">View payments</a>
@@ -306,6 +327,16 @@ _locals.headScripts = [ 'https://js.stripe.com/v3/' ];
 				});
 		});
 	});
+
+	var connectStripeAccountBtn = document.getElementById('connectStripeAccountBtn');
+	if(connectStripeAccountBtn) {
+		connectStripeAccountBtn.addEventListener('click', function() {
+			setTimeout(function() {
+				document.body.classList.add('page-loading');
+				connectStripeAccountBtn.text = 'Please wait...';
+			}, 1)
+		})
+	}
 
 
 </script>

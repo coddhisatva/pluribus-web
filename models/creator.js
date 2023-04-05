@@ -30,7 +30,9 @@ module.exports = (sequelize, DataTypes) => {
     inviteCode: DataTypes.STRING,
     stripeSubscriptionId: DataTypes.STRING,
     subscriptionAmount: DataTypes.INTEGER,
-    subscriptionCreated: DataTypes.DATE
+    subscriptionCreated: DataTypes.DATE,
+    stripeConnectedAccountId: DataTypes.STRING,
+    stripeConnectedAccountOnboarded: DataTypes.BOOLEAN,
   }, {
     sequelize,
     modelName: 'Creator',

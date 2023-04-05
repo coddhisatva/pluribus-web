@@ -1,11 +1,7 @@
 <div class="card">
 	<div class="card-body">
-		<div class="alert alert-info">
-			Your answer has been recorded. Thanks!
-		</div>
+		<form action="/dashboard/policy-execution-response/<%= policyExecution.id %>/pay" method="POST">
+			<button type="submit" class="btn btn-primary">Send $<%= pledge.amount %> to <%= creator.name %></button>
+		</form>
 	</div><!-- .card-body -->
 </div><!-- .card -->
-
-
-<%- contentFor('aside') %>
-TODO: aside

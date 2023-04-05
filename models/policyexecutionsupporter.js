@@ -18,7 +18,9 @@ module.exports = (sequelize, DataTypes) => {
     pledgeId: DataTypes.INTEGER,
 	  agree: DataTypes.BOOLEAN,
     respondedAt: DataTypes.DATE,
-	  feedback: DataTypes.STRING
+	  feedback: DataTypes.STRING,
+    stripeCheckoutSessionId: DataTypes.STRING,
+    stripeCheckoutSessionPaid: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'PolicyExecutionSupporter',

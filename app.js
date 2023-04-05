@@ -16,6 +16,7 @@ var creatorsRouter = require('./routes/creators');
 var supportersRouter = require('./routes/supporters');
 var dashboardRouter = require('./routes/dashboard');
 var adminRouter = require('./routes/admin');
+var stripeRouter = require('./routes/stripe');
 
 var app = express();
 
@@ -31,7 +32,7 @@ app.use(logger('dev'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(express.json());
+//app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(cookieSession({
@@ -69,6 +70,7 @@ app.use('/users', usersRouter);
 app.use('/creators', creatorsRouter);
 app.use('/supporters', supportersRouter);
 app.use('/dashboard', dashboardRouter);
+app.use('/stripe', stripeRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -277,6 +277,103 @@ router.post('/payments/delete-payment-method', auth.authorize, async function(re
 	res.status(200).json({ message: 'Card was removed successfully' });
 });
 
+router.get('/payments/connect-stripe-account', auth.authorizeRole('creator'), async(req, res) => {
+	// Create an Express connected account and prefill information
+	// See: https://stripe.com/docs/connect/collect-then-transfer-guide
+
+	var user = await User.findByPk(req.authUser.id);
+	var creator = await Creator.findOne({ where: {
+		userid: user.id
+	}});
+
+	const stripe = require('stripe')(credentials.stripe.secretKey);
+
+	let account;
+
+	if(creator.stripeConnectedAccountId) {
+		// Account already created. Ensure charges aren't already enabled.
+		if(creator.stripeConnectedAccountOnboarded) {
+			req.flash.notice = "You have already connected with Stripe";
+			res.redirect('/dashboard/payments');
+			return;
+		} else {
+			account = await stripe.accounts.retrieve(creator.stripeConnectedAccountId);
+			if(account.charges_enabled) {
+				creator.stripeConnectedAccountOnboarded = true;
+				creator.save();
+				req.flash.notice = "You have already connected with Stripe";
+				res.redirect('/dashboard/payments');
+				return;
+			} // otherwise continue generating an account link below
+		}
+	} else {
+		account = await stripe.accounts.create({ type: 'express', email: user.email });
+		creator.stripeConnectedAccountId = account.id;
+		await creator.save();
+	}
+	
+	const baseUrl = `${req.protocol}://${req.headers.host}`;
+	const accountLink = await stripe.accountLinks.create({
+		account: account.id,
+		refresh_url: baseUrl + '/dashboard/payments/connect-stripe-account/reauth',
+		return_url: baseUrl + '/dashboard/payments/connect-stripe-account/return',
+		type: 'account_onboarding'
+	});
+
+	res.redirect(accountLink.url);
+});
+
+router.get('/payments/connect-stripe-account/reauth', auth.authorizeRole('creator'), async(req, res) => {
+	// Stripe directs users here if the link expired, was already used etc.
+	// We recreate the link and send them back in
+	// See https://stripe.com/docs/connect/collect-then-transfer-guide
+	var user = await User.findByPk(req.authUser.id);
+	var creator = await Creator.findOne({ where: {
+		userid: user.id
+	}});
+
+	if(!creator.stripeConnectedAccountId) {
+		req.flash.alert = 'There was an error connecting your Stripe account. Please try again.';
+		res.redirect('/dashboard/payments');
+		return;
+	}
+
+	const stripe = require('stripe')(credentials.stripe.secretKey);
+
+	const baseUrl = `${req.protocol}://${req.headers.host}`;
+	const accountLink = await stripe.accountLinks.create({
+		account: creator.stripeConnectedAccountId,
+		refresh_url: baseUrl + '/dashboard/payments/connect-stripe-account/reauth',
+		return_url: baseUrl + '/dashboard/payments/connect-stripe-account/return',
+		type: 'account_onboarding'
+	});
+
+	res.redirect(accountLink.url);
+});
+
+router.get('/payments/connect-stripe-account/return', auth.authorizeRole('creator'), async(req, res) => {
+	// Stripe issues a redirect to this URL when the user completes the Connect Onboarding flow.
+	// This doesn’t mean that all information has been collected or that there are no outstanding
+	// requirements on the account. This only means the flow was entered and exited properly.
+	var user = await User.findByPk(req.authUser.id);
+	var creator = await Creator.findOne({ where: {
+		userid: user.id
+	}});
+
+	const stripe = require('stripe')(credentials.stripe.secretKey);
+
+	const account = await stripe.accounts.retrieve(creator.stripeConnectedAccountId);
+	if(account.charges_enabled) {
+		creator.stripeConnectedAccountOnboarded = true;
+		creator.save();
+		req.flash.notice = "You have successfully connected your Stripe account";
+	} else {
+		req.flash.notice = "Your Stripe account hasn't been connected yet.";
+	}
+	
+	res.redirect('/dashboard/payments');
+});
+
 router.get('/policy', auth.authorizeRole('creator'), async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userid: user.id }});
@@ -304,15 +401,26 @@ router.post('/policy',
 	}
 );
 
+async function doPolicyExecutionChecks(creator, res) {
+	if(!creator.stripeConnectedAccountOnboarded) {
+		return { error: 'You must connect a Stripe account first' };
+	}
+
+	var active = await PolicyExecution.findAll({ where: { creatorId: creator.id, processedAt: null }});
+	if(active && active.length) {
+		return { error: "You already have an active policy execution."};
+	}
+
+	return { };
+}
+
 router.get('/execute-policy', auth.authorizeRole('creator'), async function(req, res, next) {
 	const user = await User.findOne({ where: { id: req.authUser.id }});
 	const creator = await Creator.findOne({ where: { userId: user.id }});
 
-	// TODO: de-duplicate in all /execute-policy routes
-	var active = await PolicyExecution.findAll({ where: { creatorId: creator.id, processedAt: null }});
-	if(active && active.length) {
-		res.send("You already have an active policy execution!");
-		return;
+	var checks = await doPolicyExecutionChecks(creator, res);
+	if(checks.error) {
+		req.flash.alert = checks.error;
 	}
 
 	res.redirect('/dashboard/execute-policy/1');
@@ -322,11 +430,9 @@ router.get('/execute-policy/1', auth.authorizeRole('creator'), async function(re
 	const user = await User.findOne({ where: { id: req.authUser.id }});
 	const creator = await Creator.findOne({ where: { userId: user.id }});
 
-	// TODO: de-duplicate in all /execute-policy routes
-	var active = await PolicyExecution.findAll({ where: { creatorId: creator.id, processedAt: null }});
-	if(active && active.length) {
-		res.send("You already have an active policy execution!");
-		return;
+	var checks = await doPolicyExecutionChecks(creator, res);
+	if(checks.error) {
+		req.flash.alert = checks.error;
 	}
 
 	res.render('dashboard/execute-policy-step1');
@@ -335,11 +441,9 @@ router.get('/execute-policy/2', auth.authorizeRole('creator'), async function(re
 	const user = await User.findOne({ where: { id: req.authUser.id }});
 	const creator = await Creator.findOne({ where: { userId: user.id }});
 
-	// TODO: de-duplicate in all /execute-policy routes
-	var active = await PolicyExecution.findAll({ where: { creatorId: creator.id, processedAt: null }});
-	if(active && active.length) {
-		res.send("You already have an active policy execution!");
-		return;
+	var checks = await doPolicyExecutionChecks(creator, res);
+	if(checks.error) {
+		req.flash.alert = checks.error;
 	}
 
 	res.render('dashboard/execute-policy-step2');
@@ -348,11 +452,9 @@ router.post('/execute-policy/3', auth.authorizeRole('creator'), async function(r
 	const user = await User.findOne({ where: { id: req.authUser.id }});
 	const creator = await Creator.findOne({ where: { userId: user.id }});
 
-	// TODO: de-duplicate in all /execute-policy routes
-	var active = await PolicyExecution.findAll({ where: { creatorId: creator.id, processedAt: null }});
-	if(active && active.length) {
-		res.send("You already have an active policy execution!");
-		return;
+	var checks = await doPolicyExecutionChecks(creator, res);
+	if(checks.error) {
+		req.flash.alert = checks.error;
 	}
 
 	const reason = req.body.reason;
@@ -415,18 +517,102 @@ router.post('/policy-execution-response/:id', auth.authorize, async (req, res) =
 			policyExecutionSupporter.agree = true;
 			policyExecutionSupporter.respondedAt = new Date();
 			await policyExecutionSupporter.save();
-			res.render('dashboard/policy-execution-response-agreed');
+			req.flash.notice = "Your answer has been recorded. Thanks!";
+			res.redirect(`/dashboard/policy-execution-response/${req.params.id}/agreed`);
 			return;
 		case 'disagree':
 			policyExecutionSupporter.agree = false;
 			policyExecutionSupporter.respondedAt = new Date();
 			await policyExecutionSupporter.save();
-			res.render('dashboard/policy-execution-response-disagreed');
+			res.render('/dashboard/policy-execution-response-disagreed');
 			return;
 		default:
 			res.status(400).send('Invalid response');
 			return;
 	}
+});
+
+router.get('/policy-execution-response/:id/agreed', auth.authorize, async (req, res) => {
+	const user = await User.findByPk(req.authUser.id);
+	const policyExecution = await PolicyExecution.findByPk(req.params.id);
+	if(!policyExecution) {
+		res.status(404).send('Policy execution not found');
+		return;
+	}
+
+	const policyExecutionSupporter = await PolicyExecutionSupporter.findOne({ where: { policyExecutionId: policyExecution.id, userId: user.id }});
+	const pledge = await Pledge.findByPk(policyExecutionSupporter.pledgeId);
+	if(!pledge) {
+		res.status(404).send('Pledge not found');
+		return;
+	}
+
+	const creator = await Creator.findByPk(policyExecution.creatorId);
+
+	res.render('dashboard/policy-execution-response-agreed', { pledge, creator, policyExecution });
+});
+
+router.post('/policy-execution-response/:id/pay', auth.authorize, async(req, res) => {
+	const stripe = require('stripe')(credentials.stripe.secretKey);
+
+	const user = await User.findByPk(req.authUser.id);
+	const policyExecution = await PolicyExecution.findByPk(req.params.id);
+	if(!policyExecution) {
+		res.status(404).send('Policy execution not found');
+		return;
+	}
+
+	const policyExecutionSupporter = await PolicyExecutionSupporter.findOne({ where: { policyExecutionId: policyExecution.id, userId: user.id }});
+	if(policyExecutionSupporter.stripeCheckoutSessionPaid) {
+		res.status(400).send('This pledge has already been paid!');
+		return;
+	}
+
+	const pledge = await Pledge.findByPk(policyExecutionSupporter.pledgeId);
+	if(!pledge) {
+		res.status(404).send('Pledge not found');
+		return;
+	}
+
+	const creator = await Creator.findByPk(policyExecution.creatorId);
+
+	const baseUrl = `${req.protocol}://${req.headers.host}`;
+
+	const session = await stripe.checkout.sessions.create({
+		mode: 'payment',
+		line_items: [{
+			price_data: {
+				currency: 'usd',
+				product_data: {
+					name: 'Pledge to ' + creator.name,
+				},
+				unit_amount: pledge.amount * 100
+			},
+			quantity: 1
+		}],
+		payment_intent_data: {
+			application_fee_amount: Math.round(pledge.amount * 0.1 * 100),
+			transfer_data: { destination: creator.stripeConnectedAccountId },
+		},
+		success_url: baseUrl + `/dashboard/policy-execution-response/${policyExecution.id}/pay/complete`,
+		cancel_url: baseUrl + `/dashboard/policy-execution-response/${policyExecution.id}/pay/cancel`,
+	});
+
+	policyExecutionSupporter.stripeCheckoutSessionId = session.id;
+	policyExecutionSupporter.stripeCheckoutSessionPaid = false;
+	await policyExecutionSupporter.save();
+
+	res.redirect(session.url);
+});
+
+router.get('/policy-execution-response/:id/pay/complete', auth.authorize, async (req, res) => {
+	// Don't need to do anything here. We use the checkout.complete webhook callback from Stripe
+	// to record completion of the payment.
+	res.render('dashboard/policy-execution-response-paid');
+});
+
+router.get('/policy-execution-response/:id/pay/cancel', auth.authorize, async (req, res) => {
+	res.render('dashboard/policy-execution-response-payment-cancelled');
 });
 
 router.get('/security', async function(req, res, next) {
