@@ -44,7 +44,7 @@
 	paymentElement.mount('#payment-element');
 
 	const form = document.getElementById('payment-form');
-	var protocol = req.app.get('env') == 'production' ? 'https' : 'http';
+	var protocol = "<%= req.app.get('env') == 'production' ? 'https' : 'http' %>";
 	form.addEventListener('submit', async (event) => {
 		event.preventDefault();
 		document.body.classList.add('page-loading');

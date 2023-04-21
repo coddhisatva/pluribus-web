@@ -272,7 +272,7 @@ const amounts = [ 25, 250, 500 ]
 
 		document.body.classList.add('page-loading');
 
-		var protocol = req.app.get('env') == 'production' ? 'https' : 'http';
+		var protocol = "<%= req.app.get('env') == 'production' ? 'https' : 'http' %>";
 		const {error} = await stripe.confirmSetup({
 			elements: stripeElements,
 			confirmParams: {
