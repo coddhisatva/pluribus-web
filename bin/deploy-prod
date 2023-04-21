@@ -4,7 +4,7 @@ GITGUD_CREDS=`echo 'protocol=https\nhost=gitgud.io\n\n' | git credential fill`
 GITGUD_USERNAME=`echo $GITGUD_CREDS | sed -ne 's/username=//p'`
 GITGUD_PASSWORD=`echo $GITGUD_CREDS | sed -ne 's/password=//p'`
 
-ssh -tt root@206.81.100.148 "export GITGUD_USERNAME='$GITGUD_USERNAME'; export GITGUD_PASSWORD=$GITGUD_PASSWORD; bash" << 'ENDSSH'
+ssh -tt root@206.81.100.147 "export GITGUD_USERNAME='$GITGUD_USERNAME'; export GITGUD_PASSWORD=$GITGUD_PASSWORD; bash" << 'ENDSSH'
 cd prod
 
 echo https://$GITGUD_USERNAME:$GITGUD_PASSWORD@gitgud.io >> ~/.git-credentials
@@ -33,7 +33,7 @@ ENDSSH
 # pm2 list
 # 
 # If you need to start a new pm2 process:
-# NODE_ENV=production PORT=3001 pm2 start /root/prod/bin/www  --name pluribus
+# NODE_ENV=production PORT=80 pm2 start /root/prod/bin/www  --name pluribus
 #
 # Or, if you need to restart the existing pm2 process:
 # pm2 restart pluribus
