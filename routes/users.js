@@ -214,7 +214,8 @@ async function sendActivationEmail(req, user) {
 	var expires = new Date((new Date()).getTime() + expireInDays * 24 * 60 * 60 * 1000);
 	await OneTimeCode.create({ userId: user.id, email: user.email, code, expires });
 
-	var link = `${req.protocol}://${req.headers.host}/users/activate/${code}`
+	var protocol = req.app.get('env') == 'production' ? 'https' : 'http';
+	var link = `${protocol}://${req.headers.host}/users/activate/${code}`
 
 	let qs = [];
 	// Check for a continue parameter that's expected, rather than just
@@ -253,6 +254,8 @@ async function sendForgotPasswordEmail(req, user) {
 	var expires = new Date((new Date()).getTime() + expireInMinutes * 60000);
 	await OneTimeCode.create({ userId: user.id, email: user.email, code, expires });
 
+	var protocol = req.app.get('env') == 'production' ? 'https' : 'http';
+
 	var info = await email.send(req.app.get('env'), {
 		from: 'noreply@becomepluribus.com',
 		to: user.email,
@@ -261,7 +264,7 @@ async function sendForgotPasswordEmail(req, user) {
 
 Please click the following link to reset your Pluribus password:
 
-${req.protocol}://${req.headers.host}/users/reset-password/${code}
+${protocol}://${req.headers.host}/users/reset-password/${code}
 
 If you did not make this request, please disregard this email.`
 	});

@@ -33,7 +33,8 @@ router.get('/profile', auth.authorizeRole('creator'), async function(req, res, n
 		return;
 	}
 
-	var inviteBase = req.protocol + '://' + req.headers.host + '/invite/';
+	var protocol = req.app.get('env') == 'production' ? 'https' : 'http';
+	var inviteBase = protocol + '://' + req.headers.host + '/invite/';
 
 	res.render('dashboard/profile', { user, creator, inviteBase });
 });
@@ -578,7 +579,8 @@ router.post('/policy-execution-response/:id/pay', auth.authorize, async(req, res
 
 	const creator = await Creator.findByPk(policyExecution.creatorId);
 
-	const baseUrl = `${req.protocol}://${req.headers.host}`;
+	var protocol = req.app.get('env') == 'production' ? 'https' : 'http';
+	const baseUrl = `${protocol}://${req.headers.host}`;
 
 	const session = await stripe.checkout.sessions.create({
 		mode: 'payment',
