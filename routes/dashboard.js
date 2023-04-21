@@ -312,7 +312,8 @@ router.get('/payments/connect-stripe-account', auth.authorizeRole('creator'), as
 		await creator.save();
 	}
 	
-	const baseUrl = `${req.protocol}://${req.headers.host}`;
+	var protocol = req.app.get('env') == 'production' ? 'https' : 'http';
+	const baseUrl = `${protocol}://${req.headers.host}`;
 	const accountLink = await stripe.accountLinks.create({
 		account: account.id,
 		refresh_url: baseUrl + '/dashboard/payments/connect-stripe-account/reauth',
@@ -340,7 +341,8 @@ router.get('/payments/connect-stripe-account/reauth', auth.authorizeRole('creato
 
 	const stripe = require('stripe')(credentials.stripe.secretKey);
 
-	const baseUrl = `${req.protocol}://${req.headers.host}`;
+	var protocol = req.app.get('env') == 'production' ? 'https' : 'http';
+	const baseUrl = `${protocol}://${req.headers.host}`;
 	const accountLink = await stripe.accountLinks.create({
 		account: creator.stripeConnectedAccountId,
 		refresh_url: baseUrl + '/dashboard/payments/connect-stripe-account/reauth',

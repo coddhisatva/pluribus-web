@@ -25,7 +25,6 @@ ENDSSH
 # git config credential.helper store
 
 # Note to restart server:
-# screen -r prod
 #
 # Run one of these to see what the pm2 process is doing:
 # pm2 show pluribus
