@@ -44,11 +44,13 @@ _locals.nav = 'creators';
 					<% if(creator.website) { %>
 					<a href="<%= ensureUrlHasProtocol(creator.website) %>" class="weblink" target="_blank"><%= creator.website %></a>
 					<% } %>
+					<% if(creator.CreatorCategories) { %>
 					<div class="badges">
 					<% for(category of creator.CreatorCategories) { %>
 						<span class="badge"><%= category.category %></span>
 					<% } %>
 					</div>
+					<% } %>
 				</div>
 			</div>
 		</aside>
