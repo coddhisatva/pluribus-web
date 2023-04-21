@@ -44,7 +44,6 @@
 	paymentElement.mount('#payment-element');
 
 	const form = document.getElementById('payment-form');
-	var protocol = "<%= req.app.get('env') == 'production' ? 'https' : 'http' %>";
 	form.addEventListener('submit', async (event) => {
 		event.preventDefault();
 		document.body.classList.add('page-loading');
@@ -52,7 +51,7 @@
 		const {error} = await stripe.confirmPayment({
 			elements,
 			confirmParams: {
-				return_url: '<%= `${protocol}://${req.headers.host}/support/card/complete` %>',
+				return_url: '<%= `${req.app.get("env") == "production" ? "https" : "http"}://${req.headers.host}/support/card/complete` %>',
 			},
 		});
 

@@ -272,11 +272,10 @@ const amounts = [ 25, 250, 500 ]
 
 		document.body.classList.add('page-loading');
 
-		var protocol = "<%= req.app.get('env') == 'production' ? 'https' : 'http' %>";
 		const {error} = await stripe.confirmSetup({
 			elements: stripeElements,
 			confirmParams: {
-				return_url: '<%= `${protocol}://${req.headers.host}/dashboard/payments/card-added` %>?pledge=<%= creator.id%>&amount=' + (pledge.amount || '') + '&frequency=' + pledge.frequency,
+				return_url: '<%= `${req.app.get("env") == "production" ? "https" : "http"}://${req.headers.host}/dashboard/payments/card-added` %>?pledge=<%= creator.id%>&amount=' + (pledge.amount || '') + '&frequency=' + pledge.frequency,
 				payment_method_data: {
 					metadata: {
 						nickname,

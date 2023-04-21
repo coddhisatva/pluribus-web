@@ -249,11 +249,10 @@ _locals.headScripts = [ 'https://js.stripe.com/v3/' ];
 			return;
 		}
 
-		var protocol = "<%= req.app.get('env') == 'production' ? 'https' : 'http' %>";
 		const {error} = await stripe.confirmSetup({
 			elements: stripeElements,
 			confirmParams: {
-				return_url: '<%= `${protocol}://${req.headers.host}/dashboard/payments/card-added` %>',
+				return_url: '<%= `${req.app.get("env") == "production" ? "https" : "http"}://${req.headers.host}/dashboard/payments/card-added` %>',
 				payment_method_data: {
 					metadata: {
 						nickname,
