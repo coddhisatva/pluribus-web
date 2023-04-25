@@ -15,6 +15,10 @@
 	color: #fff;
 }
 
+.inverse .alert-info {
+	background: #f2f9fb;
+}
+
 .success-msg h1::before {
 	background: url("../../images/content/single-planet.svg") no-repeat;
 	background-size: contain;
