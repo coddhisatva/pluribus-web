@@ -74,8 +74,7 @@ router.get('/faq/supporters', function(req, res) {
 });
 
 router.get('/pricing', function(req, res, next) {
-	res.locals.nav = 'pricing';
-	res.render('coming-soon');
+	res.render('pricing');
 });
 
 router.get('/invite/:code', async function(req, res, next) {
