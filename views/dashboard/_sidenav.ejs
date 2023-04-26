@@ -67,14 +67,14 @@ locals.name = name;
 				<li>
 					<a href="/dashboard/referrals" class="<%= _locals.nav == 'referrals' ? 'active' : '' %>">
 						<svg><use href="/images/ui/icons.svg#stack"></use></svg>
-						<span>Referral program</span>
+						<span>Referral Program</span>
 					</a>
 				</li>
 				<% if(authUser.roles.indexOf('creator') != -1) { %>
 				<li>
 					<a href="/dashboard/policy" class="<%= _locals.nav == 'policy' ? 'active' : '' %>">
 						<svg><use href="/images/ui/icons.svg#website"></use></svg>
-						<span>Policy</span>
+						<span>Protection Plan</span>
 					</a>
 				</li>
 				<% } %>
