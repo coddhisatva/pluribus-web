@@ -147,4 +147,12 @@ router.get('/support/crypto', async (req, res) => {
 	res.render('support-crypto');
 });
 
+router.get('/contact', async (req, res) => {
+	res.render('contact');
+});
+
+router.get('/terms', async (req, res) => {
+	res.render('terms');
+});
+
 module.exports = router;
