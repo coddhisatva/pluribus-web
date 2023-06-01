@@ -7,7 +7,7 @@ _locals.nav = 'creators';
 	<div class="profile-grid">
 		<header class="card profile-head">
 			<div class="card-body">
-				<figure class="profile-photo">
+				<figure class="profile-photo <%= creator.getProfilePhotoCssClass() %>">
 					<img src="<%= creator.photo ? '/images/uploads/creators/' + creator.id + '/' + creator.photo : '/images/ui/avatar-unknown.svg' %>" alt="My Face">
 				</figure>
 				<div class="columns spliter">

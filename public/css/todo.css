@@ -241,3 +241,16 @@ input.has-password-visibility.form-control.is-valid + .password-visibility-toggl
 .social-list a[href^="https://www.youtube.com"]:before {
 	background-image: url("../images/ui/socialmedia/icon-youtube.svg");
 }
+
+/* Colored rings around subscriber photos */
+.profile-head .profile-photo.gold-subscriber {
+	border-color: gold;
+}
+
+.profile-head .profile-photo.silver-subscriber {
+	border-color: silver;
+}
+
+.profile-head .profile-photo.bronze-subscriber {
+	border-color: #cd7f32;
+}

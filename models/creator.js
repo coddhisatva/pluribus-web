@@ -16,6 +16,14 @@ module.exports = (sequelize, DataTypes) => {
       Creator.hasMany(models.CreatorCategory);
       Creator.hasMany(models.Pledge);
     }
+
+    getProfilePhotoCssClass() {
+      if(this.subscriberNum < 1) return "";
+      if(this.subscriberNum < 11) return "gold-subscriber";
+      if(this.subscriberNum < 101) return "silver-subscriber";
+      if(this.subscriberNum < 1001) return "bronze-subscriber";
+      return "";
+    }
   }
   Creator.init({
     userId: DataTypes.INTEGER,
@@ -31,6 +39,7 @@ module.exports = (sequelize, DataTypes) => {
     stripeSubscriptionId: DataTypes.STRING,
     subscriptionAmount: DataTypes.INTEGER,
     subscriptionCreated: DataTypes.DATE,
+    subscriberNum: DataTypes.INTEGER,
     stripeConnectedAccountId: DataTypes.STRING,
     stripeConnectedAccountOnboarded: DataTypes.BOOLEAN,
   }, {
