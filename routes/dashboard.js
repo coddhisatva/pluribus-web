@@ -734,7 +734,8 @@ router.post('/subscribe', auth.authorize, csrf.validateToken, async(req, res) =>
 	// Set the subscriber number, used to show gold/silver/bronze rings around
 	// profile photos for early adopters
 	if(!creator.subscriberNum) {
-		await sequelize.query('set @subNum = (select coalesce(max(subscriberNum), 0) + 1 from creators);update Creators set subscriberNum = @subNum where id = :id', { replacements: { id: creator.id } });
+		// update Creators set subscriberNum = (select subNum from (select coalesce(max(subscriberNum), 0) + 1 subNum from creators) x) where id = :id;
+		await sequelize.query('update Creators set subscriberNum = (select subNum from (select coalesce(max(subscriberNum), 0) + 1 subNum from creators) x) where id = :id', { replacements: { id: creator.id } });
 	}
 
 	req.flash.notice = 'Subscription was created successfully';
