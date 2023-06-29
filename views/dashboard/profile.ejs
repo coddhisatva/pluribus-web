@@ -230,6 +230,9 @@ _locals.nav = 'profile';
 				</div>
 			</div>
 		</div>
+		<div id="publicOnly">
+			Your profile link is <a href="<%= profileLink %>" target="_blank"><%= profileLink %></a>
+		</div>
 		<div id="inviteOnly">
 			<label class="body-sm-weak text-medium">Use this referral link to invite supporters</label>
 			<div class="input-group w-100">
@@ -337,8 +340,10 @@ Note: only include data that up.js will use.
 
 	var publicProfile = document.getElementById('publicProfile');
 	var inviteOnly = document.getElementById('inviteOnly');
+	var publicOnly = document.getElementById('publicOnly');
 	function toggleInviteOnly() {
 		inviteOnly.style.display = publicProfile.checked ? 'none' : 'block';
+		publicOnly.style.display = publicProfile.checked ? 'block' : 'none';
 	}
 	publicProfile.addEventListener('change', toggleInviteOnly)
 	toggleInviteOnly();

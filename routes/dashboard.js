@@ -35,8 +35,9 @@ router.get('/profile', auth.authorizeRole('creator'), async function(req, res, n
 
 	var protocol = req.app.get('env') == 'production' ? 'https' : 'http';
 	var inviteBase = protocol + '://' + req.headers.host + '/invite/';
+	var profileLink = protocol + '://' + req.headers.host + '/creators/' + creator.id;
 
-	res.render('dashboard/profile', { user, creator, inviteBase });
+	res.render('dashboard/profile', { user, creator, inviteBase, profileLink });
 });
 router.post('/profile', auth.authorizeRole('creator'), upload.single('newPhoto'), async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);

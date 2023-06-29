@@ -162,7 +162,7 @@ router.get('/:id', async function(req, res, next) {
 
 	// Don't let users view a Creator's private profile if they're not already following them
 	if(!isFollowing && !creator.publicProfile) {
-		res.status(404).send('Creator not found.');
+		res.status(403).send("This creator's profile is only visible to their followers.");
 		return;
 	}
 
