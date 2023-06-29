@@ -406,8 +406,12 @@ router.post('/policy',
 );
 
 async function doPolicyExecutionChecks(creator, res) {
+	if(!creator.stripeSubscriptionId) {
+		return { error: 'You must subscribe before you can activate pledges' };
+	}
+
 	if(!creator.stripeConnectedAccountOnboarded) {
-		return { error: 'You must connect a Stripe account first' };
+		return { error: 'You must connect a Stripe account before you can activate pledges' };
 	}
 
 	var active = await PolicyExecution.findAll({ where: { creatorId: creator.id, processedAt: null }});
@@ -425,6 +429,7 @@ router.get('/execute-policy', auth.authorizeRole('creator'), async function(req,
 	var checks = await doPolicyExecutionChecks(creator, res);
 	if(checks.error) {
 		req.flash.alert = checks.error;
+		res.redirect(req.headers.referer);
 	}
 
 	res.redirect('/dashboard/execute-policy/1');
