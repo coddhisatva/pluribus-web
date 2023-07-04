@@ -144,6 +144,10 @@ function getValidOneTimeCode(redirect) {
 			req.flash.alert = 'The link you followed has expired. Please try again.';
 			res.redirect(redirect);
 			return;
+		} else if(oneTimeCode.used != null) {
+			req.flash.alert = 'This link has already been used.'
+			res.redirect(redirect);
+			return;
 		}
 
 		res.locals.oneTimeCode = oneTimeCode;
@@ -361,6 +365,8 @@ router.post('/activate/:code',
 
 		user.set({ password: auth.hashPassword(password)});
 		await user.save();
+		activationCode.used = new Date();
+		await activationCode.save();
 
 		req.flash.notice = "You have successfully activated your account. Welcome to Pluribus!";
 

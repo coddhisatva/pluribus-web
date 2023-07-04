@@ -18,7 +18,8 @@ module.exports = (sequelize, DataTypes) => {
     userId: DataTypes.INTEGER,
     email: DataTypes.STRING,
     code: DataTypes.STRING,
-    expires: DataTypes.DATE
+    expires: DataTypes.DATE,
+    used: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'OneTimeCode',
