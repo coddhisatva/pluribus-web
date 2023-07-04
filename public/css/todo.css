@@ -254,3 +254,8 @@ input.has-password-visibility.form-control.is-valid + .password-visibility-toggl
 .profile-head .profile-photo.bronze-subscriber {
 	border-color: #cd7f32;
 }
+
+/* for 'beta' tag */
+.navbar-brand {
+	display: inline-block;
+}

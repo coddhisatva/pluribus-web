@@ -250,7 +250,7 @@ _locals.nav = 'profile';
 </svg>
 	
 <h3 class="heading-lg-medium text-strong">What do we do with your information?</h3>
-<p class="body-sm-weak text-medium">Gravida ut varius feugiat viverra. Ipsum, dis aenean quisque vel amet eget. Faucibus potenti consectetur duis id habitant nunc, elementum, fringilla vitae.</p>
+<p class="body-sm-weak text-medium">We don’t store your payment info in our system (that remains with Stripe). Aside from that distinction, we do not share your info with third parties.</p>
 
 
 <script src="/js/up.js"></script>
@@ -354,9 +354,12 @@ Note: only include data that up.js will use.
 		inviteLink.select();
 		inviteLink.setSelectionRange(0, inviteLink.value.length);
 		navigator.clipboard.writeText(inviteLink.value);
+		copyInvite.dataset.origText = copyInvite.textContent;
+		copyInvite.textContent = 'Copied!'
 		setTimeout(function() {
-			alert('Invite link was copied.')
-		}, 200);
+			copyInvite.textContent = copyInvite.dataset.origText;
+			delete copyInvite.dataset.origText;
+		}, 1000);
 	})
 	
 </script>

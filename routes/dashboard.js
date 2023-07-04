@@ -662,7 +662,7 @@ router.get('/search', async (req, res) => {
 		console.log(results);
 	}
 
-	res.render('dashboard/search', { results });
+	res.render('dashboard/search', { results, q });
 });
 
 router.get('/pledges', auth.authorize, async (req, res) => {
