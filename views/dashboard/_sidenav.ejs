@@ -45,6 +45,12 @@ locals.name = name;
 						<span>Protection Plan</span>
 					</a>
 				</li>
+				<li>
+					<a href="/dashboard/subscription" class="<%= _locals.nav == 'subscription' ? 'active' : '' %>">
+						<svg><use href="/images/ui/icons.svg#receipt"></use></svg>
+						<span>Subscription</span>
+					</a>
+				</li>
 				<% } %>
 				<li>
 					<a href="/dashboard/payments" class="<%= _locals.nav == 'payments' ? 'active' : '' %>">
@@ -52,12 +58,7 @@ locals.name = name;
 						<span>Payments</span>
 					</a>
 				</li>
-				<li>
-					<a href="/dashboard/subscription" class="<%= _locals.nav == 'subscription' ? 'active' : '' %>">
-						<svg><use href="/images/ui/icons.svg#receipt"></use></svg>
-						<span>Subscription</span>
-					</a>
-				</li>
+				
 				<!--
 				<li>
 					<a href="/dashboard/referrals" class="<%= _locals.nav == 'referrals' ? 'active' : '' %>">
