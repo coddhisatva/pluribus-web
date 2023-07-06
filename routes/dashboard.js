@@ -741,7 +741,7 @@ router.post('/subscribe', auth.authorize, csrf.validateToken, async(req, res) =>
 	// profile photos for early adopters
 	if(!creator.subscriberNum) {
 		// update Creators set subscriberNum = (select subNum from (select coalesce(max(subscriberNum), 0) + 1 subNum from creators) x) where id = :id;
-		await sequelize.query('update Creators set subscriberNum = (select subNum from (select coalesce(max(subscriberNum), 0) + 1 subNum from creators) x) where id = :id', { replacements: { id: creator.id } });
+		await sequelize.query('update Creators set subscriberNum = (select subNum from (select coalesce(max(subscriberNum), 0) + 1 subNum from Creators) x) where id = :id', { replacements: { id: creator.id } });
 	}
 
 	req.flash.notice = 'Subscription was created successfully';
