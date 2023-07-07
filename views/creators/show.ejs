@@ -13,7 +13,15 @@ _locals.nav = 'creators';
 				<div class="columns spliter">
 				<div class="col">
 					<h1><%= creator.name %></h1>
-					<p class="support">14k Supporters</p>
+					<% if(followerCount > 0) { %>
+						<p class="support">
+							<%= followerCount %> <%= followerCount == 1 ? "follower": "followers" %>
+							<% if(supporterCount > 0) { %>
+								&bull; <%= supporterCount %> <%= supporterCount == 1 ? "supporter": "supporters" %>
+							<% } %>
+						</p>
+					<% } %>
+					
 				</div>
 				<div class="col">
 					<button id="followBtn" data-following="<%= isFollowing %>" data-bs-toggle="dropdown" aria-expanded="false" class="btn <%= isFollowing ? 'btn-primary' : 'btn-outline' %>">

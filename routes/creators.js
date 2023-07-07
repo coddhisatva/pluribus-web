@@ -160,13 +160,16 @@ router.get('/:id', async function(req, res, next) {
 		} 
 	}
 
+	var followerCount = await Follow.count({ where: { creatorId: creator.id } });
+	var supporterCount = await Pledge.count({ where: { creatorId: creator.id }});
+
 	// Don't let users view a Creator's private profile if they're not already following them
 	if(!isFollowing && !creator.publicProfile) {
 		res.status(403).send("This creator's profile is only visible to their followers.");
 		return;
 	}
 
-	res.render('creators/show', { creator, isFollowing });
+	res.render('creators/show', { creator, isFollowing, followerCount, supporterCount });
 });
 
 /**
