@@ -45,9 +45,9 @@
 
 				<h2 id="message" class="text-strong"></h1>
 				<div id="shareIcons" class="d-flex flex-wrap justify-content-center" style="display:none">
-					<button class="btn btn-sm btn-primary m-1" data-sharer="twitter" data-title="I just supported Pluribus!" data-hashtags="cancellationinsurance" data-url="<%= req.app.get('env') == 'production' ? 'https' : 'http' %>://<%= req.hostname %>"><img src="/images/ui/socialmedia/icon-twitter.svg"/> Share on Twitter</button>
+					<button class="btn btn-sm btn-primary m-1" data-sharer="twitter" data-title="I just helped protect free speech through Pluribus!" data-hashtags="cancellationinsurance" data-url="<%= req.app.get('env') == 'production' ? 'https' : 'http' %>://<%= req.hostname %>"><img src="/images/ui/socialmedia/icon-twitter.svg"/> Share on Twitter</button>
 					<button class="btn btn-sm btn-primary m-1" data-sharer="facebook" data-hashtag="cancellationinsurance" data-url="<%= req.app.get('env') == 'production' ? 'https' : 'http' %>://<%= req.hostname %>"><img src="/images/ui/socialmedia/icon-facebook.svg"/> Share on Facebook</button>
-					<button class="btn btn-sm btn-dark m-1" data-sharer="email" data-title="Pluribus" data-url="<%= req.app.get('env') == 'production' ? 'https' : 'http' %>://<%= req.hostname %>" data-subject="Hey! Check out Pluribus" data-to="some@email.com">Share via Email</button>
+					<button class="btn btn-sm btn-dark m-1" data-sharer="email" data-title="Pluribus" data-url="<%= req.app.get('env') == 'production' ? 'https' : 'http' %>://<%= req.hostname %>" data-subject="I just helped protect free speech through Pluribus" data-to="some@email.com">Share via Email</button>
 				</div>
 				<a id="back" style="display:none" href="/support/card">Try again</a>
 			</div>
