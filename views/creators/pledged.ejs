@@ -80,11 +80,11 @@ _locals.noFooter = true;
 
 				<p>No payment means no fees, so we’d appreciate a tip to support us directly!</p>
 
-				<a href="/support" class="btn btn-primary heading-md-medium">Support Pluribus</a>
+				<a href="/support" class="btn btn-primary btn-lg heading-lg-medium glow-pulse">Support Pluribus</a>
 
 				<div id="shareIcons" class="mt-4 d-flex flex-wrap justify-content-center">
-					<button class="btn btn-sm btn-primary m-1" data-sharer="twitter" data-title="I just supported <%= creator.name %> on Pluribus!" data-hashtags="cancellationinsurance" data-url="<%= req.app.get('env') == 'production' ? 'https' : 'http' %>://<%= req.headers.host %>"><img src="/images/ui/socialmedia/icon-twitter.svg"/> Share on Twitter</button>
-					<button class="btn btn-sm btn-primary m-1" data-sharer="facebook" data-hashtag="cancellationinsurance" data-url="<%= req.app.get('env') == 'production' ? 'https' : 'http' %>://<%= req.headers.host %>"><img src="/images/ui/socialmedia/icon-facebook.svg"/> Share on Facebook</button>
+					<button class="btn btn-sm btn-dark m-1" data-sharer="twitter" data-title="I just supported <%= creator.name %> on Pluribus!" data-hashtags="cancellationinsurance" data-url="<%= req.app.get('env') == 'production' ? 'https' : 'http' %>://<%= req.headers.host %>"><img src="/images/ui/socialmedia/icon-twitter.svg"/> Share on Twitter</button>
+					<button class="btn btn-sm btn-dark m-1" data-sharer="facebook" data-hashtag="cancellationinsurance" data-url="<%= req.app.get('env') == 'production' ? 'https' : 'http' %>://<%= req.headers.host %>"><img src="/images/ui/socialmedia/icon-facebook.svg"/> Share on Facebook</button>
 					<button class="btn btn-sm btn-dark m-1" data-sharer="email" data-title="Pluribus" data-url="<%= req.app.get('env') == 'production' ? 'https' : 'http' %>://<%= req.headers.host %>" data-subject="Hey! I just supported <%= creator.name %> on Pluribus." data-to="some@email.com">Share via Email</button>
 				</div>
 				
@@ -92,3 +92,18 @@ _locals.noFooter = true;
 		</div>
 	</div>
 </div>
+
+<style>
+	.glow-pulse {
+		animation: glow-pulse 1s infinite alternate ease-in-out;
+	}
+
+	@keyframes glow-pulse {
+		0% {
+			box-shadow: 0 0 10px rgba(85,90,247, 0);
+		}
+		100% {
+			box-shadow: 0 0 20px rgba(169,171,252, 1);
+		}
+	}
+</style>
