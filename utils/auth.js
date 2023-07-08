@@ -71,7 +71,12 @@ var auth = {
 			}
 			if(!authorized) {
 				req.flash.alert = 'Please log in to continue.';
-				res.status(401).redirect(loginUrl + '?redirect=' + encodeURIComponent(req.originalUrl));
+				var redirect = req.originalUrl;
+				if(req.method == 'POST') {
+					// Can't redirect to a POST endpoint
+					redirect = req.headers.referer;
+				}
+				res.status(401).redirect(loginUrl + '?redirect=' + encodeURIComponent(redirect));
 				return;
 			}
 

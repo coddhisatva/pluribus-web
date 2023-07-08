@@ -154,11 +154,14 @@ router.get('/:id', async function(req, res, next) {
 	}
 
 	var isFollowing = false;
+	var pledge = null;
 	if(req.authUser) {
 		var follow = await Follow.findOne({ where: { userId: req.authUser.id, creatorId: creator.id } });
 		if(follow !== null) {
 			isFollowing = true;
 		} 
+
+		pledge = await Pledge.findOne({ where: { creatorId: creator.id, userId: req.authUser.id }});
 	}
 
 	var followerCount = await Follow.count({ where: { creatorId: creator.id } });
@@ -170,7 +173,7 @@ router.get('/:id', async function(req, res, next) {
 		return;
 	}
 
-	res.render('creators/show', { creator, isFollowing, followerCount, supporterCount });
+	res.render('creators/show', { creator, isFollowing, followerCount, supporterCount, pledge });
 });
 
 /**
@@ -256,12 +259,14 @@ router.post('/:id/pledge', auth.authorize, csrf.validateToken, async(req, res) =
 		return;
 	}
 
-	// Don't allow pledging to non-public profile unless the user follows this creator 
+	// Don't allow pledging to non-public profile unless the user follows this creator or they have an invite code
 	if(!creator.publicProfile) {
-		var follow = await Follow.findOne({ where: { userId, creatorId } });
-		if(!follow) {
-			res.status(400).send('Invalid pledge.');
-			return;
+		if(!req.query.invite || !req.query.invite == creator.inviteCode) {
+			var follow = await Follow.findOne({ where: { userId, creatorId } });
+			if(!follow) {
+				res.status(400).send('Invalid pledge.');
+				return;
+			}
 		}
 	}
 

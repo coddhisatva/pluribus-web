@@ -85,22 +85,29 @@ router.get('/invite/:code', async function(req, res, next) {
 		return;
 	}
 
+	// Now we let invited users view the profile
+	/*
 	if(!req.authUser) {
 		req.flash.notice = creator.name + ' is using Pluribus. Please create an account or log in to follow them.';
 		res.redirect('/users/signup?invite=' + req.params.code);
 		return;
-	}
+	}*/
 
 	let isFollowing = false;
-	let follow = await Follow.findOne({ where: { userId: req.authUser.id, creatorId: creator.id } });
-	if(follow !== null) {
-		isFollowing = true;
+	let pledge = null;
+	if(req.authUser) {
+		let follow = await Follow.findOne({ where: { userId: req.authUser.id, creatorId: creator.id } });
+		if(follow !== null) {
+			isFollowing = true;
+		}
+
+		pledge = await Pledge.findOne({ where: { creatorId: creator.id, userId: req.authUser.id }});
 	}
 
 	var followerCount = await Follow.count({ where: { creatorId: creator.id } });
 	var supporterCount = await Pledge.count({ where: { creatorId: creator.id }});
 
-	res.render('creators/show', { creator, isFollowing, invite: req.params.code, followerCount, supporterCount });
+	res.render('creators/show', { creator, isFollowing, invite: req.params.code, followerCount, supporterCount, pledge });
 });
 
 router.get('/support', function(req, res, next) {

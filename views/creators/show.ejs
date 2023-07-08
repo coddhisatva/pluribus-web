@@ -67,7 +67,11 @@ _locals.nav = 'creators';
 			<div class="card-body">
 				<h2>Pledges will go toward</h2>
 				<p><%= creator.policy %>></p>
-				<a class="btn btn-primary" href="/creators/<%= creator.id %>/pledge">Pledge support</a>
+				<% if(locals.pledge) { %> 
+					<div class="alert alert-info">Your pledge: $<%= pledge.amount %></div>
+				<% } else { %>
+					<a class="btn btn-primary" href="/creators/<%= creator.id %>/pledge<%= locals.invite ? "?invite=" + locals.invite : "" %>">Pledge support</a>
+				<% } %>
 			</div>
 		</section>
 ​
@@ -115,7 +119,15 @@ _locals.nav = 'creators';
 			updateFollowBtnState();
 
 			fetch('/creators/<%= creator.id %>/follow?invite=<%= locals.invite || "" %>', { method: 'POST' })
-				.then(null, () => alert('Error!'));
+				.then(function(res) {
+					// Detect redirect to login
+					if(res.redirected) {
+						document.location = res.url;
+					}
+				}, function(err) {
+					console.log(err);
+					alert("Error!");
+				});
 
 		} // otherwise, dropdown will be shown to unfollow
 	});
