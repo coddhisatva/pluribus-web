@@ -10,6 +10,7 @@ const upload = multer({ dest: 'uploads/tmp' });
 const fs = require('fs/promises');
 const path = require('path');
 const util = require('../utils/util');
+const email = require('../utils/email');
 const sharp = require('sharp');
 const { serialize } = require('v8');
 const credentials = require('../config/credentials');
@@ -498,6 +499,19 @@ router.get('/execute-policy/execute', auth.authorizeRole('creator'), async funct
 
 	// TODO: Notify supporters via email
 
+	// Notify Pluribus
+	var env = req.app.get('env');
+	var notifyEmails = [ 'luke@smalltech.com.au' ];
+	if(env != 'development') {
+		notifyEmails.push('help@becomepluribus.com');
+	}
+	email.send(env, { from: 'noreply@becomepluribus.com',
+		to: notifyEmails,
+		subject: `A creator has activated their pledges (${env})`,
+		text: `${creator.name} (id=${creator.id}) activated their pledges at ${req.hostname}:\r\n
+${reason}`
+	});
+
 	res.redirect('/dashboard/execute-policy/executed');
 });
 
@@ -672,7 +686,7 @@ router.get('/pledges', auth.authorize, async (req, res) => {
 	const pledgesMade = await Pledge.findAll({ where: { userId: user.id }, include: Creator });
 	const pledgesReceived = creator ? await Pledge.findAll({ where: { creatorId: creator.id  }, include: User}) : null;
 
-	res.render('dashboard/pledges', { creator, pledgesMade, pledgesReceived });
+	res.render('dashboard/pledges', { user, creator, pledgesMade, pledgesReceived });
 });
 
 router.get('/subscription', auth.authorize, async (req, res) => {

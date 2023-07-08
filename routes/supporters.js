@@ -71,10 +71,12 @@ router.post('/new/name',
 		}
 		
 		req.flash.notice = 'You\'re now set up as a supporter.';
+		req.session.name = req.body.name;
 
-		var redirect = '/dashboard/profile';
+		var redirect = '/dashboard';
 		if(req.query.invite) {
-			redirect = '/invite/' + req.query.invite;
+			// Note: invite codes may contain '/' characters, so we need to encode them
+			redirect = '/invite/' + encodeURIComponent(req.query.invite);
 		}
 		res.redirect(redirect);
 	}

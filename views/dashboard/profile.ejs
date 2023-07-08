@@ -236,7 +236,7 @@ _locals.nav = 'profile';
 		<div id="inviteOnly">
 			<label class="body-sm-weak text-medium">Use this referral link to invite supporters</label>
 			<div class="input-group w-100">
-				<input type="text" class="form-control" id="inviteLink" readonly value="<%= inviteBase %><%= creator.inviteCode %>" />
+				<input type="text" class="form-control" id="inviteLink" readonly value="<%= inviteBase %><%= encodeURIComponent(creator.inviteCode) %>" />
 				<button class="btn btn-dark" id="copyInvite">Copy link</button>
 			</div>
 		</div>

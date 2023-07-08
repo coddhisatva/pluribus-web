@@ -5,6 +5,7 @@ const { Creator, CreatorCategory, User, Follow, CardPaymentMethod, Pledge } = re
 const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
 const csrf = require('../utils/csrf');
+const email = require('../utils/email');
 const credentials = require('../config/credentials');
 const { ResultWithContext } = require('express-validator/src/chain');
 
@@ -178,9 +179,9 @@ router.get('/:id', async function(req, res, next) {
  */
 router.post('/:id/follow', auth.authorize, async function(req, res, next) {
 	var creatorId = req.params.id;
-	var creator = await Creator.findByPk(creatorId);
+	var creator = await Creator.findByPk(creatorId, { include: User });
 
-	// Don't let just anyone to follow a private profile
+	// Don't let just anyone follow a private profile
 	if(!creator.publicProfile) {
 		let inviteCode = req.query.invite;
 		let creator = inviteCode ? await Creator.findOne({ where: { inviteCode } }) : null;
@@ -191,7 +192,25 @@ router.post('/:id/follow', auth.authorize, async function(req, res, next) {
 	}
 
 	var userId = res.locals.authUser.id;
-	await Follow.create({ creatorId,  userId });
+	await Follow.create({ creatorId, userId });
+
+	// Email notification
+	var name = res.locals.authUser.name;
+	if(!name) {
+		// If the user has a creator account, use the creator's display name.
+		var followerCreator = await Creator.findOne({ where: { userId: res.locals.authUser.id }});
+		if(followerCreator) {
+			name = followerCreator.name;
+		}
+	}
+
+	email.send(req.app.get('env'), {
+		from: 'noreply@becomepluribus.com',
+		to: creator.User.email,
+		subject: 'New follower on Pluribus',
+		text: `You have a new follower on Pluribus:\r\n
+${name || '(anonymous)'}`
+	});
 
 	res.sendStatus(200);
 });
@@ -231,7 +250,7 @@ router.get('/:id/pledge', auth.authorize, async (req, res) => {
 router.post('/:id/pledge', auth.authorize, csrf.validateToken, async(req, res) => {
 	const userId = req.authUser.id;
 	const creatorId = req.params.id;
-	const creator = await Creator.findByPk(creatorId);
+	const creator = await Creator.findByPk(creatorId, { include: User });
 	if(!creator) {
 		res.status(400).send('Invalid pledge.');
 		return;
@@ -278,6 +297,24 @@ router.post('/:id/pledge', auth.authorize, csrf.validateToken, async(req, res) =
 		}
 		throw err; // unexpected error
 	}
+
+	// Email notification
+	var name = res.locals.authUser.name;
+	if(!name) {
+		// If the user has a creator account, use the creator's display name.
+		var supporterCreator = await Creator.findOne({ where: { userId: res.locals.authUser.id }});
+		if(supporterCreator) {
+			name = supporterCreator.name;
+		}
+	}
+
+	email.send(req.app.get('env'), {
+		from: 'noreply@becomepluribus.com',
+		to: creator.User.email,
+		subject: 'New pledge on Pluribus',
+		text: `You have a new pledge on Pluribus:\r\n
+${name || '(anonymous)'} pledged $${amount}`
+	});
 
 	res.redirect('/creators/' + req.params.id + '/pledged');
 });

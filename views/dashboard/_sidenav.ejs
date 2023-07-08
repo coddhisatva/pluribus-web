@@ -1,5 +1,5 @@
 <% 
-var name = locals.user?.email.split('@')[0];
+var name = locals.user?.name || locals.user?.email.split('@')[0];
 if(locals.creator && locals.creator.name) {
 	name = creator.name;
 }

@@ -2,7 +2,7 @@ var express = require('express');
 const { redirect } = require('express/lib/response');
 const { body, validationResult } = require('express-validator');
 var router = express.Router();
-var { Creator, PrelaunchEmail, Follow } = require('../models');
+var { Creator, PrelaunchEmail, Follow, Pledge } = require('../models');
 const csrf = require('../utils/csrf');
 const credentials = require('../config/credentials');
 
@@ -78,15 +78,16 @@ router.get('/pricing', function(req, res, next) {
 });
 
 router.get('/invite/:code', async function(req, res, next) {
-	if(!req.authUser) {		
-		res.redirect('/users/signup?invite=' + req.params.code);
-		return;
-	}
-
 	let creator = await Creator.findOne({ where: { inviteCode: req.params.code }});
 
 	if(!creator) {
 		res.status(404).send('Invalid invite code.');
+		return;
+	}
+
+	if(!req.authUser) {
+		req.flash.notice = creator.name + ' is using Pluribus. Please create an account or log in to follow them.';
+		res.redirect('/users/signup?invite=' + req.params.code);
 		return;
 	}
 
@@ -96,7 +97,10 @@ router.get('/invite/:code', async function(req, res, next) {
 		isFollowing = true;
 	}
 
-	res.render('creators/show', { creator, isFollowing, invite: req.params.code });
+	var followerCount = await Follow.count({ where: { creatorId: creator.id } });
+	var supporterCount = await Pledge.count({ where: { creatorId: creator.id }});
+
+	res.render('creators/show', { creator, isFollowing, invite: req.params.code, followerCount, supporterCount });
 });
 
 router.get('/support', function(req, res, next) {

@@ -45,7 +45,7 @@ router.post('/login',
 		if(creator != null) {
 			roles.push('creator');
 		}
-		req.session.authUser = { id: user.id, email: user.email, roles };
+		req.session.authUser = { id: user.id, email: user.email, name: user.name, roles };
 		if(remember) {
 			req.sessionOptions.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
 		}
@@ -55,6 +55,8 @@ router.post('/login',
 		var redirect = req.query.redirect;
 		if(redirect) {
 			res.redirect(redirect);
+		} else if(req.query.invite) {
+			res.redirect('/invite/' + encodeURIComponent(req.query.invite));
 		} else {
 			res.redirect('/');
 		}
@@ -202,7 +204,8 @@ async function(req, res, next) {
  * Displays the sign up page.
  */
 router.get('/signup', function(req, res, next) {
-	res.render('users/signup', { });
+	const inviteCode = req.query.invite
+	res.render('users/signup', { inviteCode });
 });
 
 /**
@@ -371,7 +374,7 @@ router.post('/activate/:code',
 		req.flash.notice = "You have successfully activated your account. Welcome to Pluribus!";
 
 		// Save authentication cookie
-		req.session.authUser = { id: user.id, email: user.email, roles: [ ] };
+		req.session.authUser = { id: user.id, email: user.email, name: user.name, roles: [ ] };
 
 		var redirect = '/users/choose-path';
 
