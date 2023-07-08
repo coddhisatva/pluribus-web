@@ -95,7 +95,7 @@ const dtFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
 							<tr>
 								<td class="d-none d-md-table-cell"><%= dtFormat.format(pledge.createdAt) %></td>
 								<td>
-									<%= pledge.User.name || pledge.User.email %>
+									<%= pledge.User.name || 'anonymous' %>
 									<div class="d-md-none text-medium"><%= dtFormat.format(pledge.createdAt) %></div>
 								</td>
 								<td>
