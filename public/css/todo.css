@@ -274,6 +274,7 @@ input.has-password-visibility.form-control.is-valid + .password-visibility-toggl
 	}
 	.profile-head .spliter {
 		align-items: center!important;
+		text-align: center;
 	}
 }
 
