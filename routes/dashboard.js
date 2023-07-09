@@ -499,8 +499,9 @@ router.get('/execute-policy/execute', auth.authorizeRole('creator'), async funct
 
 	// TODO: Notify supporters via email
 
-	// Notify Pluribus
 	var env = req.app.get('env');
+
+	// Notify Pluribus
 	var notifyEmails = [ 'luke@smalltech.com.au' ];
 	if(env != 'development') {
 		notifyEmails.push('help@becomepluribus.com');
@@ -510,6 +511,25 @@ router.get('/execute-policy/execute', auth.authorizeRole('creator'), async funct
 		subject: `A creator has activated their pledges (${env})`,
 		text: `${creator.name} (id=${creator.id}) activated their pledges at ${req.hostname}:\r\n
 ${reason}`
+	});
+
+	// Notify the creator
+	email.send(env, {
+		from: 'help@becomepluribus.com',
+		to: user.email,
+		subject: "You've activated your pledges on Pluribus",
+		text: `Hi ${creator.name},
+		
+You've activated your pledges on Pluribus.
+
+What happens next?
+==================
+Donors have seven days to object if they feel the claim falls outside the mutually agreed upon parameters or is otherwise perceived to be illegitimate (such as deliberately triggering consequences just to receive a payout). If less than 50% of donors formally object to your claim within a week, the claim is approved and the funds are officially transferred.
+
+The assumption of legitimacy as a baseline as opposed to putting every claim up to a vote is to ensure the security (both financial and psychological) of the recipients. For anyone to object, they must go out of their way to express it- which they will if they feel they’ve been taken advantage of. Otherwise, there are few reasons why either side would find themselves at odds with the other.
+
+
+If you have any questions, please get in touch with us at help@becomepluribus.com`
 	});
 
 	res.redirect('/dashboard/execute-policy/executed');
