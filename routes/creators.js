@@ -155,7 +155,7 @@ router.get('/:id', async function(req, res, next) {
 
 	var isFollowing = false;
 	var pledge = null;
-	if(req.authUser) {
+	if(req.authUser && req.authUser.id) {
 		var follow = await Follow.findOne({ where: { userId: req.authUser.id, creatorId: creator.id } });
 		if(follow !== null) {
 			isFollowing = true;

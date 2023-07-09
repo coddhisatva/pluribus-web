@@ -267,6 +267,16 @@ input.has-password-visibility.form-control.is-valid + .password-visibility-toggl
 	border-color: #cd7f32;
 }
 
+/* Mobile layout for profile */
+@media screen and (max-width:767px) {
+	.profile-head .card-body {
+		align-items: center;
+	}
+	.profile-head .spliter {
+		align-items: center!important;
+	}
+}
+
 /* for 'beta' tag */
 .navbar-brand {
 	display: inline-block;
