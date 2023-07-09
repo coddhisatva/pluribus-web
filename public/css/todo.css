@@ -90,6 +90,13 @@ input + .password-visibility-toggle {
 	right: 0;
 }
 
+@media screen and (max-width: 575px) {
+	input + .password-visibility-toggle {
+		width: 37px;
+		height: 37px;
+	}
+}
+
 input + .password-visibility-toggle svg {
 	width: 24px;
 	height: 24px;
@@ -263,4 +270,10 @@ input.has-password-visibility.form-control.is-valid + .password-visibility-toggl
 /* for 'beta' tag */
 .navbar-brand {
 	display: inline-block;
+}
+header.nonav {
+	align-items: center;
+}
+header.nonav .navbar-brand {
+	margin-right: 10px;
 }
