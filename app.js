@@ -7,6 +7,7 @@ const cookieSession = require('cookie-session');
 const logger = require('morgan');
 const auth = require('./utils/auth');
 const flash = require('./utils/flash');
+const email = require('./utils/email');
 const viewUtils = require('./utils/viewUtils');
 const fs = require('fs');
 
@@ -79,13 +80,34 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
+	let env = req.app.get('env');
 	// set locals, only providing error in development
-	res.locals.message = err.message;
-	res.locals.error = req.app.get('env') === 'development' ? err : {};
+	res.locals.message = env === 'development' ? err.message : 'An unexpected error occurred.';
+	res.locals.error = env === 'development' ? err : {};
 
 	// render the error page
 	res.status(err.status || 500);
 	res.render('error', { layout: false });
+	
+	if(err.status != 404) {
+		// Email error to Luke
+		try {
+			var url = req.protocol + '://' + req.get('host') + req.originalUrl;
+			var user = req.authUser ? req.authUser.email + '(' + req.authUser.id + ')' : 'anonymous';
+
+			email.send(env, {
+				from: 'errors@becomepluribus.com',
+				to: 'luke@smalltech.com.au',
+				subject: 'Pluribus Error',
+				text: `${req.method} ${url}
+User: ${user}
+Client IP Address: ${req.ip}
+Request body: ${JSON.stringify(req.body)}
+
+${err.stack}`
+			});
+		} catch(emailErr) { } // ignore
+	}
 
 	/*
 	// Log to /logs/error.log

@@ -4,13 +4,19 @@ const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
 const csrf = require('../utils/csrf');
 const email = require('../utils/email');
-const handleAsyncErrors = require('../utils/handleAsyncErrors');
+require('../utils/handleAsyncErrors').fixRouter(router);
 const { User, Follow, Creator, OneTimeCode } = require('../models');
 
-
 /* GET /login */
-router.get('/login', function(req, res, next) {
+router.get('/login', (req, res, next) => {
 	res.render('users/login');
+});
+
+// TODO: delete this
+router.get('/test-error', async (req, res, next) => {
+	var x = next.j;
+	var p = x.y;
+	res.send('testing');
 });
 
 /* POST /login (email:string, password:string, remember:1) */
@@ -20,7 +26,7 @@ router.post('/login',
 		.isEmail().withMessage('Invalid email address'),
 	body('password', 'Please enter your password').trim().isLength({min:1}),
 
-	handleAsyncErrors(async function(req, res, next) {
+	async function(req, res, next) {
 		const errors = validationResult(req).array();
 
 		var user;
@@ -62,24 +68,24 @@ router.post('/login',
 			res.redirect('/');
 		}
 	}
-));
+);
 
 /**
  * GET /logout
  */
-router.get('/logout', handleAsyncErrors(async function(req, res, next) {
+router.get('/logout', async function(req, res, next) {
 	req.session.authUser = null;
 	req.flash.notice = 'You\'ve been logged out.';
 	res.redirect('/');
-}));
+});
 
 /**
  * GET /password
  * Shows a form for a user to request a password reset ('Forgot password?' page).
  */
-router.get('/password', handleAsyncErrors(async function(req, res, next) {
+router.get('/password', async function(req, res, next) {
 	res.render('users/password');
-}));
+});
 
 /**
  * POST /password (email:string)
@@ -91,7 +97,7 @@ router.post('/password', [
 	body('email').trim().isLength({min:1}).withMessage('Please enter your email address').bail()
 		.isEmail().withMessage('Invalid email address'),
 
-	handleAsyncErrors(async function(req, res, next) {
+	async function(req, res, next) {
 
 		const errors = validationResult(req).array();
 
@@ -109,30 +115,30 @@ router.post('/password', [
 		}
 
 		res.redirect('password-reset-sent');
-	})]
+	}]
 );
 
 /**
  * GET users/password-reset-sent
  * The page shown after a password reset has been sent.
  */
-router.get('/password-reset-sent', handleAsyncErrors(async function(req, res, next) {
+router.get('/password-reset-sent', async function(req, res, next) {
 	res.render('users/password-reset-sent', { email: req.session.passwordResetEmail });
-}));
+});
 
 /**
  * POST /users/resend-password-reset
  * Resends the password reset email.
  * TODO: rate-limit requests (e.g. one per minute, increasing for each email sent) to make sure this isn't abused.
  */
- router.post('/resend-password-reset', handleAsyncErrors(async function(req, res, next) {
+ router.post('/resend-password-reset', async function(req, res, next) {
 	var email = req.session.passwordResetEmail;
 	var user = await User.findOne({ where: { email } });
 	if(user) {
 		await sendForgotPasswordEmail(req, user);
 	}
 	res.send('Sent');
-}));
+});
 
 function getValidOneTimeCode(redirect) {
 	return async function(req, res, next) {
@@ -162,12 +168,12 @@ function getValidOneTimeCode(redirect) {
  * GET /users/reset-password/:code
  * Shows the form for a user to reset their password.
  */
-router.get('/reset-password/:code', getValidOneTimeCode('/users/password'), handleAsyncErrors(async function(req, res, next) {
+router.get('/reset-password/:code', getValidOneTimeCode('/users/password'), async function(req, res, next) {
 	var passwordReset = res.locals.oneTimeCode;
 	var email = passwordReset.email;
 
 	res.render('users/reset-password', { email });
-}));
+});
 
 /**
  * POST /users/reset-password/:code (newPassword:string)
@@ -178,7 +184,7 @@ getValidOneTimeCode('/users/password'),
 body('password').trim().isLength({ min: 8 }).withMessage('Password must be 8 characters or longer')
 	.custom((value) => /[A-Z]/.test(value)).withMessage('Password must contain at least one uppercase letter')
 	.custom((value) => /[a-z]/.test(value)).withMessage('Password must contain at least one lowercase letter'),
-handleAsyncErrors(async function(req, res, next) {
+async function(req, res, next) {
 	const errors = validationResult(req);
 	if(!errors.isEmpty()) {
 		res.render('users/reset-password', { errors: errors.mapped() });
@@ -197,7 +203,7 @@ handleAsyncErrors(async function(req, res, next) {
 	req.flash.notice = "Your password was successfully reset. Please log in."
 
 	res.redirect('/users/login');
-}));
+});
 
 /**
  * GET /users/signup
@@ -287,7 +293,7 @@ If you did not make this request, please disregard this email.`
  	body('email')
 	 	.trim().isLength({ min: 1}).withMessage('Please enter your email address').bail()
 		.isEmail().withMessage('Invalid email address'),
-	handleAsyncErrors(async function(req, res, next) {
+	async function(req, res, next) {
 		var errors = validationResult(req);
 
 		if(!errors.isEmpty()) {
@@ -310,7 +316,7 @@ If you did not make this request, please disregard this email.`
 		req.session.signupEmail = email;
 		res.redirect('/users/activate-sent');
 	}
-));
+);
 
 /**
  * GET /users/activate-sent
@@ -326,25 +332,25 @@ router.get('/activate-sent', function(req, res, next) {
  * Resends the activation email.
  * TODO: rate-limit requests (e.g. one per minute, increasing for each email sent) to make sure this isn't abused.
  */
-router.post('/resend-activate', handleAsyncErrors(async function(req, res, next) {
+router.post('/resend-activate', async function(req, res, next) {
 	var email = req.session.signupEmail;
 	var user = await User.findOne({ where: { email } });
 	if(user) {
 		await sendActivationEmail(req, user);
 	}
 	res.send('Sent');
-}));
+});
 
 /**
  * GET /users/activate/:code
  * Shows the page for when a user clicks the activation link in their sign up email.
  */
-router.get('/activate/:code', getValidOneTimeCode('/users/signup'), handleAsyncErrors(async function(req, res, next) {
+router.get('/activate/:code', getValidOneTimeCode('/users/signup'), async function(req, res, next) {
 	var activationCode = res.locals.oneTimeCode;
 	var email = activationCode.email;
 
 	res.render('users/activate', { email });
-}));
+});
 
 /**
  * POST /users/activate/:code(password:string,accept:boolean)
@@ -354,7 +360,7 @@ router.post('/activate/:code',
 	getValidOneTimeCode('/users/signup'),
 	body('password').trim().isLength({ min: 8 }).withMessage('Password must be 8 characters or longer'),
 	body('accept').equals('yes').withMessage('Please accept our terms of service'),
-	handleAsyncErrors(async function(req, res, next) {
+	async function(req, res, next) {
 		const errors = validationResult(req);
 		if(!errors.isEmpty()) {
 			res.render('users/activate', { errors: errors.mapped() });
@@ -388,14 +394,14 @@ router.post('/activate/:code',
 		}
 
 		res.redirect(redirect);
-	}));
+	});
 
-router.get('/choose-path', auth.authorize, handleAsyncErrors(async function(req, res, next) {
+router.get('/choose-path', auth.authorize, async function(req, res, next) {
 	// Clear previous signup session
 	req.session.creatorSignup = null;
 
 	res.render('users/choose-path');
-}));
+});
 	
 
 module.exports = router;

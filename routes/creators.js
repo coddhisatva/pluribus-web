@@ -7,13 +7,13 @@ const auth = require('../utils/auth');
 const csrf = require('../utils/csrf');
 const email = require('../utils/email');
 const credentials = require('../config/credentials');
-const handleAsyncErrors = require('../utils/handleAsyncErrors');
+require('../utils/handleAsyncErrors').fixRouter(router);
 const { ResultWithContext } = require('express-validator/src/chain');
 
-router.get('/', handleAsyncErrors(async function(req, res, next) {
+router.get('/', async function(req, res, next) {
 	var creators = await Creator.findAll({ where: { publicProfile: true }});
 	res.render('creators/index', { creators });
-}));
+});
 
 async function ensureNoCreatorAccount(req, res, next) {
 	// If there's no logged in user, redirect to user registration
@@ -33,17 +33,17 @@ async function ensureNoCreatorAccount(req, res, next) {
 	next();
 }
 
-router.get('/new', ensureNoCreatorAccount, handleAsyncErrors(async function(req, res, next) {
+router.get('/new', ensureNoCreatorAccount, async function(req, res, next) {
 	res.redirect('/creators/new/categories');
-}));
+});
 
-router.get('/new/categories', ensureNoCreatorAccount, handleAsyncErrors(async function(req, res, next) {
+router.get('/new/categories', ensureNoCreatorAccount, async function(req, res, next) {
 	res.render('creators/new-categories');
-}));
+});
 
 router.post('/new/categories',
 	ensureNoCreatorAccount,
-	handleAsyncErrors(async function(req, res, next) {
+	async function(req, res, next) {
 		if(!req.session.creatorSignup) {
 			req.session.creatorSignup = { };
 		}
@@ -51,11 +51,11 @@ router.post('/new/categories',
 			req.body.categories : [req.body.categories];
 		res.redirect('/creators/new/about');
 	}
-));
+);
 
-router.get('/new/about', ensureNoCreatorAccount, handleAsyncErrors(function(req, res, next) {
+router.get('/new/about', ensureNoCreatorAccount, function(req, res, next) {
 	res.render('creators/new-about');
-}));
+});
 
 router.post('/new/about',
 	ensureNoCreatorAccount,
@@ -83,7 +83,7 @@ router.get('/new/name', ensureNoCreatorAccount, function(req, res) {
 router.post('/new/name',
 	ensureNoCreatorAccount,
 	body('name').trim().isLength({ min: 1 }).withMessage('Please enter your name'),
-	handleAsyncErrors(async function(req, res, next) {
+	async function(req, res, next) {
 		if(!req.body.skip) {
 			var errors = validationResult(req);
 			if(!errors.isEmpty()) {
@@ -97,16 +97,16 @@ router.post('/new/name',
 
 		res.redirect('/creators/new/policy');
 	}
-));
+);
 
-router.get('/new/policy', ensureNoCreatorAccount, handleAsyncErrors(async function(req, res) {
+router.get('/new/policy', ensureNoCreatorAccount, async function(req, res) {
 	res.render('creators/new-policy', { });
-}));
+});
 
 router.post('/new/policy',
 	ensureNoCreatorAccount,
 	body('policy').trim().isLength({ min: 20 }).withMessage('Please enter more text (20 character minimum)'),
-	handleAsyncErrors(async function(req, res, next) {
+	async function(req, res, next) {
 
 		var errors = validationResult(req);
 		if(!errors.isEmpty()) {
@@ -145,9 +145,9 @@ router.post('/new/policy',
 
 		res.redirect('/dashboard/profile');
 	}
-));
+);
 
-router.get('/:id', handleAsyncErrors(async function(req, res, next) {
+router.get('/:id', async function(req, res, next) {
 	var creator = await Creator.findByPk(req.params.id, { include: [ User, CreatorCategory ] });
 	if(!creator) {
 		res.status(404).send('Creator not found.');
@@ -175,13 +175,13 @@ router.get('/:id', handleAsyncErrors(async function(req, res, next) {
 	}
 
 	res.render('creators/show', { creator, isFollowing, followerCount, supporterCount, pledge });
-}));
+});
 
 /**
  * POST /:id/follow
  * Sets the authenticated user to follow the creator specified by :id.
  */
-router.post('/:id/follow', auth.authorize, handleAsyncErrors(async function(req, res, next) {
+router.post('/:id/follow', auth.authorize, async function(req, res, next) {
 	var creatorId = req.params.id;
 	var creator = await Creator.findByPk(creatorId, { include: User });
 
@@ -217,13 +217,13 @@ ${name || '(anonymous)'}`
 	});
 
 	res.sendStatus(200);
-}));
+});
 
 /**
  * POST /:id/unfollow
  * Sets the authenticated user to NOT follow the creator specified by :id.
  */
- router.post('/:id/unfollow', auth.authorize, handleAsyncErrors(async function(req, res, next) {
+ router.post('/:id/unfollow', auth.authorize, async function(req, res, next) {
 	var creatorId = req.params.id;
 	var userId = res.locals.authUser.id;
 	var follow = await Follow.findOne({ where: { creatorId, userId }});
@@ -232,9 +232,9 @@ ${name || '(anonymous)'}`
 	}
 
 	res.sendStatus(200);
-}));
+});
 
-router.get('/:id/pledge', auth.authorize, handleAsyncErrors(async (req, res) => {
+router.get('/:id/pledge', auth.authorize, async (req, res) => {
 	var creator = await Creator.findByPk(req.params.id, { include: [ User, CreatorCategory ] });
 	if(!creator) {
 		res.status(404).send('Creator not found.');
@@ -249,9 +249,9 @@ router.get('/:id/pledge', auth.authorize, handleAsyncErrors(async (req, res) => 
 	var primaryCardPaymentMethod = cardPaymentMethods.find(method => method.id == user.primaryCardPaymentMethodId);
 
 	res.render('creators/pledge', { creator, stripePublicKey, cardPaymentMethods, primaryCardPaymentMethod });
-}));
+});
 
-router.post('/:id/pledge', auth.authorize, csrf.validateToken, handleAsyncErrors(async(req, res) => {
+router.post('/:id/pledge', auth.authorize, csrf.validateToken, async(req, res) => {
 	const userId = req.authUser.id;
 	const creatorId = req.params.id;
 	const creator = await Creator.findByPk(creatorId, { include: User });
@@ -323,14 +323,14 @@ ${name || '(anonymous)'} pledged $${amount}`
 	});
 
 	res.redirect('/creators/' + req.params.id + '/pledged');
-}));
+});
 
-router.get('/:id/pledged', auth.authorize, handleAsyncErrors(async(req, res) => {
+router.get('/:id/pledged', auth.authorize, async(req, res) => {
 	let creator = await Creator.findByPk(req.params.id);
 	if(!creator) {
 		res.status(404).send('Creator not found.');
 	}
 	res.render('creators/pledged', { creator });
-}));
+});
 
 module.exports = router;
