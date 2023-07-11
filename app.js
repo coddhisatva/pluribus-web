@@ -26,6 +26,10 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
 
+if(app.get('env') == 'production') {
+	app.set('trust proxy', true);
+}
+
 // We need to work around this to put Stripe js in the <head>
 app.set('layout extractScripts', true);
 
