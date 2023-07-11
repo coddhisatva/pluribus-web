@@ -26,10 +26,6 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
 
-if(app.get('env') == 'production') {
-	app.set('trust proxy', true);
-}
-
 // We need to work around this to put Stripe js in the <head>
 app.set('layout extractScripts', true);
 
@@ -94,7 +90,7 @@ app.use(function(err, req, res, next) {
 	res.status(err.status || 500);
 	res.render('error', { layout: false });
 	
-	if(err.status != 404 && env !== 'development') {
+	if(err.status != 404) { // && env !== 'development') {
 		// Email error to Luke
 		try {
 			var url = req.protocol + '://' + req.get('host') + req.originalUrl;
@@ -107,7 +103,8 @@ app.use(function(err, req, res, next) {
 				text: `${req.method} ${url}
 User: ${user}
 Client IP Address: ${req.ip}
-Request body: ${JSON.stringify(req.body)}
+Request body: ${JSON.stringify(req.body, null, 2)}
+Headers: ${JSON.stringify(req.headers, null, 2)}
 
 ${err.stack}`
 			});
