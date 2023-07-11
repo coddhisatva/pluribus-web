@@ -81,15 +81,16 @@ app.use(function(req, res, next) {
 // error handler
 app.use(function(err, req, res, next) {
 	let env = req.app.get('env');
-	// set locals, only providing error in development
-	res.locals.message = env === 'development' ? err.message : 'An unexpected error occurred.';
-	res.locals.error = env === 'development' ? err : {};
+
+	// set locals, view will only provide error in development
+	res.locals.error = err;
+	res.locals.env = env;
 
 	// render the error page
 	res.status(err.status || 500);
 	res.render('error', { layout: false });
 	
-	if(err.status != 404) {
+	if(err.status != 404 && env !== 'development') {
 		// Email error to Luke
 		try {
 			var url = req.protocol + '://' + req.get('host') + req.originalUrl;

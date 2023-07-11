@@ -1,3 +1,24 @@
-<h1><%= message %></h1>
-<h2><%= error.status %></h2>
-<pre><%= error.stack %></pre>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Unexpected Error</title>
+	<link rel="stylesheet" href="/css/main.css"/>
+</head>
+<body>
+	<div class="container pt-5">
+		<% if(env === 'development') { %>
+			<h1>Error</h1>
+			<pre><%= error.stack %></pre>
+		<% } else { %>
+			<h1>Something went wrong</h1>
+			<p>
+				We've been notified and we'll fix the problem ASAP.
+			</p>
+			<p>
+				In the meantime, you could <a href="javascript:history.go(-1)">go back</a> and try something different.
+			</p>
+		<% } %>
+	</div>
+</body>
+</html>
+
