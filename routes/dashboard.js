@@ -11,12 +11,13 @@ const fs = require('fs/promises');
 const path = require('path');
 const util = require('../utils/util');
 const email = require('../utils/email');
+const handleAsyncErrors = require('../utils/handleAsyncErrors');
 const sharp = require('sharp');
 const { serialize } = require('v8');
 const credentials = require('../config/credentials');
 const settings = require('../config/settings');
 
-router.get('/', auth.authorize, async function(req, res, next) {
+router.get('/', auth.authorize, handleAsyncErrors(async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userId: user.id }});
 	var following = await Follow.findAll({ where: { userId: user.id }, include: Creator });
@@ -24,9 +25,9 @@ router.get('/', auth.authorize, async function(req, res, next) {
 	var executed = await PolicyExecutionSupporter.findAll({ where: { userId: user.id, agree: null }, include: { model: PolicyExecution, include: Creator } });
 
 	res.render('dashboard/index', { user, creator, following, executed });
-});
+}));
 
-router.get('/profile', auth.authorizeRole('creator'), async function(req, res, next) {
+router.get('/profile', auth.authorizeRole('creator'), handleAsyncErrors(async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userId: user.id }});
 	if(!creator) {
@@ -39,8 +40,9 @@ router.get('/profile', auth.authorizeRole('creator'), async function(req, res, n
 	var profileLink = protocol + '://' + req.headers.host + '/creators/' + creator.id;
 
 	res.render('dashboard/profile', { user, creator, inviteBase, profileLink });
-});
-router.post('/profile', auth.authorizeRole('creator'), upload.single('newPhoto'), async function(req, res, next) {
+}));
+
+router.post('/profile', auth.authorizeRole('creator'), upload.single('newPhoto'), handleAsyncErrors(async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userId: user.id }});
 
@@ -159,9 +161,9 @@ router.post('/profile', auth.authorizeRole('creator'), upload.single('newPhoto')
 	await Creator.update(update, { where: { id: creator.id }});
 
 	res.send(sync);
-});
+}));
 
-router.get('/payments', auth.authorize, async function(req, res, next) {
+router.get('/payments', auth.authorize, handleAsyncErrors(async function(req, res, next) {
 	var stripePublicKey = credentials.stripe.publicKey;
 
 	var user = await User.findByPk(req.authUser.id);
@@ -171,14 +173,14 @@ router.get('/payments', auth.authorize, async function(req, res, next) {
 	var primaryCardPaymentMethod = cardPaymentMethods.find(method => method.id == user.primaryCardPaymentMethodId);
 
 	res.render('dashboard/payments', { user, creator, stripePublicKey, cardPaymentMethods, primaryCardPaymentMethod });
-});
+}));
 
 /**
  * POST /dashboard/payments/beginAddCreditCard
  * Called before adding a credit card payment method for a user to setup Stripe custom integration.
  * https://stripe.com/docs/payments/save-and-reuse?platform=web
  */
-router.post('/payments/beginAddCreditCard', auth.authorize, async function(req, res, next) {
+router.post('/payments/beginAddCreditCard', auth.authorize, handleAsyncErrors(async function(req, res, next) {
 	const stripe = require('stripe')(credentials.stripe.secretKey);
 	var user = await User.findByPk(req.authUser.id);
 
@@ -197,9 +199,9 @@ router.post('/payments/beginAddCreditCard', auth.authorize, async function(req, 
 
 	res.json({ clientSecret: setupIntent.client_secret });
 
-});
+}));
 
-router.get('/payments/card-added', auth.authorize, async function(req, res, next) {
+router.get('/payments/card-added', auth.authorize, handleAsyncErrors(async function(req, res, next) {
 	const stripe = require('stripe')(credentials.stripe.secretKey);
 
 	var setupIntentId = req.query.setup_intent;
@@ -243,9 +245,9 @@ router.get('/payments/card-added', auth.authorize, async function(req, res, next
 	}
 	
 	res.redirect('/dashboard/payments');
-});
+}));
 
-router.post('/payments/set-primary-method', auth.authorize, async function(req, res, next) {
+router.post('/payments/set-primary-method', auth.authorize, handleAsyncErrors(async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 
 	var methodId = req.body.id;
@@ -259,9 +261,9 @@ router.post('/payments/set-primary-method', auth.authorize, async function(req, 
 	}
 
 	res.redirect('/dashboard/payments');
-});
+}));
 
-router.post('/payments/delete-payment-method', auth.authorize, async function(req, res, next) {
+router.post('/payments/delete-payment-method', auth.authorize, handleAsyncErrors(async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 
 	var methodId = req.body.id;
@@ -278,9 +280,9 @@ router.post('/payments/delete-payment-method', auth.authorize, async function(re
 
 	await cardPaymentMethod.destroy();
 	res.status(200).json({ message: 'Card was removed successfully' });
-});
+}));
 
-router.get('/payments/connect-stripe-account', auth.authorizeRole('creator'), async(req, res) => {
+router.get('/payments/connect-stripe-account', auth.authorizeRole('creator'), handleAsyncErrors(async(req, res) => {
 	// Create an Express connected account and prefill information
 	// See: https://stripe.com/docs/connect/collect-then-transfer-guide
 
@@ -325,9 +327,9 @@ router.get('/payments/connect-stripe-account', auth.authorizeRole('creator'), as
 	});
 
 	res.redirect(accountLink.url);
-});
+}));
 
-router.get('/payments/connect-stripe-account/reauth', auth.authorizeRole('creator'), async(req, res) => {
+router.get('/payments/connect-stripe-account/reauth', auth.authorizeRole('creator'), handleAsyncErrors(async(req, res) => {
 	// Stripe directs users here if the link expired, was already used etc.
 	// We recreate the link and send them back in
 	// See https://stripe.com/docs/connect/collect-then-transfer-guide
@@ -354,9 +356,9 @@ router.get('/payments/connect-stripe-account/reauth', auth.authorizeRole('creato
 	});
 
 	res.redirect(accountLink.url);
-});
+}));
 
-router.get('/payments/connect-stripe-account/return', auth.authorizeRole('creator'), async(req, res) => {
+router.get('/payments/connect-stripe-account/return', auth.authorizeRole('creator'), handleAsyncErrors(async(req, res) => {
 	// Stripe issues a redirect to this URL when the user completes the Connect Onboarding flow.
 	// This doesn’t mean that all information has been collected or that there are no outstanding
 	// requirements on the account. This only means the flow was entered and exited properly.
@@ -377,18 +379,18 @@ router.get('/payments/connect-stripe-account/return', auth.authorizeRole('creato
 	}
 	
 	res.redirect('/dashboard/payments');
-});
+}));
 
-router.get('/policy', auth.authorizeRole('creator'), async function(req, res, next) {
+router.get('/policy', auth.authorizeRole('creator'), handleAsyncErrors(async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userid: user.id }});
 	res.render('dashboard/policy', { user, creator, policy: creator.policy });
-});
+}));
 
 router.post('/policy',
 	auth.authorizeRole('creator'),
 	body('policy').trim().isLength({ min: 20 }).withMessage('Please enter more text (20 character minimum)'),
-	async function(req, res, next) {
+	handleAsyncErrors(async function(req, res, next) {
 		var errors = validationResult(req);
 		if(!errors.isEmpty()) {
 			res.status(400).json({ errors: errors.array() });
@@ -404,7 +406,7 @@ router.post('/policy',
 
 		res.json({ result: "ok" });
 	}
-);
+));
 
 async function doPolicyExecutionChecks(creator, res) {
 	if(!creator.stripeSubscriptionId) {
@@ -423,7 +425,7 @@ async function doPolicyExecutionChecks(creator, res) {
 	return { };
 }
 
-router.get('/execute-policy', auth.authorizeRole('creator'), async function(req, res, next) {
+router.get('/execute-policy', auth.authorizeRole('creator'), handleAsyncErrors(async function(req, res, next) {
 	const user = await User.findOne({ where: { id: req.authUser.id }});
 	const creator = await Creator.findOne({ where: { userId: user.id }});
 
@@ -434,9 +436,9 @@ router.get('/execute-policy', auth.authorizeRole('creator'), async function(req,
 	}
 
 	res.redirect('/dashboard/execute-policy/1');
-});
+}));
 
-router.get('/execute-policy/1', auth.authorizeRole('creator'), async function(req, res, next) {
+router.get('/execute-policy/1', auth.authorizeRole('creator'), handleAsyncErrors(async function(req, res, next) {
 	const user = await User.findOne({ where: { id: req.authUser.id }});
 	const creator = await Creator.findOne({ where: { userId: user.id }});
 
@@ -446,8 +448,9 @@ router.get('/execute-policy/1', auth.authorizeRole('creator'), async function(re
 	}
 
 	res.render('dashboard/execute-policy-step1');
-});
-router.get('/execute-policy/2', auth.authorizeRole('creator'), async function(req, res, next) {
+}));
+
+router.get('/execute-policy/2', auth.authorizeRole('creator'), handleAsyncErrors(async function(req, res, next) {
 	const user = await User.findOne({ where: { id: req.authUser.id }});
 	const creator = await Creator.findOne({ where: { userId: user.id }});
 
@@ -457,8 +460,9 @@ router.get('/execute-policy/2', auth.authorizeRole('creator'), async function(re
 	}
 
 	res.render('dashboard/execute-policy-step2');
-});
-router.post('/execute-policy/3', auth.authorizeRole('creator'), async function(req, res, next) {
+}));
+
+router.post('/execute-policy/3', auth.authorizeRole('creator'), handleAsyncErrors(async function(req, res, next) {
 	const user = await User.findOne({ where: { id: req.authUser.id }});
 	const creator = await Creator.findOne({ where: { userId: user.id }});
 
@@ -470,9 +474,9 @@ router.post('/execute-policy/3', auth.authorizeRole('creator'), async function(r
 	const reason = req.body.reason;
 	req.session.policyExecution = { reason };
 	res.render('dashboard/execute-policy-step3', { reason, creator });
-});
+}));
 
-router.get('/execute-policy/execute', auth.authorizeRole('creator'), async function(req, res, next) {
+router.get('/execute-policy/execute', auth.authorizeRole('creator'), handleAsyncErrors(async function(req, res, next) {
 	const user = await User.findOne({ where: { id: req.authUser.id }});
 	const creator = await Creator.findOne({ where: { userId: user.id }});
 
@@ -533,13 +537,13 @@ If you have any questions, please get in touch with us at help@becomepluribus.co
 	});
 
 	res.redirect('/dashboard/execute-policy/executed');
-});
+}));
 
 router.get('/execute-policy/executed', (req, res) => {
 	res.render('dashboard/execute-policy-executed');
 });
 
-router.post('/policy-execution-response/:id', auth.authorize, async (req, res) => {
+router.post('/policy-execution-response/:id', auth.authorize, handleAsyncErrors(async (req, res) => {
 	const response = req.body.response;
 
 	const user = await User.findByPk(req.authUser.id);
@@ -573,9 +577,9 @@ router.post('/policy-execution-response/:id', auth.authorize, async (req, res) =
 			res.status(400).send('Invalid response');
 			return;
 	}
-});
+}));
 
-router.get('/policy-execution-response/:id/agreed', auth.authorize, async (req, res) => {
+router.get('/policy-execution-response/:id/agreed', auth.authorize, handleAsyncErrors(async (req, res) => {
 	const user = await User.findByPk(req.authUser.id);
 	const policyExecution = await PolicyExecution.findByPk(req.params.id);
 	if(!policyExecution) {
@@ -593,9 +597,9 @@ router.get('/policy-execution-response/:id/agreed', auth.authorize, async (req, 
 	const creator = await Creator.findByPk(policyExecution.creatorId);
 
 	res.render('dashboard/policy-execution-response-agreed', { pledge, creator, policyExecution });
-});
+}));
 
-router.post('/policy-execution-response/:id/pay', auth.authorize, async(req, res) => {
+router.post('/policy-execution-response/:id/pay', auth.authorize, handleAsyncErrors(async(req, res) => {
 	const stripe = require('stripe')(credentials.stripe.secretKey);
 
 	const user = await User.findByPk(req.authUser.id);
@@ -647,40 +651,40 @@ router.post('/policy-execution-response/:id/pay', auth.authorize, async(req, res
 	await policyExecutionSupporter.save();
 
 	res.redirect(session.url);
-});
+}));
 
-router.get('/policy-execution-response/:id/pay/complete', auth.authorize, async (req, res) => {
+router.get('/policy-execution-response/:id/pay/complete', auth.authorize, handleAsyncErrors(async (req, res) => {
 	// Don't need to do anything here. We use the checkout.complete webhook callback from Stripe
 	// to record completion of the payment.
 	res.render('dashboard/policy-execution-response-paid');
-});
+}));
 
-router.get('/policy-execution-response/:id/pay/cancel', auth.authorize, async (req, res) => {
+router.get('/policy-execution-response/:id/pay/cancel', auth.authorize, handleAsyncErrors(async (req, res) => {
 	res.render('dashboard/policy-execution-response-payment-cancelled');
-});
+}));
 
-router.get('/security', async function(req, res, next) {
+router.get('/security', handleAsyncErrors(async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userid: user.id }});
 	res.locals.nav = 'security';
 	res.render('coming-soon', { user, creator });
-});
+}));
 
-router.get('/settings', async function(req, res, next) {
+router.get('/settings', handleAsyncErrors(async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userid: user.id }});
 	res.locals.nav = 'settings';
 	res.render('coming-soon', { user, creator });
-});
+}));
 
-router.get('/referrals', async function(req, res, next) {
+router.get('/referrals', handleAsyncErrors(async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userid: user.id }});
 	res.locals.nav = 'referrals';
 	res.render('coming-soon', { user, creator });
-});
+}));
 
-router.get('/search', async (req, res) => {
+router.get('/search', handleAsyncErrors(async (req, res) => {
 	let q = req.query['q'];
 	let results = null;
 	if(q) {
@@ -697,9 +701,9 @@ router.get('/search', async (req, res) => {
 	}
 
 	res.render('dashboard/search', { results, q });
-});
+}));
 
-router.get('/pledges', auth.authorize, async (req, res) => {
+router.get('/pledges', auth.authorize, handleAsyncErrors(async (req, res) => {
 	const user = await User.findByPk(req.authUser.id);
 	const creator = await Creator.findOne({ where: { userid: user.id }});
 
@@ -707,16 +711,16 @@ router.get('/pledges', auth.authorize, async (req, res) => {
 	const pledgesReceived = creator ? await Pledge.findAll({ where: { creatorId: creator.id  }, include: User}) : null;
 
 	res.render('dashboard/pledges', { user, creator, pledgesMade, pledgesReceived });
-});
+}));
 
-router.get('/subscription', auth.authorize, async (req, res) => {
+router.get('/subscription', auth.authorize, handleAsyncErrors(async (req, res) => {
 	const user = await User.findByPk(req.authUser.id);
 	const creator = await Creator.findOne({ where: { userid: user.id }});
 
 	res.render('dashboard/subscription', { creator });
-});
+}));
 
-router.get('/subscribe', auth.authorize, async (req, res) => {
+router.get('/subscribe', auth.authorize, handleAsyncErrors(async (req, res) => {
 	const user = await User.findByPk(req.authUser.id);
 
 	const creator = await Creator.findOne({ where: { userid: user.id }});
@@ -744,9 +748,9 @@ router.get('/subscribe', auth.authorize, async (req, res) => {
 		primaryCardPaymentMethod,
 		amount: product.default_price.unit_amount / 100
 	});
-});
+}));
 
-router.post('/subscribe', auth.authorize, csrf.validateToken, async(req, res) => {
+router.post('/subscribe', auth.authorize, csrf.validateToken, handleAsyncErrors(async(req, res) => {
 	const cardId = req.body.card;
 	if(!cardId) {
 		req.flash.alert = 'Please choose a card or add a new payment method.';
@@ -789,9 +793,9 @@ router.post('/subscribe', auth.authorize, csrf.validateToken, async(req, res) =>
 	req.flash.notice = 'Subscription was created successfully';
 
 	return res.redirect('/dashboard/subscription');
-});
+}));
 
-router.get('/cancel-subscription', auth.authorize, async(req, res) => {
+router.get('/cancel-subscription', auth.authorize, handleAsyncErrors(async(req, res) => {
 	const user = await User.findByPk(req.authUser.id);
 	const creator = await Creator.findOne({ where: { userid: user.id }});
 	if(!creator.stripeSubscriptionId) {
@@ -801,9 +805,9 @@ router.get('/cancel-subscription', auth.authorize, async(req, res) => {
 	}
 
 	res.render('dashboard/subscription-cancel', { creator });
-});
+}));
 
-router.post('/cancel-subscription', auth.authorize, csrf.validateToken, async(req, res) => {
+router.post('/cancel-subscription', auth.authorize, csrf.validateToken, handleAsyncErrors(async(req, res) => {
 	const user = await User.findByPk(req.authUser.id);
 	let creator = await Creator.findOne({ where: { userid: user.id }});
 
@@ -825,6 +829,6 @@ router.post('/cancel-subscription', auth.authorize, csrf.validateToken, async(re
 
 	req.flash.notice = 'Your subscription was successfully cancelled.';
 	res.redirect('/dashboard/subscription');
-});
+}));
 
 module.exports = router;

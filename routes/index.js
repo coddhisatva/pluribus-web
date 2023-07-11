@@ -5,12 +5,13 @@ var router = express.Router();
 var { Creator, PrelaunchEmail, Follow, Pledge } = require('../models');
 const csrf = require('../utils/csrf');
 const credentials = require('../config/credentials');
+const handleAsyncErrors = require('../utils/handleAsyncErrors');
 
 /**
  * GET /
  * Shows the home page, or redirects the logged-in user to their dashboard
  */ 
-router.get('/', async function(req, res, next) {
+router.get('/', handleAsyncErrors(async function(req, res, next) {
 
 	// If the user is logged in, take them to their dashboard
 	if(req.authUser != null) {
@@ -21,13 +22,13 @@ router.get('/', async function(req, res, next) {
 	// Home page
 	//creatorCount = await Creator.count();
 	res.render('index');
-});
+}));
 
 /** POST /newsletter(email: string) */
 router.post('/newsletter',
 	body('email').trim().isLength({min:1}).withMessage('Please enter your email address').bail()
 		.isEmail().withMessage('Please enter a valid email address'),
-	async function(req, res, next) {
+	handleAsyncErrors(async function(req, res, next) {
 		const errors = validationResult(req);
 		if(!errors.isEmpty()) {
 			req.flash.alert = "Please enter a valid email address!";
@@ -47,7 +48,7 @@ router.post('/newsletter',
 
 		res.redirect('newsletter-signup')
 	}
-);
+));
 
 router.get('/newsletter-signup', (req, res) => {
 	res.render('newsletter-signup');
@@ -77,7 +78,7 @@ router.get('/pricing', function(req, res, next) {
 	res.render('pricing');
 });
 
-router.get('/invite/:code', async function(req, res, next) {
+router.get('/invite/:code', handleAsyncErrors(async function(req, res, next) {
 	let creator = await Creator.findOne({ where: { inviteCode: req.params.code }});
 
 	if(!creator) {
@@ -108,7 +109,7 @@ router.get('/invite/:code', async function(req, res, next) {
 	var supporterCount = await Pledge.count({ where: { creatorId: creator.id }});
 
 	res.render('creators/show', { creator, isFollowing, invite: req.params.code, followerCount, supporterCount, pledge });
-});
+}));
 
 router.get('/support', function(req, res, next) {
 	res.render('support');
@@ -123,7 +124,7 @@ router.get('/support/card/init', (req, res) => {
 	res.redirect('/support/card');
 });
 
-router.post('/support/card/init', csrf.validateToken, async (req, res, next) => {
+router.post('/support/card/init', csrf.validateToken, handleAsyncErrors(async (req, res, next) => {
 	// create a payment intent
 	const stripe = require('stripe')(credentials.stripe.secretKey);
 
@@ -140,30 +141,30 @@ router.post('/support/card/init', csrf.validateToken, async (req, res, next) => 
 	});
 
 	res.render('support-card-init', { paymentIntent, stripePublicKey: credentials.stripe.publicKey });
-});
+}));
 
-router.post('/support/card/update', async(req, res) => {
+router.post('/support/card/update', handleAsyncErrors(async(req, res) => {
 	const intent = await stripe.paymentIntents.update(
 		'{{PAYMENT_INTENT_ID}}',
 		{amount: 1499}
 	);
 	res.json({status: intent.status});
-});
+}));
 
-router.get('/support/card/complete', async (req, res) => {
+router.get('/support/card/complete', handleAsyncErrors(async (req, res) => {
 	res.render('support-card-complete', { stripePublicKey: credentials.stripe.publicKey });
-});
+}));
 
-router.get('/support/crypto', async (req, res) => {
+router.get('/support/crypto', handleAsyncErrors(async (req, res) => {
 	res.render('support-crypto');
-});
+}));
 
-router.get('/contact', async (req, res) => {
+router.get('/contact', handleAsyncErrors(async (req, res) => {
 	res.render('contact');
-});
+}));
 
-router.get('/terms', async (req, res) => {
+router.get('/terms', handleAsyncErrors(async (req, res) => {
 	res.render('terms');
-});
+}));
 
 module.exports = router;

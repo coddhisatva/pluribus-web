@@ -4,8 +4,9 @@ const { PolicyExecutionSupporter } = require('../models');
 const credentials = require('../config/credentials');
 const settings = require('../config/settings');
 const email = require('../utils/email');
+const handleAsyncErrors = require('../utils/handleAsyncErrors');
 
-router.post('/webhook', express.raw({type: 'application/json'}), async (req, res,) => {
+router.post('/webhook', express.raw({type: 'application/json'}), handleAsyncErrors(async (req, res,) => {
 	const stripe = require('stripe')(credentials.stripe.secretKey);
 
 	//express.raw();
@@ -64,6 +65,6 @@ ${log}`
 	// Return a 200 response to acknowledge receipt of the event
 	res.send();
 
-});
+}));
 
 module.exports = router;
