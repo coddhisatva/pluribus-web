@@ -3,9 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
-    "devstart": "nodemon ./bin/www",
-    "prodstart": "DEBUG=pluribus:* NODE_ENV=production pm2 ./bin/www",
+    "devstart": "nodemon --unhandled-rejections=strict ./bin/www",
     "test": "mocha"
   },
   "dependencies": {

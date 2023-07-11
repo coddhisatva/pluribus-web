@@ -748,10 +748,18 @@ router.get('/subscribe', auth.authorize, async (req, res) => {
 
 router.post('/subscribe', auth.authorize, csrf.validateToken, async(req, res) => {
 	const cardId = req.body.card;
+	if(!cardId) {
+		req.flash.alert = 'Please choose a card or add a new payment method.';
+		return res.redirect('/dashboard/subscribe');
+	}
 
 	const user = await User.findByPk(req.authUser.id);
 
-	const card = await CardPaymentMethod.findOne({ where: { id: cardId }});
+	const card = await CardPaymentMethod.findOne({ where: { id: cardId, userId: user.id }});
+	if(!card) {
+		req.flash.alert = 'Please choose a card or add a new payment method.';
+		return res.redirect('/dashboard/subscribe');
+	}
 
 	const stripe = require('stripe')(credentials.stripe.secretKey);
 

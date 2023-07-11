@@ -87,6 +87,7 @@ app.use(function(err, req, res, next) {
 	res.status(err.status || 500);
 	res.render('error', { layout: false });
 
+	/*
 	// Log to /logs/error.log
 	const logDir = path.join(__dirname, 'logs');
 	const logPath = path.join(logDir, 'error.log');
@@ -97,7 +98,7 @@ app.use(function(err, req, res, next) {
 		if(err) {
 			console.error(err);
 		}
-	});
+	});*/
 });
 
 app.locals.validationMessage = function(paramName) {

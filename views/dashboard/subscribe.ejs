@@ -16,7 +16,7 @@ _locals.headScripts = [ 'https://js.stripe.com/v3/' ];
 				<h3 class="heading-lg-medium text-strong">Pay with</h3>
 				<div>
 					<select id="selectCard" name="card" class="form-select">
-						<option>Select...</option>
+						<option value="">Select...</option>
 						<% for(var cardPaymentMethod of cardPaymentMethods) { %>
 							<option value="<%= cardPaymentMethod.id %>" <%= cardPaymentMethod.id == primaryCardPaymentMethod.id ? 'selected': ''%>>
 								<%= camelize(cardPaymentMethod.cardType) %>—***<%= cardPaymentMethod.last4 %>
