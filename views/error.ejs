@@ -5,20 +5,24 @@
 	<link rel="stylesheet" href="/css/main.css"/>
 </head>
 <body>
-	<div class="container pt-5">
-		<% if(env === 'development') { %>
+	<% if(env === 'development') { %>
+		<div class="container pt-5">
 			<h1>Error</h1>
 			<pre><%= error.stack %></pre>
-		<% } else { %>
-			<h1>Something went wrong</h1>
-			<p>
-				We've been notified and we'll fix the problem ASAP.
-			</p>
-			<p>
-				In the meantime, you could <a href="javascript:history.go(-1)">go back</a> and try something different.
-			</p>
-		<% } %>
-	</div>
+		</div>
+	<% } else { %>
+		<div class="container pt-5 mt-5 text-center">
+			<h1 class="display-3">Something went wrong!</h1>
+			<div class="heading-xl-weak text-muted mt-5">
+				<p>
+					We've been notified, and we'll fix the problem ASAP.
+				</p>
+				<p>
+					In the meantime, you could <a href="javascript:history.go(-1)">go back</a> and try something different.
+				</p>
+			</div>
+		</div>
+	<% } %>
 </body>
 </html>
 
