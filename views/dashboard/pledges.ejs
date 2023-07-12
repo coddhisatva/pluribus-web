@@ -120,6 +120,15 @@ const dtFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
 	
 </div><!-- .card -->
 
+<script>
+	window.addEventListener('DOMContentLoaded', function() {
+		if(window.location.hash == '#received') {
+			var triggerEl = document.getElementById('received-tab');
+			bootstrap.Tab.getOrCreateInstance(triggerEl).show() 
+		}
+	});
+</script>
+
 <%- contentFor('aside') %>
 <svg width="36" height="36" class="text-strong"><use href="/images/ui/icons.svg#heart" /></svg>
 <h3 class="body-sm-medium text-strong mt-0">Your pledge history</h3>

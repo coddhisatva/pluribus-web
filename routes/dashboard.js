@@ -384,7 +384,12 @@ router.get('/payments/connect-stripe-account/return', auth.authorizeRole('creato
 router.get('/policy', auth.authorizeRole('creator'), async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userid: user.id }});
-	res.render('dashboard/policy', { user, creator, policy: creator.policy });
+
+	var totalPledges = (await sequelize.query('select sum(amount) pledgeTotal from Pledges where creatorid = :creatorid',
+		{ replacements: { creatorid: creator.id }, plain: true, raw: true }));
+
+	var pledgeTotal = new Number(totalPledges.pledgeTotal);
+	res.render('dashboard/policy', { user, creator, policy: creator.policy, pledgeTotal });
 });
 
 router.post('/policy',

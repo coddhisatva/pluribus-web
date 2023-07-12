@@ -1,4 +1,15 @@
+<%
+_locals.title = 'Protection plan';
+_locals.nav = 'policy';
+%>
 <h1 class="mb-3">Your protection plan</h1>
+
+<% if(pledgeTotal) { %>
+	<div class="rounded border bg-white p-4 mb-4">
+		<h3 class="heading-sm-medium mb-2">Total pledges</h3>
+		<div><span class="heading-lg-medium">$<%= pledgeTotal %></span> <a class="body-sm-weak" href="/dashboard/pledges#received">View</a></div>
+	</div>
+<% } %>
 
 <div id="policyForm" class="rounded border bg-white p-4">
 	<div>
