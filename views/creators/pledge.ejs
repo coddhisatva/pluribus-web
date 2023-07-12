@@ -164,9 +164,6 @@ const amounts = [ 25, 50, 100 ]
 	selectCard.addEventListener('change', function(e) {
 		if(selectCard.value == 'new') {
 			addCardModal.show();
-			addCardModalShown = true;
-		} else {
-
 		}
 	});
 
@@ -189,7 +186,6 @@ const amounts = [ 25, 50, 100 ]
 		hiddenFrequency.value = pledge.frequency;
 	}
 
-	var addCardModal = new bootstrap.Modal(document.getElementById('addCardModal'));
 	var addCardForm = document.getElementById('addCardForm');
 	var stripeErrorMessage = document.getElementById('stripeErrorMessage');
 	var addCardModalShown = false;
@@ -197,6 +193,8 @@ const amounts = [ 25, 50, 100 ]
 	// Prepare Stripe ahead of time
 	const stripe = Stripe('<%= stripePublicKey %>');
 	var stripeElements;
+	var paymentElement;
+
 	fetch('/dashboard/payments/beginAddCreditCard', { method: 'post' })
 		.then(function(response) {
 			response.json().then(function(json) {
@@ -235,27 +233,19 @@ const amounts = [ 25, 50, 100 ]
 				};
 				
 				stripeElements = stripe.elements(options);
-				const paymentElement = stripeElements.create('payment', { business: { name: 'Pluribus' }});
-
-				// Stripe will not be able to compute styles for floating labels correctly when the modal is not displayed
-				// So we display it temporarily (while hidden) to allow Stripe to compute layout, then hide it again.
-				// We need to wait a while for Stripe to 'mount', so we wait 1s before resetting modal back to normal. 
-				addCardModal._element.style.visibility = 'hidden';
-				addCardModal._element.style.display = 'block';
-				
-				paymentElement.mount('#stripePaymentElement');
-				setTimeout(function() {
-					// We don't want to hide the modal if it has been opened in the time elapsed since we
-					// started waiting for stripe to mount.
-					if(!addCardModalShown) {
-						addCardModal._element.style.display = null;
-					}
-					addCardModal._element.style.visibility = null;
-				}, 1000);
-
-				paymentElement.on('change', () => stripeErrorMessage.classList.add('visually-hidden') );
+				paymentElement = stripeElements.create('payment', { business: { name: 'Pluribus' }});
 			});
 		});
+
+	var addCardModalDiv = document.getElementById('addCardModal');
+	var addCardModal = new bootstrap.Modal(addCardModalDiv);
+	addCardModalDiv.addEventListener('shown.bs.modal', function() {
+		if(!addCardModalShown) {
+			paymentElement.mount('#stripePaymentElement');
+			paymentElement.on('change', () => stripeErrorMessage.classList.add('visually-hidden') );
+		}
+		addCardModalShown = true;
+	});
 
 	addCardForm.addEventListener('submit', async function(event) {
 		event.preventDefault();
