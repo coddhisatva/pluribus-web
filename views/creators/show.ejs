@@ -69,9 +69,13 @@ _locals.nav = 'creators';
 				<p><%= creator.policy %></p>
 				<% if(locals.pledge) { %> 
 					<div class="alert alert-info">Your pledge: $<%= pledge.amount %></div>
-				<% } else { %>
+				<% } else if(creator.stripeSubscriptionId) { %>
 					<a class="btn btn-primary" href="/creators/<%= creator.id %>/pledge<%= locals.invite ? "?invite=" + locals.invite : "" %>">Pledge support</a>
-				<% } %>
+				<% } else if(locals.creatorViewingOwnProfile) { %>
+					<div class="alert alert-danger">You must <a href="/dashboard/subscribe">subscribe</a> to accept pledges</div>
+				<% } else { %>
+					<div class="p-2 rounded border bg-light">Pledges are not currently enabled.</div>
+				<% }%>
 			</div>
 		</section>
 ​

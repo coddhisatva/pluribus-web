@@ -174,7 +174,9 @@ router.get('/:id', async function(req, res, next) {
 		return;
 	}
 
-	res.render('creators/show', { creator, isFollowing, followerCount, supporterCount, pledge });
+	var creatorViewingOwnProfile = req.authUser && (creator.User.id == req.authUser.id);
+
+	res.render('creators/show', { creator, isFollowing, followerCount, supporterCount, pledge, creatorViewingOwnProfile });
 });
 
 /**
@@ -241,6 +243,12 @@ router.get('/:id/pledge', auth.authorize, async (req, res) => {
 		return;
 	}
 
+	if(!creator.stripeSubscriptionId) {
+		req.flash.alert = "Creator must have a subscription to accept pledges.";
+		res.redirect(creator.publicProfile ? '/creators/' + id : '/invite/' + encodeURIComponent(creator.inviteCode));
+		return;
+	}
+
 	var user = await User.findByPk(req.authUser.id);
 
 	var stripePublicKey = credentials.stripe.publicKey;
@@ -257,6 +265,12 @@ router.post('/:id/pledge', auth.authorize, csrf.validateToken, async(req, res) =
 	const creator = await Creator.findByPk(creatorId, { include: User });
 	if(!creator) {
 		res.status(400).send('Invalid pledge.');
+		return;
+	}
+
+	if(!creator.stripeSubscriptionId) {
+		req.flash.alert = "Creator must have a subscription to accept pledges.";
+		res.redirect(creator.publicProfile ? '/creators/' + id : '/invite/' + encodeURIComponent(creator.inviteCode));
 		return;
 	}
 

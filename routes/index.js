@@ -2,7 +2,7 @@ var express = require('express');
 const { redirect } = require('express/lib/response');
 const { body, validationResult } = require('express-validator');
 var router = express.Router();
-var { Creator, PrelaunchEmail, Follow, Pledge } = require('../models');
+var { User, Creator, PrelaunchEmail, Follow, Pledge } = require('../models');
 const csrf = require('../utils/csrf');
 const credentials = require('../config/credentials');
 require('../utils/handleAsyncErrors').fixRouter(router);
@@ -79,7 +79,7 @@ router.get('/pricing', function(req, res, next) {
 });
 
 router.get('/invite/:code', async function(req, res, next) {
-	let creator = await Creator.findOne({ where: { inviteCode: req.params.code }});
+	let creator = await Creator.findOne({ where: { inviteCode: req.params.code }, include: User });
 
 	if(!creator) {
 		res.status(404).send('Invalid invite code.');
@@ -108,7 +108,9 @@ router.get('/invite/:code', async function(req, res, next) {
 	var followerCount = await Follow.count({ where: { creatorId: creator.id } });
 	var supporterCount = await Pledge.count({ where: { creatorId: creator.id }});
 
-	res.render('creators/show', { creator, isFollowing, invite: req.params.code, followerCount, supporterCount, pledge });
+	var creatorViewingOwnProfile = req.authUser && (creator.User.id == req.authUser.id);
+
+	res.render('creators/show', { creator, isFollowing, invite: req.params.code, followerCount, supporterCount, pledge, creatorViewingOwnProfile });
 });
 
 router.get('/support', function(req, res, next) {
