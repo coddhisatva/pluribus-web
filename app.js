@@ -77,8 +77,9 @@ app.use('/supporters', supportersRouter);
 app.use('/dashboard', dashboardRouter);
 app.use('/stripe', stripeRouter);
 
-// catch 404 and forward to error handler
+// catch 404 
 app.use(function(req, res, next) {
+	//next(createError(404)); // (forward to error handler)
 	res.render('notfound');
 });
 
