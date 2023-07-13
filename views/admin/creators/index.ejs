@@ -4,12 +4,21 @@
 		<tr>
 			<td>Name</td>
 			<td>Email</td>
+			<td>Status</td>
 		</tr>
 	</thead>
 	<% for(creator of creators) { %>
 	<tr>
 		<td><a href="/admin/creators/<%= creator.id %>"><%= creator.name || '(No name)' %></a></td>
 		<td><%= creator.User.email %></td>
+		<td>
+			<% if(creator.stripeSubscriptionId) { %>
+				<span class="badge bg-primary fw-normal">subscribed</span>
+			<% } %>
+			<% if(creator.stripeConnectedAccountId) { %>
+				<span class="badge bg-success fw-normal">stripe connected</span>
+			<% } %>
+		</td>
 	</tr>
 	<% } %>
 </table>

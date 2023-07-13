@@ -1,7 +1,21 @@
 <div class="row">
 	<div class="col-md-8">
+		<a href="/admin/creators">Creators</a> &gt;
 		<h1><%= creator.name %></h1>
+		<div>
+			<% if(creator.stripeSubscriptionId) { %>
+				<span class="badge bg-primary fw-normal">subscribed</span>
+			<% } else { %>
+				<span class="badge bg-dark fw-normal">not subscribed</span>
+			<% } %>
+			<% if(creator.stripeConnectedAccountId) { %>
+				<span class="badge bg-success fw-normal">stripe connected</span>
+			<% } else { %>
+				<span class="badge bg-dark fw-normal">stripe not connected</span>
+			<% } %>
+		</div>
 		<p><%= creator.about %></p>
+		
 	</div>
 	<div class="col">
 		<form method="post" action="/admin/creators/<%= creator.id %>/delete" onsubmit="return confirm('Really delete this creator?');">
