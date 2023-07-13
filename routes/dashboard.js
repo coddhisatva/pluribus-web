@@ -438,6 +438,7 @@ router.get('/execute-policy', auth.authorizeRole('creator'), async function(req,
 	if(checks.error) {
 		req.flash.alert = checks.error;
 		res.redirect(req.headers.referer);
+		return;
 	}
 
 	res.redirect('/dashboard/execute-policy/1');
