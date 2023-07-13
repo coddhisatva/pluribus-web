@@ -419,7 +419,7 @@ async function doPolicyExecutionChecks(creator, res) {
 	}
 
 	if(!creator.stripeConnectedAccountOnboarded) {
-		return { error: 'You must connect a Stripe account before you can activate pledges' };
+		return { error: 'You must connect a Stripe account before you can activate pledges', needsStripeConnect: true };
 	}
 
 	var active = await PolicyExecution.findAll({ where: { creatorId: creator.id, processedAt: null }});
@@ -436,6 +436,10 @@ router.get('/execute-policy', auth.authorizeRole('creator'), async function(req,
 
 	var checks = await doPolicyExecutionChecks(creator, res);
 	if(checks.error) {
+		if(checks.needsStripeConnect) {
+			res.redirect('/dashboard/execute-policy/connect-first');
+			return;
+		}
 		req.flash.alert = checks.error;
 		res.redirect(req.headers.referer);
 		return;
@@ -443,6 +447,10 @@ router.get('/execute-policy', auth.authorizeRole('creator'), async function(req,
 
 	res.redirect('/dashboard/execute-policy/1');
 });
+
+router.get('/execute-policy/connect-first', auth.authorizeRole('creator'), async (req, res, next) => {
+	res.render('dashboard/execute-policy-connect-first');
+})
 
 router.get('/execute-policy/1', auth.authorizeRole('creator'), async function(req, res, next) {
 	const user = await User.findOne({ where: { id: req.authUser.id }});

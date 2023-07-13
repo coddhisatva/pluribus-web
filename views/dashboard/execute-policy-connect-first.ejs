@@ -1,0 +1,33 @@
+<%
+_locals.title = 'Connect with Stripe';
+_locals.nav = 'policy';
+%>
+
+<div class="card mb-3">
+	<div class="card-body">
+		<h1 class="heading-lg-medium">Please connect with Stripe</h1>
+		<div class="mb-3">
+			Before you can activate your pledges, you need to connect with Stripe.
+		</div>
+		<div>
+			The onboarding process only takes a few minutes. If you don't already have
+			a Stripe account, one will be created for you as part of this process.
+		</div>
+	</div><!-- .card-body -->
+	<div class="card-footer bg-transparent p-4 d-flex align-items-center justify-content-between">
+		<a class="btn btn-primary" href="/dashboard/payments/connect-stripe-account" id="connectStripeAccountBtn">Connect with Stripe</a>
+	</div>
+</div>
+
+<script>
+	var connectStripeAccountBtn = document.getElementById('connectStripeAccountBtn');
+	if(connectStripeAccountBtn) {
+		connectStripeAccountBtn.addEventListener('click', function() {
+			setTimeout(function() {
+				document.body.classList.add('page-loading');
+				connectStripeAccountBtn.text = 'Please wait...';
+			}, 1)
+		})
+	}
+</script>
+
