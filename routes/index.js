@@ -96,7 +96,7 @@ router.get('/invite/:code', async function(req, res, next) {
 
 	let isFollowing = false;
 	let pledge = null;
-	if(req.authUser) {
+	if(req.authUser && req.authUser.id) {
 		let follow = await Follow.findOne({ where: { userId: req.authUser.id, creatorId: creator.id } });
 		if(follow !== null) {
 			isFollowing = true;

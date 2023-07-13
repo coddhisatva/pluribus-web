@@ -15,6 +15,17 @@
 			<% } %>
 		</div>
 		<p><%= creator.about %></p>
+
+		<h3>Profile</h3>
+		<div>
+		<% if(creator.publicProfile) { %>
+			<a href="/creators/<%= creator.id %>"><%= `${req.protocol}://${req.get('host')}/creators/${creator.id}` %></a>
+			<span class="badge bg-primary fw-normal">public</span>
+		<% } else { %>
+			<a href="/invite/<%= encodeURIComponent(creator.inviteCode) %>"><%= `${req.protocol}://${req.get('host')}/invite/${encodeURIComponent(creator.inviteCode)}` %></a>
+			<span class="badge bg-dark fw-normal">private</span>
+		<% } %>
+		</div>
 		
 	</div>
 	<div class="col">
