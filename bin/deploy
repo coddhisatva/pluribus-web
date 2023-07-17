@@ -4,8 +4,8 @@ GITGUD_CREDS=`echo 'protocol=https\nhost=gitgud.io\n\n' | git credential fill`
 GITGUD_USERNAME=`echo $GITGUD_CREDS | sed -ne 's/username=//p'`
 GITGUD_PASSWORD=`echo $GITGUD_CREDS | sed -ne 's/password=//p'`
 
-ssh -tt root@206.81.100.148 "export GITGUD_USERNAME='$GITGUD_USERNAME'; export GITGUD_PASSWORD=$GITGUD_PASSWORD; bash" << 'ENDSSH'
-cd dev
+ssh -tt root@206.81.100.147 "export GITGUD_USERNAME='$GITGUD_USERNAME'; export GITGUD_PASSWORD=$GITGUD_PASSWORD; bash" << 'ENDSSH'
+cd prod
 
 echo https://$GITGUD_USERNAME:$GITGUD_PASSWORD@gitgud.io >> ~/.git-credentials
 git pull
@@ -13,12 +13,10 @@ rm ~/.git-credentials
 
 npm install
 
-npx sequelize db:migrate
+NODE_ENV=production npx sequelize db:migrate
 
 # Restart the server
-pkill -f /root/dev/bin/www
-screen -S dev -X stuff 'cd /root/dev\n'
-screen -S dev -X stuff 'node /root/dev/bin/www\n'
+pm2 restart pluribus
 
 exit
 ENDSSH
@@ -27,8 +25,17 @@ ENDSSH
 # git config credential.helper store
 
 # Note to restart server:
-# screen -r dev
-# (Press Ctrl-C) or run `pkill -f /root/dev/bin/www`
-# node /root/dev/bin/www
+#
+# Run one of these to see what the pm2 process is doing:
+# pm2 show pluribus
+# -or-
+# pm2 list
+# 
+# If you need to start a new pm2 process:
+# NODE_ENV=production PORT=80 pm2 start /root/prod/bin/www  --name pluribus --node-args="--unhandled-rejections=strict"
+#
+# Or, if you need to restart the existing pm2 process:
+# pm2 restart pluribus
+# 
 # (To detach from screen press Ctrl-A then Ctrl-D)
-# (If dev screen not there, you can start one with screen -R dev)
+# (If prod screen not there, you can start one with screen -R prod)

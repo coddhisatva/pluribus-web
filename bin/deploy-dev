@@ -1,0 +1,34 @@
+#!/bin/zsh
+
+GITGUD_CREDS=`echo 'protocol=https\nhost=gitgud.io\n\n' | git credential fill`
+GITGUD_USERNAME=`echo $GITGUD_CREDS | sed -ne 's/username=//p'`
+GITGUD_PASSWORD=`echo $GITGUD_CREDS | sed -ne 's/password=//p'`
+
+ssh -tt root@206.81.100.148 "export GITGUD_USERNAME='$GITGUD_USERNAME'; export GITGUD_PASSWORD=$GITGUD_PASSWORD; bash" << 'ENDSSH'
+cd dev
+
+echo https://$GITGUD_USERNAME:$GITGUD_PASSWORD@gitgud.io >> ~/.git-credentials
+git pull
+rm ~/.git-credentials
+
+npm install
+
+npx sequelize db:migrate
+
+# Restart the server
+pkill -f /root/dev/bin/www
+screen -S dev -X stuff 'cd /root/dev\n'
+screen -S dev -X stuff 'node /root/dev/bin/www\n'
+
+exit
+ENDSSH
+
+# Note: if starting from scratch, in order for Git credentials to work you need to run:
+# git config credential.helper store
+
+# Note to restart server:
+# screen -r dev
+# (Press Ctrl-C) or run `pkill -f /root/dev/bin/www`
+# node /root/dev/bin/www
+# (To detach from screen press Ctrl-A then Ctrl-D)
+# (If dev screen not there, you can start one with screen -R dev)
