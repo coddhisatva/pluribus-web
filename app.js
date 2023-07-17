@@ -80,6 +80,7 @@ app.use('/stripe', stripeRouter);
 // catch 404 
 app.use(function(req, res, next) {
 	//next(createError(404)); // (forward to error handler)
+	res.locals.layout = 'layout';
 	res.render('notfound');
 });
 
