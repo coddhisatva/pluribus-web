@@ -19,7 +19,7 @@ _locals.nav = 'creators';
 							<% if(supporterCount > 0) { %>
 								&bull; <%= supporterCount %> <%= supporterCount == 1 ? "supporter": "supporters" %>
 							<% } %>
-							<% if(creator.displayPledges && pledgeTotal > 0) { %>
+							<% if(creator.displayPledgeTotal && pledgeTotal > 0) { %>
 								&bull; $<%= pledgeTotal %> pledged
 							<% } %>
 						</p>

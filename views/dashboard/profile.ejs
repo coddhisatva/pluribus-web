@@ -217,7 +217,7 @@ _locals.nav = 'profile';
 		<!-- Pledge display toggle -->
 		<div class="mb-4 row">
 			<div class="col">
-				<label class="heading-sm-weak mb-2" for="displayPledges">
+				<label class="heading-sm-weak mb-2" for="displayPledgeTotal">
 					Display pledge total
 				</label>
 				<div class="body-sm-weak text-medium">
@@ -226,7 +226,7 @@ _locals.nav = 'profile';
 			</div>
 			<div class="col-md-2 d-flex justify-content-end">
 				<div class="form-check form-switch">
-					<input class="form-check-input" type="checkbox" id="displayPledges" value="yes" <%= creator.displayPledges ? 'checked': ''%>>
+					<input class="form-check-input" type="checkbox" id="displayPledgeTotal" value="yes" <%= creator.displayPledgeTotal ? 'checked': ''%>>
 				</div>
 			</div>
 		</div>
@@ -329,7 +329,7 @@ Note: only include data that up.js will use.
 	up.wire(profileForm, model, '/dashboard/profile', functions);
 
 	// Toggle switches
-	var toggleIds = [ 'displaySupporterCount', 'displayPledges', 'publicProfile' ];
+	var toggleIds = [ 'displaySupporterCount', 'displayPledgeTotal', 'publicProfile' ];
 	toggleIds.forEach(function(toggleId) {
 		var toggle = document.getElementById(toggleId);
 		toggle.addEventListener('change', function() {

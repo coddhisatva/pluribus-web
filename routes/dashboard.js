@@ -51,7 +51,7 @@ router.post('/profile', auth.authorizeRole('creator'), upload.single('newPhoto')
 	var sync = { };
 
 	var update = { };
-	['name', 'about', 'website', 'displaySupporterCount', 'displayPledges', 'publicProfile' ].forEach(prop => {
+	['name', 'about', 'website', 'displaySupporterCount', 'displayPledgeTotal', 'publicProfile' ].forEach(prop => {
 		var value = req.body[prop];
 
 		if(value !== undefined) {
