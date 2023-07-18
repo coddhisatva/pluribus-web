@@ -2,7 +2,7 @@ var express = require('express');
 const { redirect } = require('express/lib/response');
 const { body, validationResult } = require('express-validator');
 var router = express.Router();
-var { User, Creator, PrelaunchEmail, Follow, Pledge } = require('../models');
+var { sequelize, User, Creator, PrelaunchEmail, Follow, Pledge } = require('../models');
 const csrf = require('../utils/csrf');
 const credentials = require('../config/credentials');
 require('../utils/handleAsyncErrors').fixRouter(router);
@@ -106,11 +106,15 @@ router.get('/invite/:code', async function(req, res, next) {
 	}
 
 	var followerCount = await Follow.count({ where: { creatorId: creator.id } });
-	var supporterCount = await Pledge.count({ where: { creatorId: creator.id }});
+	var pledgeSummary = (await sequelize.query('select count(amount) supporterCount, sum(amount) pledgeTotal from Pledges where creatorid = :creatorid',
+		{ replacements: { creatorid: creator.id }, plain: true, raw: true }));
+
+	var supporterCount = new Number(pledgeSummary.supporterCount);
+	var pledgeTotal = new Number(pledgeSummary.pledgeTotal);
 
 	var creatorViewingOwnProfile = req.authUser && (creator.User.id == req.authUser.id);
 
-	res.render('creators/show', { creator, isFollowing, invite: req.params.code, followerCount, supporterCount, pledge, creatorViewingOwnProfile });
+	res.render('creators/show', { creator, isFollowing, invite: req.params.code, followerCount, supporterCount, pledgeTotal, pledge, creatorViewingOwnProfile });
 });
 
 router.get('/support', function(req, res, next) {

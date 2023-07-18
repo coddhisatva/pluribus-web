@@ -34,6 +34,7 @@ module.exports = (sequelize, DataTypes) => {
     website: DataTypes.STRING,
     socialProfiles: DataTypes.STRING,
     displaySupporterCount: DataTypes.BOOLEAN,
+    displayPledges: DataTypes.BOOLEAN,
     publicProfile: DataTypes.BOOLEAN,
     inviteCode: DataTypes.STRING,
     stripeSubscriptionId: DataTypes.STRING,

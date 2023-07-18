@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
-const { Creator, CreatorCategory, User, Follow, CardPaymentMethod, Pledge } = require('../models');
+const { sequelize, Creator, CreatorCategory, User, Follow, CardPaymentMethod, Pledge } = require('../models');
 const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
 const csrf = require('../utils/csrf');
@@ -166,7 +166,11 @@ router.get('/:id', async function(req, res, next) {
 	}
 
 	var followerCount = await Follow.count({ where: { creatorId: creator.id } });
-	var supporterCount = await Pledge.count({ where: { creatorId: creator.id }});
+	var pledgeSummary = (await sequelize.query('select count(amount) supporterCount, sum(amount) pledgeTotal from Pledges where creatorid = :creatorid',
+		{ replacements: { creatorid: creator.id }, plain: true, raw: true }));
+
+	var supporterCount = new Number(pledgeSummary.supporterCount);
+	var pledgeTotal = new Number(pledgeSummary.pledgeTotal);
 
 	// Don't let users view a Creator's private profile if they're not already following them
 	if(!isFollowing && !creator.publicProfile) {
@@ -176,7 +180,7 @@ router.get('/:id', async function(req, res, next) {
 
 	var creatorViewingOwnProfile = req.authUser && (creator.User.id == req.authUser.id);
 
-	res.render('creators/show', { creator, isFollowing, followerCount, supporterCount, pledge, creatorViewingOwnProfile });
+	res.render('creators/show', { creator, isFollowing, followerCount, supporterCount, pledgeTotal, pledge, creatorViewingOwnProfile });
 });
 
 /**
