@@ -32,7 +32,7 @@ ENDSSH
 # pm2 list
 # 
 # If you need to start a new pm2 process:
-# NODE_ENV=production PORT=80 pm2 start /root/prod/bin/www  --name pluribus --node-args="--unhandled-rejections=strict"
+# cd ~/prod && NODE_ENV=production PORT=80 pm2 start /root/prod/bin/www  --name pluribus --node-args="--unhandled-rejections=strict"
 #
 # Or, if you need to restart the existing pm2 process:
 # pm2 restart pluribus
