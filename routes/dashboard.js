@@ -17,6 +17,10 @@ const { serialize } = require('v8');
 const credentials = require('../config/credentials');
 const settings = require('../config/settings');
 
+router.get('/test', (req, res) => {
+	res.json(process.cwd());
+})
+
 router.get('/', auth.authorize, async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
 	var creator = await Creator.findOne({ where: { userId: user.id }});
