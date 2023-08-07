@@ -77,7 +77,7 @@ router.post('/profile', auth.authorizeRole('creator'), upload.single('newPhoto')
 			.resize({ width: 200, height: 200})
 			.toFile(dir + '/' + filename);
 
-		await fs.rm(req.file.path);
+		//await fs.rm(req.file.path);
 		update.photo = filename;
 		sync.photo = filename;
 		sync.newPhoto = ''; // a little hacky, but tell the view to reset the newPhoto file input
