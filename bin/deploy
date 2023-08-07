@@ -37,5 +37,3 @@ ENDSSH
 # Or, if you need to restart the existing pm2 process:
 # pm2 restart pluribus
 # 
-# (To detach from screen press Ctrl-A then Ctrl-D)
-# (If prod screen not there, you can start one with screen -R prod)
