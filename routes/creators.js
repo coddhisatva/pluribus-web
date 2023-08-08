@@ -8,7 +8,6 @@ const csrf = require('../utils/csrf');
 const email = require('../utils/email');
 const credentials = require('../config/credentials');
 require('../utils/handleAsyncErrors').fixRouter(router);
-const { ResultWithContext } = require('express-validator/src/chain');
 
 router.get('/', async function(req, res, next) {
 	var creators = await Creator.findAll({ where: { publicProfile: true }});

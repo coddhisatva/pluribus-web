@@ -1,13 +1,53 @@
-<% 
-_locals.title = 'Creators';
-_locals.nav = 'creators';
+<%
+_locals.title = 'Featured Creators';
 %>
+<style>
+	/* Temporary styling - delete once John has done it properly ! */
+	.result {
+		display: flex;
+		padding: 16px;
+	}
+	.result:hover {
+		background-color: rgba(0,0,0,0.05);
+	}
+	.result figure {
+		margin: 0 24px 0 0;
+		width: 52px;
+		height: 52px;
+		overflow: hidden;
+	}
 
-<div class="container my-4">
-	<h1>Creators</h1>
+	.result > div a {
+		display: block;
+		font-size: var(--heading-sm);
+    	font-weight: 500;
+	}
 
-	<% creators.forEach(function(creator) { %>
-		<h3><a href="/creators/<%= creator.id %>"><%= creator.name %></a></h3>
-		<p><%= creator.about %></p>
-	<% }); %>
+</style>
+<header class="promo-block-sm light">
+	<div class="wrapper">
+		<h1 class="display-xs">Featured creators</h1>
+		<p>Here are some of the trailblazers that have joined our brand new platform so far.</p>
+	</div>
+</header>
+
+<div class="main-content wrapper">
+	<% if(locals.creators != null && locals.creators.length) { %>
+	<div class="border rounded bg-white mt-4 p-3">
+		<% for(var i = 0; i < creators.length; i++) {
+			var creator = creators[i]; %>
+			<a class="result text-decoration-none rounded" href="/creators/<%= creator.id %>">
+				<figure class="border rounded-circle">
+					<img src="<%= creator.photo != null ? ('/images/uploads/creators/' + creator.id + '/' + creator.photo) : '/images/ui/avatar-unknown.svg' %>" />
+				</figure>
+				<div>
+					<div><%= creator.name %></div>
+					<div class="result-about fw-normal"><%= truncate(creator.about, 50) %></div>
+				</div>
+			</a>
+		<% } %>
+	</div>
+	<% } else { %>
+		<div class="alert alert-warning my-3">There are no featured creators currently.</div>
+	<% } %>
 </div>
