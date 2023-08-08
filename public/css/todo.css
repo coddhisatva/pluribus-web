@@ -238,8 +238,11 @@ input.has-password-visibility.form-control.is-valid + .password-visibility-toggl
 }
 
 /* Social icons */
+.social-list a:before {
+	background-image: url("../images/ui/socialmedia/icon-facebook-dark.svg");
+}
 .social-list a[href^="https://twitter.com/"]:before {
-	background-image: url("../images/ui/socialmedia/icon-twitter.svg");
+	background-image: url("../images/ui/socialmedia/icon-twitter-dark.svg");
 }
 .social-list a[href^="https://discord.gg/"]:before {
 	background-image: url("../images/ui/socialmedia/icon-discord.svg");
@@ -247,11 +250,11 @@ input.has-password-visibility.form-control.is-valid + .password-visibility-toggl
 .social-list a[href^="https://t.me/"]:before {
 	background-image: url("../images/ui/socialmedia/icon-telegram.svg");
 }
-.social-list a[href$=".substack.com/"]:before {
-	background-image: url("../images/ui/socialmedia/icon-substack.svg");
+.social-list a[href$=".substack.com"]:before {
+	background-image: url("../images/ui/socialmedia/icon-substack-dark.svg");
 }
 .social-list a[href^="https://www.youtube.com"]:before {
-	background-image: url("../images/ui/socialmedia/icon-youtube.svg");
+	background-image: url("../images/ui/socialmedia/icon-youtube-dark.svg");
 }
 
 /* Colored rings around subscriber photos */
