@@ -103,8 +103,14 @@ app.use(function(err, req, res, next) {
 			var user = req.authUser ? req.authUser.email + '(' + req.authUser.id + ')' : 'anonymous';
 			var errlog = err.stack;
 			if(err.name && err.name == 'SequelizeDatabaseError') {
-				errlog = 'Sequelize Error: ' + err.message + '\n' + 
-					'SQL: ' + sql + '\n' + errlog;
+				try {
+					errlog = 'Sequelize Error: ' + err.message + '\n' + 
+					'SQL: ' + err.sql + '\n' + 
+					'Parameters: ' + JSON.stringify(err.parameters) + '\n\n'
+					+ errlog;
+				} catch(e) {
+					errlog = '(error setting Sequelize error log: ' + e + ')\n' + errlog;
+				}
 			}
 
 			email.send(env, {
