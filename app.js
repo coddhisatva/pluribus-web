@@ -101,6 +101,11 @@ app.use(function(err, req, res, next) {
 		try {
 			var url = req.protocol + '://' + req.get('host') + req.originalUrl;
 			var user = req.authUser ? req.authUser.email + '(' + req.authUser.id + ')' : 'anonymous';
+			var errlog = err.stack;
+			if(err.name && err.name == 'SequelizeDatabaseError') {
+				errlog = 'Sequelize Error: ' + err.message + '\n' + 
+					'SQL: ' + sql + '\n' + errlog;
+			}
 
 			email.send(env, {
 				from: 'errors@becomepluribus.com',
@@ -111,7 +116,7 @@ User: ${user}
 Client IP Address: ${req.ip}
 Request body: ${JSON.stringify(req.body)}
 
-${err.stack}`
+${errlog}`
 			});
 		} catch(emailErr) { } // ignore
 	}
