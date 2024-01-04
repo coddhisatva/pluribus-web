@@ -62,9 +62,10 @@ router.get('/about', function(req, res) {
 	res.render('about');
 });
 
+/*
 router.get('/roadmap', function(req, res) {
 	res.render('roadmap');
-});
+});*/
 
 router.get('/faq/creators', function(req, res) {
 	res.render('faq-creators');
