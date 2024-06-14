@@ -1,0 +1,13 @@
+services:
+  db:
+    image: mysql:latest
+    container_name: db
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=goop
+      - MYSQL_DATABASE=pluribus
+      - MYSQL_USER=pluribus-web
+      - MYSQL_PASSWORD=pluribus-web
+    volumes:
+      - ./db:/var/lib/mysql

@@ -1,6 +1,7 @@
 /node_modules
 /uploads
 /data
+/db
 /logs
 /public/images/uploads
 /config/credentials.js
