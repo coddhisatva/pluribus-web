@@ -11,3 +11,12 @@ services:
       - MYSQL_PASSWORD=pluribus-web
     volumes:
       - ./db:/var/lib/mysql
+
+  mail: # view email ui at http://localhost:8025
+    image: axllent/mailpit:latest
+    container_name: mail
+    restart: always
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    
