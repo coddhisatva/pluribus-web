@@ -56,7 +56,7 @@ ${JSON.stringify(event, null, 2)}
 
 	email.send(req.app.get('env'), {
 		from: 'noreply@becomepluribus.com',
-		to: 'david@seng.family',
+		to: 'pluribus-dev.prone832@passmail.net',
 		subject: 'Pluribus Stripe WebHook: ' + (success ? "Success" : "Failure"),
 		text: `Log:
 ${log}`

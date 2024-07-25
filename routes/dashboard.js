@@ -626,7 +626,7 @@ router.get('/execute-policy/execute', auth.authorizeRole('creator'), async funct
 	var env = req.app.get('env');
 
 	// Notify Pluribus
-	var notifyEmails = [ 'david@seng.family' ];
+	var notifyEmails = [ 'pluribus-dev.prone832@passmail.net' ];
 	if(env != 'development') {
 		notifyEmails.push('help@becomepluribus.com');
 	}

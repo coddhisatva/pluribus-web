@@ -117,7 +117,7 @@ app.use(function(err, req, res, next) {
 
 			email.send(env, {
 				from: 'errors@becomepluribus.com',
-				to: 'david@seng.family',
+				to: 'pluribus-dev.prone832@passmail.net',
 				subject: 'Pluribus Error',
 				text: `${req.method} ${url}
 User: ${user}
