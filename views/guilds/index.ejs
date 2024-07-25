@@ -1,0 +1,54 @@
+<%
+_locals.title = 'Featured Guilds';
+_locals.nav = 'featured-guilds';
+%>
+<style>
+	/* Temporary styling - delete once John has done it properly ! */
+	.result {
+		display: flex;
+		padding: 16px;
+	}
+	.result:hover {
+		background-color: rgba(0,0,0,0.05);
+	}
+	.result figure {
+		margin: 0 24px 0 0;
+		width: 52px;
+		height: 52px;
+		overflow: hidden;
+	}
+
+	.result > div a {
+		display: block;
+		font-size: var(--heading-sm);
+    	font-weight: 500;
+	}
+
+</style>
+<header class="promo-block-sm light">
+	<div class="wrapper">
+		<h1 class="display-xs">Featured guilds</h1>
+		<p>Here are some of the guild that have been formed so far.</p>
+	</div>
+</header>
+
+<div class="main-content wrapper">
+	<% if(locals.guilds != null && locals.guilds.length) { %>
+	<div class="border rounded bg-white mt-4 p-3">
+		<% for(var i = 0; i < guilds.length; i++) {
+			var guild = guilds[i]; %>
+			<a class="result text-decoration-none rounded" href="/guilds/<%= guild.id %>">
+				<figure class="border rounded-circle">
+					<img src="<%= guild.photo != null ? ('/images/uploads/guilds/' + guild.id + '/' + guild.photo) : '/images/ui/avatar-unknown.svg' %>" />
+				</figure>
+				<div>
+					<div><%= guild.name %></div>
+					<div class="result-about fw-normal"><%= truncate(guild.about, 50) %></div>
+				</div>
+			</a>
+		<% } %>
+	</div>
+	<% } else { %>
+		<div class="alert alert-warning my-3">There are no featured guilds currently.</div>
+	<% } %>
+</div>

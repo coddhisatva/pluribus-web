@@ -1,0 +1,126 @@
+<%
+_locals.title = "Creating a Protection Plan";
+_locals.noNav = true;
+
+var name = '';
+if(req.session && req.session.guildSignup && req.session.guildSignup.name) {
+	name = req.session.guildSignup.name;
+}
+if(postedValues.name) {
+	name = postedValues.name;
+}
+%>
+
+<div class="row justify-content-center">
+	<div class="col-md-6">
+		<div class="rounded border bg-white p-5 my-4">
+			<h1 class="display-xxs">Creating a Protection Plan</h1>
+			<div class="body-sm-weak">
+				<p>
+					Welcome to Pluribus, where you can proactively crowdfund a safety net to hedge against a
+					potential cancellation. The ability to tailor your protection according to your personal
+					situation is extremely important to us, but for the sake of clarity, here are the basic
+					standards of what qualifies as legitimate scenarios to collect pledges for:
+				</p>
+				<p>
+					<b>Scenarios wherein the pledge recipient experiences an event that directly removes
+					(not reduces) access to a channel that provides income directly (i.e. Patreon,
+					salaried job, etc.) or indirectly (i.e. Twitter, Facebook, etc.) via the audience
+					it provides.</b> This means that temporary suspensions from platforms, delays on projects,
+					or other similarly unfortunate yet less severe situations do not currently meet the
+					necessary threshold.
+				</p>
+				<p>
+					Aside from this basic distinction, we will not be placing limits on how you articulate
+					the criteria you would like protection from. However, please be advised that it is ultimately
+					up to your supporters whether your terms are deemed to be agreeable &mdash; even allies will
+					hardly be inclined to provide a lifeline that can be tapped from a mild inconvenience.
+					In addition, should you decide to activate your pledges, they will use their discretion to determine
+					if your claim falls within the parameters you are about to set
+					(see <a href="/how-it-works" target="_blank">How it Works</a> for more).
+				</p>
+				<p>
+					Please describe the scenario you would like to protect guild members against below. Once you are done, you may begin collecting pledges by activating your guild on the next page by clicking "Subscribe Now" or through the "Subscription" tab on the left.Please describe the scenario you would like to protect yourself against below. Once you are done, you may begin collecting pledges by activating your subscription on the next page by clicking "Subscribe Now" or through the "Subscription" tab on the left.
+				</p>
+			</div>
+
+			<div class="examples-wrap">
+				<a href="#" id="examplesToggle">
+					Show me examples<svg class="icon-down ms-2" width="24" height="24"><use href="/images/ui/icons.svg#chevron-down"></use></svg><svg class="icon-up ms-2" width="24" height="24"><use href="/images/ui/icons.svg#chevron-up"></use></svg>
+				</a>
+				<div class="examples body-sm-weak text-medium mt-4">
+					<ul class="ps-3">
+						<li>“I’d like protection in case a guild member gets de-platformed from Patreon”</li>
+						<li>“A guild member is on two Youtube strikes, we need this in case we get a 3rd”</li>
+						<li>“A guild member relies on two major sponsorships, I’d like security in case one of them is successfully pressured to cut ties with the guild member before the contract expires”</li>
+					</ul>
+				</div>
+			</div>
+
+			<form method="post">
+				<div class="form-floating mt-4">
+					<textarea name="policy" id="policy" class="form-control" placeholder="Your protection plan" style="height:10rem;"><%= postedValues.policy %></textarea>
+					<label for="name">Guild protection plan</label>
+					<%- validationMessage('policy') %>
+				</div>
+
+				<div class="mt-5 row">
+					<div class="col">
+						<button class="btn btn-primary w-100 py-3 heading-md-medium" id="continueBtn" disabled>Continue</button>
+					</div>
+				</div>
+			</form>
+			
+		</div>
+		
+	</div>
+</div>
+<style>
+
+	.examples {
+		display: none;
+		transition: opacity .5s ease;
+	}
+
+	.examples-wrap .icon-up {
+		display: none;
+	}
+
+	.examples-wrap.visible .icon-up {
+		display: initial;
+	}
+
+	.examples-wrap.visible .icon-down {
+		display: none;
+	}
+
+	.examples-wrap.visible .examples {
+		display: block;
+		opacity: 1;
+	}
+</style>
+
+<script src="/js/forms.js"></script><!-- hooks up server validation -->
+<script>
+	window.addEventListener('load', function() {
+		var name = document.getElementById('policy');
+		var continueBtn = document.getElementById('continueBtn');
+
+		function inputChange(e) {
+			continueBtn.disabled = !name.value;
+		}
+
+		name.addEventListener('input', inputChange);
+
+		// In case the user went back, check if anything was previously entered
+		inputChange();
+	});
+
+	var examplesToggle = document.getElementById('examplesToggle');
+	var examplesWrap = document.querySelector('.examples-wrap');
+	examplesToggle.addEventListener('click', function(e) {
+		e.preventDefault();
+		examplesWrap.classList.toggle('visible');
+	});
+	
+</script>

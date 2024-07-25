@@ -20,7 +20,8 @@ module.exports = (sequelize, DataTypes) => {
     respondedAt: DataTypes.DATE,
 	  feedback: DataTypes.STRING,
     stripeCheckoutSessionId: DataTypes.STRING,
-    stripeCheckoutSessionPaid: DataTypes.BOOLEAN
+    stripeCheckoutSessionPaid: DataTypes.BOOLEAN,
+    pledgeSource: DataTypes.ENUM('creator', 'guild')
   }, {
     sequelize,
     modelName: 'PolicyExecutionSupporter',

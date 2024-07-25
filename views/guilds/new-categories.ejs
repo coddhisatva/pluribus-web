@@ -1,0 +1,67 @@
+<%
+_locals.title = "What does the guild do?";
+_locals.noNav = true;
+
+var savedCategories = [];
+if(req.session && req.session.guildSignup && req.session.guildSignup.categories) {
+	savedCategories = req.session.guildSignup.categories;
+}
+%>
+
+<div class="row justify-content-center">
+	<div class="col-md-6">
+		<div class="rounded border bg-white p-5 my-4">
+			<h1 class="display-xxs">What does the guild do?</h1>
+			<div>
+				Choosing from the following categories helps people find your guild. You can change these at any time. 
+			</div>
+			<form method="post">
+
+				<% for(var category of ['Art','Podcasts','Writing','Videography','Journalism']) { %>
+					<% var id = 'check' + camelize(category); %>
+					<div class="form-check my-3">
+						<input class="form-check-input input-lg" type="checkbox" value="<%= category %>" name="categories" id="<%= id %>" <%= savedCategories.indexOf(category) != -1 ? 'checked': '' %>>
+						<label class="form-check-label" for="<%= id %>">
+							<%= category %>
+						</label>
+					</div>
+				<% } %>
+				<div class="form-check my-3">
+					<input class="form-check-input" type="checkbox" value="" name="categories" id="checkPreferNotToSay">
+					<label class="form-check-label" for="checkPreferNotToSay">
+						Prefer not to say
+					</label>
+				</div>
+
+				<div class="mt-5">
+					<button class="btn btn-primary w-100 py-3" id="continueBtn" disabled>Continue</button>
+				</div>
+			</form>
+			
+		</div>
+		
+	</div>
+</div>
+
+<script>
+	var categoryInputs = document.querySelectorAll('input[name=categories]');
+	var continueBtn = document.getElementById('continueBtn');
+
+	function inputChange(e) {
+		var anythingChecked = false;
+		for(input of categoryInputs) {
+			if(input.checked) {
+				anythingChecked = true;
+				break;
+			}
+		}
+		continueBtn.disabled = !anythingChecked;
+	}
+
+	categoryInputs.forEach(function(input) {
+		input.addEventListener('change', inputChange);
+	});
+
+	// In case the user went back, check if any boxes were previously selected
+	inputChange();
+</script>

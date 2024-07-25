@@ -171,8 +171,8 @@ router.get('/:id', async function(req, res, next) {
 	var supporterCount = new Number(pledgeSummary.supporterCount);
 	var pledgeTotal = new Number(pledgeSummary.pledgeTotal);
 
-	// Don't let users view a Creator's private profile if they're not already following them
-	if(!isFollowing && !creator.publicProfile) {
+	// Don't let users view a Creator's private profile if they're not already invited or following them
+	if(!isFollowing && !creator.publicProfile && !req.authUser.roles.includes(`view-creator-${creator.id}`)) {
 		res.status(403).send("This creator's profile is only visible to their followers.");
 		return;
 	}
@@ -192,9 +192,7 @@ router.post('/:id/follow', auth.authorize, async function(req, res, next) {
 
 	// Don't let just anyone follow a private profile
 	if(!creator.publicProfile) {
-		let inviteCode = req.query.invite;
-		let creator = inviteCode ? await Creator.findOne({ where: { inviteCode } }) : null;
-		if(!creator) {
+		if (!req.authUser.roles.includes(`view-creator-${creator.id}`)) {
 			res.sendStatus(404);
 			return;
 		}

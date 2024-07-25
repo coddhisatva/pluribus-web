@@ -1,0 +1,54 @@
+<%
+_locals.title = "About the guild";
+_locals.noNav = true;
+
+var about = '';
+if(req.session && req.session.guildSignup && req.session.guildSignup.about) {
+	about = req.session.guildSignup.about;
+}
+if(postedValues.about) {
+	about = postedValues.about;
+}
+%>
+
+<div class="row justify-content-center">
+	<div class="col-md-6">
+		<div class="rounded border bg-white p-5 my-4">
+			<h1 class="display-xxs">A little about the guild</h1>
+			<div class="heading-sm-weak">
+				Tell us a little about the guild's mission, and why people should support this guild.
+			</div>
+			<form method="post">
+				<div class="mt-4">
+					<textarea name="about" id="about" class="form-control" size="4"><%= about %></textarea>
+					<%- validationMessage('about') %>
+				</div>
+
+				<div class="mt-5 row">
+					<div class="col">
+						<button class="btn btn-primary text-black bg-white w-100 py-3 heading-md-medium border-0" name="skip" value="1">Skip for now</button>
+					</div>
+					<div class="col">
+						<button class="btn btn-primary w-100 py-3 heading-md-medium" id="continueBtn" disabled>Continue</button>
+					</div>
+				</div>
+			</form>
+			
+		</div>
+		
+	</div>
+</div>
+
+<script>
+	var about = document.getElementById('about');
+	var continueBtn = document.getElementById('continueBtn');
+
+	function inputChange(e) {
+		continueBtn.disabled = !about.value;
+	}
+
+	about.addEventListener('input', inputChange);
+
+	// In case the user went back, check if anything was previously entered
+	inputChange();
+</script>

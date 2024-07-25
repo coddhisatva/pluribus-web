@@ -77,7 +77,7 @@ var globalFuncs = {
 	// Pre-parse social profiles and add them into socialProfiles_* pseudo properties
 	// for the edit view to use.
 	profileLookups: {
-		Twitter: /twitter.com\/(.*)/,
+		Twitter: /(?:twitter|x).com\/(.*)/,
 		YouTube: /youtube.com\/(?:user\/|c\/|@)(.*)/,
 		Instagram: /instagram.com\/(.*)/,
 		Substack: /(?:https?:\/\/)?([^\.]*.substack.com)/,

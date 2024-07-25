@@ -76,10 +76,10 @@ module.exports = {
 
 		//console.log(userIds);
 		var creators = [
-			{ userId: userIds[0].id, name: 'Joe Rogan', about: 'The Joe Rogan Experience podcast', createdAt: d, updatedAt: d },
-			{ userId: userIds[1].id, name: 'Harry Bergeron', about: 'Writing American Alchemy at harrybergeron.substack.com', createdAt: d, updatedAt: d },
-			{ userId: userIds[2].id, name: 'Curtis Yarvin', about: 'Writing at greymirror.substack.com', createdAt: d, updatedAt: d },
-			{ userId: userIds[3].id, name: 'eugyppius', about: 'Writing A Plague Chronicle at eugyppius.substack.com', createdAt: d, updatedAt: d },
+			{ userId: userIds[0].id, name: 'Joe Rogan', about: 'The Joe Rogan Experience podcast', createdAt: d, updatedAt: d, inviteCode: 'joe' },
+			{ userId: userIds[1].id, name: 'Harry Bergeron', about: 'Writing American Alchemy at harrybergeron.substack.com', createdAt: d, updatedAt: d, inviteCode: 'harry' },
+			{ userId: userIds[2].id, name: 'Curtis Yarvin', about: 'Writing at greymirror.substack.com', createdAt: d, updatedAt: d, inviteCode: 'curtis' },
+			{ userId: userIds[3].id, name: 'eugyppius', about: 'Writing A Plague Chronicle at eugyppius.substack.com', createdAt: d, updatedAt: d, inviteCode: 'eugyppius' },
 		];
 
 		addTimestamps(creators);

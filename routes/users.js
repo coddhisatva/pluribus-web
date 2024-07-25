@@ -5,7 +5,7 @@ const auth = require('../utils/auth');
 const csrf = require('../utils/csrf');
 const email = require('../utils/email');
 require('../utils/handleAsyncErrors').fixRouter(router);
-const { User, Follow, Creator, OneTimeCode } = require('../models');
+const { Creator, Follow, Guild, OneTimeCode, User } = require('../models');  
 
 /* GET /login */
 router.get('/login', (req, res, next) => {
@@ -45,13 +45,19 @@ router.post('/login',
 		}
 
 		var remember = req.body.remember == '1';
-		var creator = await Creator.findOne({ where: { userId: user.id }});
+		var creator = await Creator.count({ where: { userId: user.id }});
 
 		// Save authentication cookie
 		var roles = [ ];
-		if(creator != null) {
+		if(creator > 0) {
 			roles.push('creator');
 		}
+
+		var guildAdmin = await Guild.count({ where: { userId: user.id } });
+		if(guildAdmin > 0) {
+			roles.push('guildAdmin');
+		}
+
 		req.session.authUser = { id: user.id, email: user.email, name: user.name, roles };
 		if(remember) {
 			req.sessionOptions.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days

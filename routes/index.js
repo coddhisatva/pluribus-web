@@ -1,8 +1,8 @@
 var express = require('express');
-const { redirect } = require('express/lib/response');
 const { body, validationResult } = require('express-validator');
 var router = express.Router();
-var { sequelize, User, Creator, PrelaunchEmail, Follow, Pledge } = require('../models');
+var { Creator, Guild, PrelaunchEmail, User } = require('../models'); 
+const auth = require('../utils/auth');
 const csrf = require('../utils/csrf');
 const credentials = require('../config/credentials');
 require('../utils/handleAsyncErrors').fixRouter(router);
@@ -79,43 +79,24 @@ router.get('/pricing', function(req, res, next) {
 	res.render('pricing');
 });
 
-router.get('/invite/:code', async function(req, res, next) {
-	let creator = await Creator.findOne({ where: { inviteCode: req.params.code }, include: User });
-
-	if(!creator) {
-		res.status(404).send('Invalid invite code.');
+router.get('/invite/:code', auth.authorize, async function(req, res, next) {
+	const creator = await Creator.findOne({ where: { inviteCode: req.params.code }, include: User });
+	if(creator) {
+		req.session.authUser.roles.push(`view-creator-${creator.id}`);
+		res.redirect(`/creators/${creator.id}`);
 		return;
 	}
 
-	// Now we let invited users view the profile
-	/*
-	if(!req.authUser) {
-		req.flash.notice = creator.name + ' is using Pluribus. Please create an account or log in to follow them.';
-		res.redirect('/users/signup?invite=' + req.params.code);
+	const guild = await Guild.findOne({ where: { inviteCode: req.params.code }, include: User });
+	if(guild) {
+		req.session.authUser.roles.push(`view-guild-${guild.id}`);
+		res.redirect(`/guilds/${guild.id}`);
 		return;
-	}*/
-
-	let isFollowing = false;
-	let pledge = null;
-	if(req.authUser && req.authUser.id) {
-		let follow = await Follow.findOne({ where: { userId: req.authUser.id, creatorId: creator.id } });
-		if(follow !== null) {
-			isFollowing = true;
-		}
-
-		pledge = await Pledge.findOne({ where: { creatorId: creator.id, userId: req.authUser.id }});
 	}
 
-	var followerCount = await Follow.count({ where: { creatorId: creator.id } });
-	var pledgeSummary = (await sequelize.query('select count(amount) supporterCount, sum(amount) pledgeTotal from Pledges where creatorid = :creatorid',
-		{ replacements: { creatorid: creator.id }, plain: true, raw: true }));
+	res.status(404).send('Invalid invite code.');
+	return;
 
-	var supporterCount = new Number(pledgeSummary.supporterCount);
-	var pledgeTotal = new Number(pledgeSummary.pledgeTotal);
-
-	var creatorViewingOwnProfile = req.authUser && (creator.User.id == req.authUser.id);
-
-	res.render('creators/show', { creator, isFollowing, invite: req.params.code, followerCount, supporterCount, pledgeTotal, pledge, creatorViewingOwnProfile });
 });
 
 router.get('/support', function(req, res, next) {

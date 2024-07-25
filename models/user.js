@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.CardPaymentMethod);
       User.hasMany(models.UserInterest);
       User.hasMany(models.Pledge);
+      User.hasOne(models.Guild);
     }
   }
   User.init({

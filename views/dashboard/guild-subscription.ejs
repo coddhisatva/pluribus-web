@@ -1,0 +1,38 @@
+<%
+_locals.title = 'Guild Subscription';
+_locals.nav = 'guild-subscription';
+%>
+
+<header>
+	<h1 class="display-xxs">Guild Subscription</h1>
+</header>
+
+<div class="card rounded-4">
+	<div class="card-body">
+		<div>
+			<% if(guild.stripeSubscriptionId) { %>
+				<h3 class="heading-sm-medium text-strong">Monthly subscription</h3>
+				<div class="body-sm-weak text-muted">
+					$<%= guild.subscriptionAmount / 100 %>/month, starting <%= guild.subscriptionCreated.toLocaleString('en-US', { timeZone: 'UTC', day: 'numeric', month: 'short', year: 'numeric'}) %>
+				</div>
+			<% } else { %>
+				You don't have an active subscription.
+			<% } %>
+		</div>
+
+	</div><!-- .card-body -->
+	
+	<div class="card-footer text-end">
+		<% if(guild.stripeSubscriptionId) { %>
+			<a href="/dashboard/guild-cancel-subscription" class="text-danger text-decoration-none">Cancel Subscription</a>
+		<% } else { %>
+			<a href="/dashboard/guild-subscribe" class="btn btn-lg btn-primary">Subscribe now</a>
+		<% } %>
+	</div>
+	
+</div><!-- .card -->
+
+<%- contentFor('aside') %>
+<svg width="36" height="36" class="text-strong"><use href="/images/ui/icons.svg#heart" /></svg>
+<h3 class="body-sm-medium text-strong mt-0">Guild Subscription</h3>
+<div class="mt-0">Your guild subscription allows your followers to support you and your guild creators through Pluribus.</div>

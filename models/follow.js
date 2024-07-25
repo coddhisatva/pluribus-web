@@ -16,11 +16,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Follow.init({
-    creatorId: DataTypes.INTEGER,
-    userId: DataTypes.INTEGER
+    creatorId: { type: DataTypes.INTEGER, primaryKey: true },
+    userId: { type: DataTypes.INTEGER, primaryKey: true }
   }, {
     sequelize,
-    modelName: 'Follow',
+    modelName: 'Follow'
   });
   return Follow;
 };

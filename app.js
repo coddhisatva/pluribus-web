@@ -18,6 +18,7 @@ var supportersRouter = require('./routes/supporters');
 var dashboardRouter = require('./routes/dashboard');
 var adminRouter = require('./routes/admin');
 var stripeRouter = require('./routes/stripe');
+var guildsRouter = require('./routes/guilds');
 
 var app = express();
 
@@ -76,6 +77,7 @@ app.use('/creators', creatorsRouter);
 app.use('/supporters', supportersRouter);
 app.use('/dashboard', dashboardRouter);
 app.use('/stripe', stripeRouter);
+app.use('/guilds', guildsRouter);
 
 // catch 404 
 app.use(function(req, res, next) {
@@ -97,7 +99,7 @@ app.use(function(err, req, res, next) {
 	res.render('error', { layout: false });
 	
 	if(err.status != 404 && env !== 'development') {
-		// Email error to Luke
+		// Email error to David
 		try {
 			var url = req.protocol + '://' + req.get('host') + req.originalUrl;
 			var user = req.authUser ? req.authUser.email + '(' + req.authUser.id + ')' : 'anonymous';
@@ -115,7 +117,7 @@ app.use(function(err, req, res, next) {
 
 			email.send(env, {
 				from: 'errors@becomepluribus.com',
-				to: 'luke@smalltech.com.au',
+				to: 'david@seng.family',
 				subject: 'Pluribus Error',
 				text: `${req.method} ${url}
 User: ${user}

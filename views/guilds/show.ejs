@@ -1,0 +1,197 @@
+<%
+_locals.title = guild.name;
+_locals.nav = 'guilds';
+_locals.headScripts = [ '/js/htmx.min.js' ];
+%>
+
+<div class="main-content" role="main">
+	<div class="profile-grid">
+		<header class="card profile-head">
+			<div class="card-body">
+				<figure class="profile-photo <%= guild.getProfilePhotoCssClass() %>">
+					<img src="<%= guild.photo ? '/images/uploads/guilds/' + guild.id + '/' + guild.photo : '/images/ui/avatar-unknown.svg' %>" alt="Avatar">
+				</figure>
+				<div class="columns spliter">
+					<div class="col">
+						<h1><%- guild.name %></h1>
+						<% if(guild.displaySupporterCount && (followerCount > 0 || supporterCount > 0 || creatorCount > 0)) { %>
+							<p class="support">
+								<%= followerCount %> <%= followerCount == 1 ? "follower": "followers" %>
+								<% if(creatorCount > 0) { %>
+									&bull; <%= creatorCount %> <%= creatorCount === 1 ? "creator": "creators" %>
+								<% } %>
+								<% if(supporterCount > 0) { %>
+									&bull; <%= supporterCount %> <%= supporterCount == 1 ? "supporter": "supporters" %>
+								<% } %>
+								<% if(guild.displayPledgeTotal && pledgeTotal > 0) { %>
+									&bull; $<%= pledgeTotal %> pledged
+								<% } %>
+								<% if (isMember && candidates.length > 0) { %>
+									&bull; <a href="#candidates" id="candidates-anchor"><%= candidates.length %> candidate<%= candidates.length == 1 ? "" : "s" %></a>
+									<div id="candidates" class="card">
+										<div class="card-body">
+										<% candidates.forEach(c => { %>
+											<div>
+												<div class="candidate-name p-2 row">
+													<h2><a href="/creators/<%= c.candidate.Creator.id %>"><%= c.candidate.Creator.name %></a></h2>
+												</div>
+												<div class="p-2 row" style="margin-left: auto">
+													Can <%- c.candidate.Creator.name %> join this guild?
+													
+												</div>
+												<div id="vote-<%= c.candidate.Creator.id %>">
+													<%- include('_candidate-vote', { guild, candidate: c.candidate, vote: c.vote }) %>
+												</div>
+											</div>
+										 <% }) %>
+										</div>
+									</div>
+								<% } %>
+							</p>
+						<% } %>
+					</div>
+					<div class="col">
+						<% if (!guildViewingOwnProfile) { %>
+						<button id="followBtn" data-following="<%= isFollowing %>" data-bs-toggle="dropdown" aria-expanded="false" class="btn <%= isFollowing ? 'btn-primary' : 'btn-outline' %>">
+							<%= isFollowing ? 'Following' : 'Follow' %>
+						</button>
+						<% if (showJoin) { %>
+						<button id="joinBtn" class="btn btn-primary" <%= canJoin ? '' : 'disabled' %>>
+							<%= isFull ? 'Closed' : (canJoin ? 'Join' : '...') %>  
+						</button>
+						<% } %>
+						<ul class="dropdown-menu" aria-labelledby="followBtn" id="followBtnDropdown">
+							<li><a class="dropdown-item text-danger" href="#" id="unfollowDropdownItem">Unfollow <%= guild.name %></a></li>
+						</ul>
+						<% } %>
+					</div>
+				</div>
+			</div>
+		</header>
+​
+		<aside class="side-content">
+			<div class="card">
+				<div class="card-body flow">
+					<% if(guild.socialProfiles) { %>
+					<ul class="social-list">
+					<% for(var socialUrl of guild.socialProfiles.split('||')) {
+						const [ website, handle ] = lookupSocialProfile(socialUrl);
+						%>
+						<li><a href="<%= socialUrl %>" target="_blank" title="<%= website + ': ' + handle %>" class="<%= website.toLowerCase() %>"><span class="visually-hidden"><%= website %></span></a></li>
+					<% } %>
+					</ul>
+					<% } %>
+					
+					<% if(guild.website) { %>
+					<a href="<%= ensureUrlHasProtocol(guild.website) %>" class="weblink" target="_blank"><%= guild.website %></a>
+					<% } %>
+					<% if(guild.GuildCategories) { %>
+					<div class="badges">
+					<% for(category of guild.GuildCategories) { %>
+						<span class="badge"><%= category.category %></span>
+					<% } %>
+					</div>
+					<% } %>
+				</div>
+			</div>
+		</aside>
+​
+​
+		<section class="card reasons">
+			<div class="card-body">
+				<h2>Pledges will go toward</h2>
+				<p><%= guild.policy %></p>
+				<% if(locals.pledge) { %> 
+					<div class="alert alert-info">Your pledge: $<%= pledge.amount %></div>
+				<% } else if(guild.stripeSubscriptionId) { %>
+					<a class="btn btn-primary" href="/guilds/<%= guild.id %>/pledge<%= locals.invite ? "?invite=" + locals.invite : "" %>">Pledge support</a>
+				<% } else if(locals.guildViewingOwnProfile) { %>
+					<div class="alert alert-danger">You must <a href="/dashboard/guild-subscribe">subscribe</a> to accept pledges</div>
+				<% } else { %>
+					<div class="p-2 rounded border bg-light">Pledges are not currently enabled.</div>
+				<% }%>
+			</div>
+		</section>
+​
+		<section class="card">
+			<div class="flow card-body">
+				<h2>About</h2>
+				<p><%= guild.about %></p>
+				
+				<h2 class="mb-0">Creators</h2>
+				<ul>
+					<% guild.GuildCreators.forEach(function(guildCreator) { %>
+						<li><a href="/creators/<%= guildCreator.Creator.id %>"><%= guildCreator.Creator.name %></a></li>
+					<% }) %>
+				</ul>
+				
+			</div>
+		</section>
+	</div>
+</div>
+
+<% if(!guildViewingOwnProfile) { %>
+<script>
+	var followBtn = document.getElementById('followBtn');
+	followBtn.following = followBtn.dataset.following === 'true';
+
+	var joinBtn = document.getElementById('joinBtn');
+	var followBtnDropdown = document.getElementById('followBtnDropdown');
+	var unfollowDropdownItem = document.getElementById('unfollowDropdownItem');
+
+	function updateFollowBtnState() {
+		if(followBtn.following) {
+			followBtn.classList.remove('btn-outline');
+			followBtn.classList.add('btn-primary');
+			followBtn.innerHTML = 'Following';
+			bootstrap.Dropdown.getOrCreateInstance(followBtn).hide();
+			followBtn.blur();
+
+		} else {
+			followBtn.classList.remove('btn-primary');
+			followBtn.classList.add('btn-outline');
+			followBtn.innerHTML = 'Follow';
+		}
+	}
+
+	followBtn.addEventListener('click', function() {
+		if(!followBtn.following) {
+			followBtn.following = true;
+			updateFollowBtnState();
+
+			fetch('/guilds/<%= guild.id %>/follow?invite=<%= locals.invite || "" %>', { method: 'POST' })
+				.then(function(res) {
+					// Detect redirect to login
+					if(res.redirected) {
+						document.location = res.url;
+					}
+				}, function(err) {
+					console.log(err);
+					alert("Error!");
+				});
+
+		} // otherwise, dropdown will be shown to unfollow
+	});
+
+	joinBtn.addEventListener('click', function() {
+		joinBtn.innerHTML = '...';
+		joinBtn.disabled = true;
+		fetch('/guilds/<%= guild.id %>/join', { method: 'POST' })
+			.then(null, () => alert('Error!'));
+	});
+
+	unfollowDropdownItem.addEventListener('click', function() {
+		if(followBtn.following) {
+			followBtn.following = false;
+			updateFollowBtnState();
+
+			fetch('/guilds/<%= guild.id %>/unfollow', { method: 'POST' })
+				.then(null, () => alert('Error!'));
+		}
+	});
+
+</script>
+<% } %>
+
+<%- contentFor('head') %>
+<link rel="stylesheet" href="/css/pages/dash.css" />

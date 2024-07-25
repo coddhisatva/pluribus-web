@@ -47,7 +47,7 @@ const dtFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
 		<div class="tab-content">
 		
 			<div class="tab-pane active show pt-3" id="made" role="tab" aria-controls="made" aria-selected="true">
-				<% if(pledgesMade) { %>
+				<% if(pledgesMade || guildPledgesMade) { %>
 					<table class="table">
 						<thead>
 							<tr>
@@ -57,7 +57,7 @@ const dtFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
 								<th class="d-none d-md-table-cell">Status</th>
 							</tr>
 						</thead>
-						<% for(var pledge of pledgesMade) { %>
+						<% if (pledgesMade) for(const pledge of pledgesMade) { %>
 						<tr>
 							<td class="d-none d-md-table-cell"><%= dtFormat.format(pledge.createdAt) %></td>
 							<td>
@@ -73,15 +73,31 @@ const dtFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
 							</td>
 						</tr>
 						<% } %>
+						<% if (guildPledgesMade) for(const pledge of guildPledgesMade) { %>
+							<tr>
+								<td class="d-none d-md-table-cell"><%= dtFormat.format(pledge.createdAt) %></td>
+								<td>
+									<%= pledge.Guild.name || pledge.Creator.email %>
+									<div class="d-md-none text-medium"><%= dtFormat.format(pledge.createdAt) %></div>
+								</td>
+								<td>
+									$<%= pledge.amount %>
+									<div class="d-md-none text-medium"><div class="text-primary">Pledged</div></div>
+								</td>
+								<td class="d-none d-md-table-cell">
+									<div class="text-primary">Pledged to Guild</div>
+								</td>
+							</tr>
+							<% } %>
 					</table>
 				<% } else { %>
 					<p>You have not received any pledges yet.</p>
 				<% } %>
 			</div>
 
-			<% if(creator) { %>
+			<% if(creator || guild) { %>
 				<div class="tab-pane pt-3" id="received" role="tab" aria-controls="received" aria-selected="true">
-					<% if(pledgesReceived) { %>
+					<% if(pledgesReceived || guildPledgesReceived) { %>
 						<table class="table">
 							<thead>
 								<tr>
@@ -91,7 +107,7 @@ const dtFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
 									<th class="d-none d-md-table-cell">Status</th>
 								</tr>
 							</thead>
-							<% for(var pledge of pledgesReceived) { %>
+							<% if (pledgesReceived) for(const pledge of pledgesReceived) { %>
 							<tr>
 								<td class="d-none d-md-table-cell"><%= dtFormat.format(pledge.createdAt) %></td>
 								<td>
@@ -106,9 +122,25 @@ const dtFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
 									<div class="text-primary">Pledged</div>
 								</td>
 							</tr>
+							<% }
+							   if (guildPledgesReceived) for(const pledge of guildPledgesReceived) { %> 
+							<tr>
+								<td class="d-none d-md-table-cell"><%= dtFormat.format(pledge.createdAt) %></td>
+								<td>
+									<%= pledge.User.name || 'anonymous' %>
+									<div class="d-md-none text-medium"><%= dtFormat.format(pledge.createdAt) %></div>
+								</td>
+								<td>
+									$<%= pledge.amount %>
+									<div class="d-md-none text-medium"><div class="text-primary">Pledged</div></div>
+								</td>
+								<td class="d-none d-md-table-cell">
+									<div class="text-primary">Pledged via Guild</div>
+								</td>
+							</tr>
 							<% } %>
 						</table>
-					<% } else { %>
+					<% } else if (!pledgesReceived && !guildPledgesReceived) { %> 
 						<p>You have not received any pledges yet.</p>
 					<% } %>
 				</div><!-- .tab-pane#received -->

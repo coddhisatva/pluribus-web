@@ -3,13 +3,20 @@
 	_locals.nav = 'home';
 %> 
 <style>
-	/* temporary styles until John implements. */
 	.execution figure {
 		width: 80px;
 		height: 80px;
 		margin-right: 16px;
 		overflow: hidden;
 	}
+	.creator-link::after, .guild-link::after {
+		font-size: var(--heading-sm);
+		color: var(--text-medium);
+		vertical-align: sub;
+		font-size: 75%;
+	}
+	.creator-link::after{ content: ' x'; }
+	.guild-link::after{ content: ' +';}
 </style>
 <header>
 	<h1 class="display-xxs">Home</h1>
@@ -52,14 +59,19 @@
 		<% }) %>
 	<% } %>
 
-	<%- include('_subscribe-alert', { creator: creator }) %>
+	<%- include('_subscribe-alert', { subscribable: creator, subscribeUrl: '/dashboard/subscribe' }) %>
+	<%- include('_subscribe-alert', { subscribable: guild, subscribeUrl: '/dashboard/guild-subscribe' }) %>
 
-	<% if(following && following.length) { %>
+	<% const links = [];
+		if (following) following.forEach(follow => links.push({ href: '/creators/' + follow.creatorId, text: follow.Creator.name, class: 'creator-link' }));
+		if (guildFollowing) guildFollowing.forEach(follow => links.push({ href: '/guilds/' + follow.guildId, text: follow.Guild.name, class: 'guild-link' }));
+		links.sort((a, b) => a.text.localeCompare(b.text));
+		if(links.length) { %>
 		<h3>Following</h3>
 		<ul>
-		<% following.forEach(follow => { %>
-			<li><a href="/creators/<%= follow.creatorId %>"><%= follow.Creator.name %></a></li>
-		<% }); %>
+		<% for(const follow of links) { %>
+			<li><a href="<%= follow.href %>" class="<%= follow.class %>"><%= follow.text %></a></li>
+		<% } %>
 		</ul>
 	<% } else { %>
 		<p>You're not following anyone yet. Followed creators will show up here once you do.</p>
@@ -70,7 +82,6 @@
 			Are you a creator too? 
 			<a href="/creators/new" class="">Set up a creator profile</a>
 		</div>
-		
 	<% } %>
 	</div>
 </div>

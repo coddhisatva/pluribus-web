@@ -3,8 +3,7 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
 const csrf = require('../utils/csrf');
-const { sequelize, User, Creator, Follow, CardPaymentMethod, Pledge, PolicyExecution, PolicyExecutionSupporter } = require('../models');
-const mysql = require('mysql2');
+const { sequelize, User, Creator, Follow, Guild, GuildCreator, GuildFollow, GuildPledge, CardPaymentMethod, Pledge, PolicyExecution, PolicyExecutionSupporter } = require('../models');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/tmp' });
 const fs = require('fs/promises');
@@ -13,34 +12,97 @@ const util = require('../utils/util');
 const email = require('../utils/email');
 require('../utils/handleAsyncErrors').fixRouter(router);
 const sharp = require('sharp');
-const { serialize } = require('v8');
 const credentials = require('../config/credentials');
 const settings = require('../config/settings');
 
 router.get('/', auth.authorize, async function(req, res, next) {
-	var user = await User.findByPk(req.authUser.id);
-	var creator = await Creator.findOne({ where: { userId: user.id }});
+	const user = await User.findOne({
+		where: { id: req.authUser.id }, 
+		include: [
+			{ model: Creator, required: false }, 
+			{ model: Guild, required: false } ] });
+	const creator = user.Creator;
+	const guild = user.Guild;
 	var following = await Follow.findAll({ where: { userId: user.id }, include: Creator });
-
+	var guildFollowing = await GuildFollow.findAll({ where: { userId: user.id }, include: Guild });
 	var executed = await PolicyExecutionSupporter.findAll({ where: { userId: user.id, agree: null }, include: { model: PolicyExecution, include: Creator } });
 
-	res.render('dashboard/index', { user, creator, following, executed });
+	res.render('dashboard/index', { user, creator, guild, following, guildFollowing, executed });
 });
 
 router.get('/profile', auth.authorizeRole('creator'), async function(req, res, next) {
-	var user = await User.findByPk(req.authUser.id);
-	var creator = await Creator.findOne({ where: { userId: user.id }});
+	const user = await User.findByPk(req.authUser.id,
+		{ include: [ { model: Creator, required: false }, { model: Guild, required: false } ] }   
+	);
+	const creator = user.Creator
 	if(!creator) {
 		res.status(404).send("Creator not found.");
 		return;
 	}
 
-	var protocol = req.app.get('env') == 'production' ? 'https' : 'http';
-	var inviteBase = protocol + '://' + req.headers.host + '/invite/';
-	var profileLink = protocol + '://' + req.headers.host + '/creators/' + creator.id;
+	const protocol = req.app.get('env') == 'production' ? 'https' : 'http';
+	const inviteBase = `${protocol}://${req.headers.host}/invite/`;
+	const profileLink = `${protocol}://${req.headers.host}/creators/${creator.id}`;
+	
+	const guild = user.Guild;
+	let guildLink = null;
+	if (guild) {
+		guildLink = `${protocol}://${req.headers.host}/guilds/${guild.id}`;
+	}
 
-	res.render('dashboard/profile', { user, creator, inviteBase, profileLink });
+	res.render('dashboard/profile', { user, creator, guild, inviteBase, profileLink, guildLink });
 });
+
+// Social profiles are passed in using pseudo properties from client and need to
+// be recombined into the .socialProfiles property.
+const socialProfileFns = {
+	twitter: {
+		parse: (value) => {
+			var m = /^\s*(?:https?:\/\/)?(?:twitter|x).com\/([a-z0-9_]+)/i.exec(value);
+			if(m) return m[1];
+			m = /^\s*([a-z0-9_]+)\s*$/i.exec(value);
+			if(m) return m[1];
+			return null;
+		},
+		format: value => 'https://x.com/' + value
+	},
+	youtube: {
+		// TODO: we need to handle these formats
+		// https://www.youtube.com/@CoryWongMusic ✅
+		// https://www.youtube.com/user/CoryWongMusic ✅
+		// https://www.youtube.com/c/CoryWongMusic ✅
+		// https://www.youtube.com/c/CoryWongMusic/videos
+		// https://www.youtube.com/CoryWongMusic 
+		// https://www.youtube.com/channel/UCQqC08JWnJGJIgw43XJ0GXw
+		
+		parse: (value) => {
+			var m = /^\s*(?:https?:\/\/)?(?:www\.)?youtube.com\/(?:user\/|c\/|@)(\w+)/i.exec(value);
+			if(m) return m[1];
+			m = /^\s*(\w+)\s*$/i.exec(value);
+			if(m) return m[1];
+			return null;
+		},
+		format: (value) => 'https://youtube.com/@' + value
+	},
+	instagram: {
+		parse: (value) => {
+			var m = /^\s*(?:https?:\/\/)?(?:www\.)?instagram.com\/([a-z0-9_]+)/i.exec(value);
+			if(m) return m[1];
+			m = /^\s*([a-z0-9_]+)\s*$/i.exec(value);
+			if(m) return m[1];
+			return null;
+		},
+		format: value => 'https://instagram.com/' + value
+	},
+	substack: {
+		parse: (value) => {
+			var m = /^\s*(?:https?:\/\/)?([a-z0-9\-_]+.substack.com)/i.exec(value);
+			if(m) return m[1];
+			return null;
+		},
+		format: (value) => 'https://' + value
+	}
+};
 
 router.post('/profile', auth.authorizeRole('creator'), upload.single('newPhoto'), async function(req, res, next) {
 	var user = await User.findByPk(req.authUser.id);
@@ -89,56 +151,6 @@ router.post('/profile', auth.authorizeRole('creator'), upload.single('newPhoto')
 		update.photo = null;
 	}
 
-	// Social profiles are passed in using pseudo properties from client and need to
-	// be recombined into the .socialProfiles property.
-	const socialProfileFns = {
-		twitter: {
-			parse: (value) => {
-				var m = /^\s*(?:https?:\/\/)?twitter.com\/([a-z0-9_]+)/i.exec(value);
-				if(m) return m[1];
-				m = /^\s*([a-z0-9_]+)\s*$/i.exec(value);
-				if(m) return m[1];
-				return null;
-			},
-			format: value => 'https://twitter.com/' + value
-		},
-		youtube: {
-			// TODO: we need to handle these formats
-			// https://www.youtube.com/@CoryWongMusic ✅
-			// https://www.youtube.com/user/CoryWongMusic ✅
-			// https://www.youtube.com/c/CoryWongMusic ✅
-			// https://www.youtube.com/c/CoryWongMusic/videos
-			// https://www.youtube.com/CoryWongMusic 
-			// https://www.youtube.com/channel/UCQqC08JWnJGJIgw43XJ0GXw
-			
-			parse: (value) => {
-				var m = /^\s*(?:https?:\/\/)?(?:www\.)?youtube.com\/(?:user\/|c\/|@)(\w+)/i.exec(value);
-				if(m) return m[1];
-				m = /^\s*(\w+)\s*$/i.exec(value);
-				if(m) return m[1];
-				return null;
-			},
-			format: (value) => 'https://youtube.com/@' + value
-		},
-		instagram: {
-			parse: (value) => {
-				var m = /^\s*(?:https?:\/\/)?(?:www\.)?instagram.com\/([a-z0-9_]+)/i.exec(value);
-				if(m) return m[1];
-				m = /^\s*([a-z0-9_]+)\s*$/i.exec(value);
-				if(m) return m[1];
-				return null;
-			},
-			format: value => 'https://instagram.com/' + value
-		},
-		substack: {
-			parse: (value) => {
-				var m = /^\s*(?:https?:\/\/)?([a-z0-9\-_]+.substack.com)/i.exec(value);
-				if(m) return m[1];
-				return null;
-			},
-			format: (value) => 'https://' + value
-		}
-	};
 	var socialProfiles = [];
 	var hasSocialProfilesUpdates = false;
 
@@ -160,6 +172,80 @@ router.post('/profile', auth.authorizeRole('creator'), upload.single('newPhoto')
 	
 	await Creator.update(update, { where: { id: creator.id }});
 
+	res.send(sync);
+});
+
+router.post('/guild', auth.authorizeRole('guildAdmin'), upload.single('newGuildPhoto'), async function(req, res, next) {
+	const user = await User.findByPk(req.authUser.id);
+	const guild = await Guild.findOne({ where: { userId: user.id }});
+
+	// These are value we need to send back to the client. Only send
+	// values that the client wouldn't otherwise know about.
+	const sync = { };
+	const update = { };
+	['name', 'about', 'website', 'displaySupporterCount', 'displayPledgeTotal', 'publicProfile' ].forEach(prop => {
+		const formMap = {
+			'displaySupporterCount': 'displayGuildSupporterCount',
+			'displayPledgeTotal': 'displayGuildPledgeTotal',
+			'publicProfile': 'publicGuild'
+		};
+		const value = req.body[formMap[prop] || prop];
+		if(value !== undefined) {
+			if(Guild.tableAttributes[prop].type.key == 'BOOLEAN') {
+				// For check boxes, any string equals true
+				update[prop] = !!value;
+			} else {
+				update[prop] = value;
+			}
+		}
+	});
+
+	if(req.file) {
+		var dir = 'public/images/uploads/guilds/' + guild.id;
+		var filename = path.basename(req.file.path);
+		var ext = util.mimeTypeExtensions[req.file.mimetype];
+		if(!ext) {
+			throw 'Mime type not implemented: ' + req.file.mimetype;
+		}
+		filename += ext;
+		await fs.mkdir(dir, { recursive: true });
+		var sharpResult = await sharp(req.file.path)
+			.resize({ width: 200, height: 200})
+			.toFile(dir + '/' + filename);
+
+		await fs.rm(req.file.path);
+		update.photo = filename;
+		sync.photo = filename;
+		sync.newPhoto = ''; // a little hacky, but tell the view to reset the newPhoto file input
+	}
+
+	if(req.body.removeExistingPhoto && guild.photo) {
+		var photoPath = 'public/images/uploads/guilds/' + guild.id + '/' + guild.photo; 
+		await fs.rm(photoPath, { force: true }); // force ignores exceptions if file doesn't exist
+		update.photo = null;
+	}
+
+	
+	var socialProfiles = [];
+	var hasSocialProfilesUpdates = false;
+
+	for(var key in socialProfileFns) {
+		var value = req.body['socialProfiles_' + key];
+		if(value !== undefined) {
+			hasSocialProfilesUpdates = true;
+			var fns = socialProfileFns[key];
+			var parsed = fns.parse(value);
+			if(parsed) {
+				socialProfiles.push(fns.format(parsed));
+			}
+		}
+	}
+	if(hasSocialProfilesUpdates) {
+		update.socialProfiles = socialProfiles.join('||');
+		sync.socialProfiles = update.socialProfiles;
+	}
+	
+	await Guild.update(update, { where: { id: guild.id }});
 	res.send(sync);
 });
 
@@ -491,8 +577,15 @@ router.post('/execute-policy/3', auth.authorizeRole('creator'), async function(r
 });
 
 router.get('/execute-policy/execute', auth.authorizeRole('creator'), async function(req, res, next) {
-	const user = await User.findOne({ where: { id: req.authUser.id }});
-	const creator = await Creator.findOne({ where: { userId: user.id }});
+	const user = await User.findOne({ 
+		where: { id: req.authUser.id },
+		include: [
+			{ model: Creator, required: false },
+			{ model: Guild, required: false }
+		]
+	});
+	const creator =  user.Creator;
+	const guild = user.Guild;
 
 	// TODO: de-duplicate in all /execute-policy routes
 	var active = await PolicyExecution.findAll({ where: { creatorId: creator.id, processedAt: null }});
@@ -507,20 +600,33 @@ router.get('/execute-policy/execute', auth.authorizeRole('creator'), async funct
 	let execution = await PolicyExecution.create({ creatorId: creator.id, reason, executedAt });
 
 	const pledges = await Pledge.findAll({ where: { creatorId: creator.id }});
-	for await(pledge of pledges) {
-		const executionSupporter = await PolicyExecutionSupporter.create({
+	const guildPledges = !guild ? [] : await GuildPledge.findAll({ where: { guildId: guild.id }});
+	const supporters = [];
+	for (const pledge of pledges) {
+		supporters.push({
 			policyExecutionId: execution.id,
 			userId: pledge.userId,
 			pledgeId: pledge.id,
+			pledgeSource: 'creator'
 		});
 	}
+	for (const pledge of guildPledges) {
+		supporters.push({
+			policyExecutionId: execution.id,
+			userId: pledge.userId,
+			pledgeId: pledge.id,
+			pledgeSource: 'guild'
+		});
+	}
+
+	await PolicyExecutionSupporter.bulkCreate(supporters);
 
 	// TODO: Notify supporters via email
 
 	var env = req.app.get('env');
 
 	// Notify Pluribus
-	var notifyEmails = [ 'luke@smalltech.com.au' ];
+	var notifyEmails = [ 'david@seng.family' ];
 	if(env != 'development') {
 		notifyEmails.push('help@becomepluribus.com');
 	}
@@ -718,13 +824,26 @@ router.get('/search', async (req, res) => {
 });
 
 router.get('/pledges', auth.authorize, async (req, res) => {
-	const user = await User.findByPk(req.authUser.id);
-	const creator = await Creator.findOne({ where: { userid: user.id }});
-
+	const user = await User.findOne({ 
+		where: { id: req.authUser.id },
+		include: [
+			{ model: Creator, required: false, attributes: ['id', 'name'] },
+			{ model: Guild, required: false, attributes: ['id', 'name'] }
+		] });
+	const creator = user.Creator;
+	let guild = user.Guild;
+	if (!guild && creator) {
+		guild = await Guild.findOne({ 
+			include: { model: GuildCreator, where: { creatorId: creator.id, status: 'approved' }, attributes: [] },
+			attributes: ['id', 'name'],
+			required: true
+		});
+	}
 	const pledgesMade = await Pledge.findAll({ where: { userId: user.id }, include: Creator });
 	const pledgesReceived = creator ? await Pledge.findAll({ where: { creatorId: creator.id  }, include: User}) : null;
-
-	res.render('dashboard/pledges', { user, creator, pledgesMade, pledgesReceived });
+	const guildPledgesMade = await GuildPledge.findAll({ where: { userId: user.id }, include: Guild });
+	const guildPledgesReceived = guild ? await GuildPledge.findAll({ where: { guildId: guild.id  }, include: User }) : null;
+	res.render('dashboard/pledges', { user, creator, pledgesMade, pledgesReceived, guild, guildPledgesMade, guildPledgesReceived });
 });
 
 router.get('/subscription', auth.authorize, async (req, res) => {
@@ -843,6 +962,128 @@ router.post('/cancel-subscription', auth.authorize, csrf.validateToken, async(re
 
 	req.flash.notice = 'Your subscription was successfully cancelled.';
 	res.redirect('/dashboard/subscription');
+});
+
+router.get('/guilds', auth.authorizeRole('creator'), async function(req, res, next) {
+	console.log(req.authUser);
+	console.log(res.locals.authUser);
+
+	var guild = await Guild.findOne({ where: { userId: res.locals.authUser.id } });
+	if (guild) {
+		res.redirect('/guilds/' + guild.id);
+		return;
+	}
+
+	res.render('dashboard/guilds');
+});
+
+router.get('/guild-subscribe', auth.authorize, async (req, res) => {
+	const user = await User.findByPk(req.authUser.id);
+	const guild = await Guild.findOne({ where: { userid: user.id }});
+	if (guild.stripeSubscriptionId) {
+		req.flash.alert = 'You already have a guild subscription';
+		res.redirect('/dashboard/guild-subscription');
+		return;
+	}
+
+	const stripePublicKey = credentials.stripe.publicKey;
+	const stripe = require('stripe')(credentials.stripe.secretKey);
+	const product = await stripe.products.retrieve(
+
+		// TODO: use guild's subscription product?
+		settings.stripe.products.standardSubscription,
+		{ expand: [ 'default_price' ]}
+	);
+
+	var cardPaymentMethods = await CardPaymentMethod.findAll({ where: { userId: req.authUser.id }});
+	var primaryCardPaymentMethod = cardPaymentMethods.find(method => method.id == user.primaryCardPaymentMethodId);
+	res.render('dashboard/guild-subscribe', {
+		guild,
+		stripePublicKey,
+		cardPaymentMethods,
+		primaryCardPaymentMethod,
+		amount: product.default_price.unit_amount / 100
+	});
+});
+
+router.post('/guild-subscribe', auth.authorize, csrf.validateToken, async(req, res) => {
+	const cardId = req.body.card;
+	if(!cardId) {
+		req.flash.alert = 'Please choose a card or add a new payment method.';
+		return res.redirect('/dashboard/guild-subscribe');
+	}
+
+	const user = await User.findByPk(req.authUser.id);
+	const card = await CardPaymentMethod.findOne({ where: { id: cardId, userId: user.id }});
+	if(!card) {
+		req.flash.alert = 'Please choose a card or add a new payment method.';
+		return res.redirect('/dashboard/guild-subscribe');
+	}
+
+	const stripe = require('stripe')(credentials.stripe.secretKey);
+
+	// TODO: use guild's subscription product?
+	const product = await stripe.products.retrieve(settings.stripe.products.standardSubscription);
+	const subscription = await stripe.subscriptions.create({
+		customer: user.stripeCustomerId,
+		default_payment_method: card.stripePaymentMethodId,
+		items: [
+			{ price: product.default_price },
+		],
+	});
+
+	const guild = await Guild.findOne({ where: { userid: user.id }});
+	guild.stripeSubscriptionId = subscription.id;
+	guild.subscriptionAmount = subscription.items.data[0].price.unit_amount;
+	guild.subscriptionCreated = new Date(subscription.created * 1000);
+	guild.save();
+
+	// Set the subscriber number, used to show gold/silver/bronze rings around
+	// profile photos for early adopters
+	if(!guild.subscriberNum) {
+		// update Guilds set subscriberNum = (select subNum from (select coalesce(max(subscriberNum), 0) + 1 subNum from creators) x) where id = :id;
+		await sequelize.query('update Guilds set subscriberNum = (select subNum from (select coalesce(max(subscriberNum), 0) + 1 subNum from Guilds) x) where id = :id', { replacements: { id: guild.id } });
+	}
+
+	req.flash.notice = 'Subscription was created successfully';
+
+	return res.redirect('/dashboard/guild-subscription');
+});
+
+router.get('/guild-subscription', auth.authorize, async (req, res) => {
+	const user = await User.findOne({
+		where: { id: res.locals.authUser.id },
+		include: { model: Guild, required: false }
+	}); 
+	const guild = user.Guild;
+	res.render('dashboard/guild-subscription', { guild });
+});
+
+router.post('/guild-cancel-subscription', auth.authorize, csrf.validateToken, async(req, res) => {
+	const user = await User.findOne({
+		where: { id: res.authUser.id },
+		include: { model: Guild, required: false }
+	}); 
+	const guild = user.Guild;
+
+	if(!guild?.stripeSubscriptionId) {
+		req.flash.alert = 'You don\'t have an active subscription';
+		res.redirect('/dashboard/guild-subscription');
+		return;
+	}
+
+	const stripe = require('stripe')(credentials.stripe.secretKey);
+	await stripe.subscriptions.del(
+		guild.stripeSubscriptionId
+	);
+
+	guild.stripeSubscriptionId = null;
+	guild.subscriptionAmount = null;
+	guild.subscriptionCreated = null;
+	guild.save();
+
+	req.flash.notice = 'Your subscription was successfully cancelled.';
+	res.redirect('/dashboard/guild-subscription');
 });
 
 module.exports = router;

@@ -1,0 +1,10 @@
+<div class="btn-group">
+    <button class="btn btn-sm <%= vote === 'yea' ? 'btn-primary' : 'btn-outline ' %>" title="Vote Yea"
+        hx-post="/guilds/<%= guild.id %>/creators/<%= candidate.Creator.id %>/vote" hx-vals='{"vote": "yea"}' hx-target="#vote-<%= candidate.Creator.id %>">
+        <svg class="icon-up" width="24" height="24"><use href="/images/ui/icons.svg#chevron-up"></use></svg> yea
+    </button>
+    <button class="btn btn-sm <%= vote === 'nay' ? 'btn-primary' : 'btn-outline ' %>" title="Vote Nay"
+        hx-post="/guilds/<%= guild.id %>/creators/<%= candidate.Creator.id %>/vote" hx-vals='{"vote": "nay"}' hx-target="#vote-<%= candidate.Creator.id %>">
+        <svg class="icon-up" width="24" height="24"><use href="/images/ui/icons.svg#chevron-down"></use></svg> nay
+    </button>
+</div>

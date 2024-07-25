@@ -1,0 +1,302 @@
+<%
+_locals.title = 'Pledge to ' + guild.name;
+_locals.nav = 'guilds';
+_locals.headScripts = [ 'https://js.stripe.com/v3/' ];
+_locals.noSidenav = true;
+
+const amounts = [ 10, 25, 50 ]
+%>
+
+<style>
+	.selection {
+		cursor: pointer;
+		transition: outline .1s, box-shadow .2s, color .2s, background-color .2s;
+		outline: 1px solid var(--bs-gray-300);
+	}
+	
+	.selection:hover {
+		outline-color: #1d1d23 !important;
+		outline-width: 2px;
+		box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.12) !important;
+	}
+
+	.selection.selected {
+		background-color: #1d1d23;
+		color: white;
+	}
+</style>
+
+<div class="main-content" role="main">
+	<div class="profile-grid">
+		<section class="card">
+			<form method="post">
+				<%- csrfToken() %>
+				<div class="flow card-body p-4">
+					<h2 class="heading-xl-medium text-strong">Pledge information</h2>
+					<div class="row gx-4" id="pledgeAmounts">
+						<% for(var amount of amounts) { %>
+							<div class="col-lg-4">
+								<div class="selection rounded p-4 mb-2 text-strong heading-lg-medium text-center" data-amount="<%= amount %>">
+									$<%= amount %>
+								</div>
+							</div>
+						<% } %>
+					</div>
+					<div class="form-floating">
+						<input type="number" min="5" step="1" class="form-control" id="customAmount" placeholder="Custom amount" />
+						<label for="customAmount">Custom amount</label>
+					</div>
+
+					<%/*
+					<div class="row gx-4" id="pledgeFrequencies">
+						<div class="col-lg-6">
+							<div class="selection d-block rounded p-4 mb-4 text-strong" data-frequency="once">
+								<h3 class="heading-sm-medium">One-time pledge</h2>
+								<div class="heading-xs-weak">This goes into effect if a guild member is cancelled.</div>
+							</div>
+						</div>
+						<div class="col-lg-6">
+							<div class="selection d-block rounded p-4 mb-4 text-strong" data-frequency="monthly">
+								<h3 class="heading-sm-medium">Monthly support</h2>
+								<div class="heading-xs-weak">This gives the guild member a chance to count on support.</div>
+							</div>
+						</div>
+					</div>
+					*/%>
+
+					<div class="mt-4">
+						<h3 class="heading-lg-medium text-strong">Pay with</h3>
+						<div>
+							<select id="selectCard" name="card" class="form-select">
+								<option>Select...</option>
+								<% for(var cardPaymentMethod of cardPaymentMethods) { %>
+									<option value="<%= cardPaymentMethod.id %>" <%= cardPaymentMethod.id == primaryCardPaymentMethod.id ? 'selected': ''%>>
+										<%= camelize(cardPaymentMethod.cardType) %>—***<%= cardPaymentMethod.last4 %>
+									</option>
+								<% }%>
+								<option value="new">Add a payment method...</option>
+							</select>
+						</div>
+
+						<div class="alert alert-info my-3">
+							<b class="heading-sm-medium">Your card <u>will not</u> be charged immediately</b>. Pledge payments will <u>only</u> be processed if <%= guild.name %> member activates them in time of need.
+						</div>
+					</div>
+				</div>
+				<div class="card-footer text-end bg-transparent p-4">
+					<input type="hidden" name="amount" id="hiddenAmount" />
+					<input type="hidden" name="frequency" id="hiddenFrequency" />
+					<a href="/guilds/<%=guild.id %>" class="btn heading-md-medium btn-lg">Cancel</a>
+					<button class="btn btn-primary btn-lg" id="submitBtn">Submit pledge</button>
+				</div>
+			</form>
+		</section>
+​
+		<aside class="side-content">
+			<div class="card">
+				<div class="card-body flow">
+					<h3 class="heading-md-medium text-strong">Your pledge</h3>
+					<table>
+						<tr>
+							<td>Your pledge to <%= guild.name %></td>
+							<td id="summaryAmount" class="text-end">$0</td>
+						</tr>
+						<%/*
+						<tr>
+							<td>Frequency</td>
+							<td id="summaryFrequency" class="text-end">--</td>
+						</tr>
+						*/%>
+					</table>
+				</div>
+			</div>
+		</aside>
+
+	</div>
+</div>
+
+<%- include('../_add-card-modal.ejs') %>
+
+<data id="pledgeData" value="<%= JSON.stringify({
+	amount: req.query.amount || null,
+	frequency: req.query.frequency || null
+}) %>"></data>
+<script>
+	var pledge = JSON.parse(document.getElementById('pledgeData').value);
+	var frequencyDisplay = {
+		'once': 'One-time',
+		'monthly': 'Monthly'
+	}
+
+	var hiddenAmount = document.getElementById('hiddenAmount');
+	var hiddenFrequency = document.getElementById('hiddenFrequency');
+
+	function updateSummary() {
+		document.getElementById('summaryAmount').textContent = '$' + (pledge.amount || '0');
+		//document.getElementById('summaryFrequency').textContent = pledge.frequency ? frequencyDisplay[pledge.frequency] : '--';
+	}
+
+	document.querySelectorAll('#pledgeAmounts .selection').forEach(function(btn) {
+		btn.addEventListener('click', function(e) {
+			document.querySelector('#pledgeAmounts .selection.selected')?.classList.remove('selected');			
+			pledge.amount = Number(btn.dataset['amount']);
+			hiddenAmount.value = pledge.amount;
+			btn.classList.add('selected');
+			updateSummary();
+		});
+	});
+
+	document.querySelectorAll('#pledgeFrequencies .selection').forEach(function(btn) {
+		btn.addEventListener('click', function(e) {
+			document.querySelector('#pledgeFrequencies .selection.selected')?.classList.remove('selected');			
+			pledge.frequency = btn.dataset['frequency'];
+			hiddenFrequency.value = pledge.frequency;
+			btn.classList.add('selected');
+			updateSummary();
+		});
+	});
+
+	var customAmount = document.getElementById('customAmount');
+	customAmount.addEventListener('input', function() {
+		document.querySelector('#pledgeAmounts .selection.selected')?.classList.remove('selected');
+		pledge.amount = Number(customAmount.value);
+		hiddenAmount.value = pledge.amount;
+		updateSummary();
+	});
+
+	var selectCard = document.getElementById('selectCard');
+	selectCard.addEventListener('change', function(e) {
+		if(selectCard.value == 'new') {
+			addCardModal.show();
+		}
+	});
+
+	// init based on querystring
+	updateSummary();
+	if(pledge.amount) {
+		var amountBtn = document.querySelector(`#pledgeAmounts .selection[data-amount="${pledge.amount}"]`);
+		if(amountBtn) {
+			amountBtn.classList.add('selected');
+		} else {
+			customAmount.value = pledge.amount;
+		}
+		hiddenAmount.value = pledge.amount;
+	}
+	if(pledge.frequency) {
+		var freqBtn = document.querySelector(`#pledgeFrequencies .selection[data-frequency="${pledge.frequency}"]`);
+		if(freqBtn) {
+			freqBtn.classList.add('selected');
+		}
+		hiddenFrequency.value = pledge.frequency;
+	}
+
+	var addCardForm = document.getElementById('addCardForm');
+	var stripeErrorMessage = document.getElementById('stripeErrorMessage');
+	var addCardModalShown = false;
+
+	// Prepare Stripe ahead of time
+	const stripe = Stripe('<%= stripePublicKey %>');
+	var stripeElements;
+	var paymentElement;
+
+	fetch('/dashboard/payments/beginAddCreditCard', { method: 'post' })
+		.then(function(response) {
+			response.json().then(function(json) {
+				var secret = json.clientSecret;
+
+				// Set up credit card form
+				const options = {
+					clientSecret: secret,
+					fonts: [
+						{ cssSrc: 'https://fonts.googleapis.com/css2?family=Rubik:wght@400' }
+					],
+					appearance: {
+						variables: {
+							fontFamily: 'Rubik, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
+							fontSizeBase: '16px',
+							colorPrimary: '#555af7',
+							colorText: '#212529',
+							spacingGridRow: '24px'
+						},
+						rules: {
+							'.Input': {
+								borderColor: '#ced4da',
+								lineHeight: '1.25',
+								padding: '8px',
+								boxShadow: 'none'
+							},
+							'.Input:focus': {
+								boxShadow: '0 0 0 0.25rem rgba(85,90,247,0.25)'
+							},
+							'.Label--resting': {
+								color: '#717171'
+							}
+						},
+						labels: 'floating',
+					}
+				};
+				
+				stripeElements = stripe.elements(options);
+				paymentElement = stripeElements.create('payment', { business: { name: 'Pluribus' }});
+			});
+		});
+
+	var addCardModalDiv = document.getElementById('addCardModal');
+	var addCardModal = new bootstrap.Modal(addCardModalDiv);
+	addCardModalDiv.addEventListener('shown.bs.modal', function() {
+		if(!addCardModalShown) {
+			paymentElement.mount('#stripePaymentElement');
+			paymentElement.on('change', () => stripeErrorMessage.classList.add('visually-hidden') );
+		}
+		addCardModalShown = true;
+	});
+
+	addCardForm.addEventListener('submit', async function(event) {
+		event.preventDefault();
+
+		var nickname = document.getElementById('cardNickname').value;
+		var firstName = document.getElementById('cardFirstName').value;
+		var lastName = document.getElementById('cardLastName').value;
+
+		// Validate our fields first
+		if(!addCardForm.checkValidity()) {
+			addCardForm.classList.add('was-validated');
+			return;
+		}
+
+		document.body.classList.add('page-loading');
+
+		const {error} = await stripe.confirmSetup({
+			elements: stripeElements,
+			confirmParams: {
+				// TODO: review pledge querystring parameter usage
+				return_url: '<%= `${req.app.get("env") == "production" ? "https" : "http"}://${req.headers.host}/dashboard/payments/card-added` %>?pledge=<%= guild.id%>&amount=' + (pledge.amount || '') + '&frequency=' + pledge.frequency,
+				payment_method_data: {
+					metadata: {
+						nickname,
+						firstName,
+						lastName
+					}
+				}
+			}
+		})
+
+		if(error) { 
+			stripeErrorMessage.textContent = error.message;
+			stripeErrorMessage.classList.remove('visually-hidden');
+
+			document.body.classList.remove('page-loading');
+		}
+	});
+
+	// We need to do this rather than just use [data-bs-dismiss="modal"] because
+	// the button is inside a form and we need to prevent the form submitting.
+	var cancelAddCardBtn = document.getElementById('cancelAddCardBtn');
+	cancelAddCardBtn.addEventListener('click', e => {
+		e.preventDefault();
+		addCardModal.hide();
+	})
+</script>
+
+<%- contentFor('head') %>
+<link rel="stylesheet" href="/css/pages/dash.css" />

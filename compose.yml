@@ -9,8 +9,6 @@ services:
       - MYSQL_DATABASE=pluribus
       - MYSQL_USER=pluribus-web
       - MYSQL_PASSWORD=pluribus-web
-    volumes:
-      - ./db:/var/lib/mysql
 
   mail: # view email ui at http://localhost:8025
     image: axllent/mailpit:latest
