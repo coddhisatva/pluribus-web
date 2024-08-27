@@ -1,0 +1,384 @@
+<%
+_locals.title = "Guild";
+_locals.nav = 'guild';
+%>
+
+<link rel="stylesheet" href="/css/up.css" />
+<style>
+	.profile-link svg {
+		width: 24px;
+		height: 24px;
+		margin: 0 10px 5px 0;
+		color: #ccc;
+	}
+</style>
+
+<h1 class="display-xxs mb-3">Guild Information</h1>
+
+<%- include('_subscribe-alert', { subscribable: guild, subscribeUrl: '/dashboard/guild-subscribe' }) %>
+
+<div id="guildForm" class="card">
+    <div class="card-body">
+
+        <!-- Photo -->
+        <div class="mb-4">
+            <div view>
+                <div class="heading-sm-weak mb-2">
+                    Photo
+                    <a edit-btn href="#" bind="photo ? 'Update' : 'Add'" class="float-end text-black"></a>
+                </div>
+                <div class="body-sm-weak text-medium">
+                    <img bind="src:photo ? '/images/uploads/guilds/<%= guild.id %>/' + photo : ''" if="photo" class="rounded-circle" style="max-width:80px;max-height:80px" />
+                    <div else>Not provided</div>
+                </div>
+            </div>
+            <div edit>
+                <div class="row">
+                    <div class="col">
+                        <div class="mb-3">
+                            <label for="newGuildPhoto" class="form-label">Upload a new photo</label>
+                            <input type="file" name="newGuildPhoto" id="newGuildPhoto" class="form-control" placeholder="Choose a photo" accept="image/*" />
+                        </div>
+
+                        <div class="mb-2">
+                            <a id="removeExistingGuildPhoto" href="#">Remove existing photo</a>
+                        </div>
+
+                        <button save-btn class="btn bg-black text-white saving">Save</button>
+                    </div>
+                    <div class="col-md-2">
+                        <a href="#" cancel-btn class="float-end text-black">Cancel</a>
+                    </div>
+                </div>			
+            </div>
+        </div>
+
+        <!-- Name -->
+        <div class="mb-4">
+            <div view>
+                <div class="heading-sm-weak mb-2">
+                    Guild name
+                    <a edit-btn href="#" bind="name ? 'Update' : 'Add'" class="float-end text-black"></a>
+                </div>
+                <div class="body-sm-weak text-medium">
+                    <div bind="name" if="name"></div>
+                    <div else>Not provided</div>
+                </div>
+            </div>
+            <div edit>
+                <div class="row">
+                    <div class="col">
+                        <label for="guildName" class="form-label">Guild name</label>
+                        <div class="form-floating mb-3">
+                            <input type="text" name="name" id="guildName" class="form-control" placeholder="Guild name" />
+                            <label for="guildName" class="form-label">Guild name</label>
+                        </div>
+
+                        <button save-btn class="btn bg-black text-white saving">Save</button>
+                    </div>
+                    <div class="col-md-2">
+                        <a href="#" cancel-btn class="float-end text-black">Cancel</a>
+                    </div>
+                </div>			
+            </div>
+        </div>
+
+        <!-- About the guild -->
+        <div class="mb-4">
+            <div view>
+                <div class="heading-sm-weak mb-2">
+                    About the guild
+                    <a edit-btn href="#" bind="about ? 'Update' : 'Add'" class="float-end text-black"></a>
+                </div>
+                <div class="body-sm-weak text-medium">
+                    <div bind="about" if="about"></div>
+                    <div else>Not provided</div>
+                </div>
+            </div>
+            <div edit>
+                <div class="row">
+                    <div class="col">
+                        <label for="aboutGuild" class="form-label">About the guild</label>
+                        <div class="form-floating mb-3">
+                            <textarea name="about" id="aboutGuild" class="form-control" placeholder="Write your message here" style="height:120px"></textarea>
+                            <label for="aboutGuild" class="form-label">Write your message here</label>
+                        </div>
+
+                        <button save-btn class="btn bg-black text-white">Save</button>
+                    </div>
+                    <div class="col-md-2">
+                        <a href="#" cancel-btn class="float-end text-black">Cancel</a>
+                    </div>
+                </div>					
+            </div>
+        </div>
+
+        <!-- Website -->
+        <div class="mb-4">
+            <div view>
+                <div class="heading-sm-weak mb-2">
+                    Website
+                    <a edit-btn href="#" bind="website ? 'Update' : 'Add'" class="float-end text-black"></a>
+                </div>
+                <div class="body-sm-weak text-medium">
+                    <div bind="website" if="website"></div>
+                    <div else>Not provided</div>
+                </div>
+            </div>
+            <div edit>
+                <div class="row">
+                    <div class="col">
+                        <label for="websiteGuild" class="form-label">Website</label>
+                        <div class="form-floating mb-3">
+                            <input type="text" name="website" id="websiteGuild" class="form-control" placeholder="www.example.com" />
+                            <label for="websiteGuild" class="form-label">Your website address</label>
+                        </div>
+
+                        <button save-btn class="btn bg-black text-white">Save</button>
+                    </div>
+                    <div class="col-md-2">
+                        <a href="#" cancel-btn class="float-end text-black">Cancel</a>
+                    </div>
+                </div>					
+            </div>
+        </div>
+
+        <!-- Social profiles -->
+        <div class="mb-4">
+            <div view id="socialGuildProfilesView">
+                <div class="heading-sm-weak mb-2">
+                    Social profiles
+                    <a edit-btn href="#" bind="socialProfiles ? 'Update' : 'Add'" class="float-end text-black"></a>
+                </div>
+                <div class="body-sm-weak text-medium">
+                    <div if="socialProfiles">
+                        <a foreach="profileUrl in socialProfiles.split('||')" bind="href:profileUrl,class:'d-block profile-link '+lookupSocialProfile(profileUrl)[0]" target="_blank">
+                            <svg><use bind="href:'/images/ui/social-icons.svg#' + (lookupSocialProfile(profileUrl)[0] || 'twitter')"></use></svg><span bind="lookupSocialProfile(profileUrl)[1] || profileUrl"></span>
+                        </a>
+                    </div>
+                    <div else>Not provided</div>
+                </div>
+            </div>
+            <div edit>
+                <div class="row">
+                    <div class="col">
+                        <label class="form-label">Social profiles</label>
+                        
+                        <!-- Twitter -->
+                        <div class="form-floating mb-3">
+                            <input type="text" name="socialProfiles_twitter" id="socialGuildProfiles_twitter" class="form-control" placeholder="Twitter" />
+                            <label for="socialGuildProfiles_twitter">Twitter</label>
+                        </div>
+
+                        <!-- YouTube -->
+                        <div class="form-floating mb-3">
+                            <input type="text" name="socialProfiles_youtube" id="socialGuildProfiles_youtube" class="form-control" placeholder="YouTube" />
+                            <label for="socialGuildProfiles_youtube">YouTube</label>
+                        </div>
+
+                        <!-- Instagram -->
+                        <div class="form-floating mb-3">
+                            <input type="text" name="socialProfiles_instagram" id="socialGuildProfiles_instagram" class="form-control" placeholder="Instagram" />
+                            <label for="socialGuildProfiles_instagram">Instagram</label>
+                        </div>
+
+                        <!-- Substack -->
+                        <div class="form-floating mb-3">
+                            <input type="text" name="socialProfiles_substack" id="socialGuildProfiles_substack" class="form-control" placeholder="Substack" />
+                            <label for="socialGuildProfiles_substack">Substack</label>
+                        </div>
+
+                        <button save-btn class="btn bg-black text-white">Update social profiles</button>
+                    </div>
+                    <div class="col-md-2">
+                        <a href="#" cancel-btn class="float-end text-black">Cancel</a>
+                    </div>
+                </div>					
+            </div>
+        </div>
+
+        <!-- Supporter count toggle -->
+        <div class="mb-4 row">
+            <div class="col">
+                <label class="heading-sm-weak mb-2" for="displayGuildSupporterCount">
+                    Display supporter count
+                </label>
+                <div class="body-sm-weak text-medium">
+                    Credibility is key for supporters. Display the guild supporter count to inspire more support.
+                </div>
+            </div>
+            <div class="col-md-2 d-flex justify-content-end">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="displayGuildSupporterCount" value="yes" <%= guild.displaySupporterCount ? 'checked': ''%>> 
+                </div>
+            </div>
+        </div>
+
+        <!-- Pledge display toggle -->
+        <div class="mb-4 row">
+            <div class="col">
+                <label class="heading-sm-weak mb-2" for="displayGuildPledgeTotal">
+                    Display pledge total
+                </label>
+                <div class="body-sm-weak text-medium">
+                    Show the total amount pledged guild supporters.
+                </div>
+            </div>
+            <div class="col-md-2 d-flex justify-content-end">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="displayGuildPledgeTotal" value="yes" <%= guild.displayPledgeTotal ? 'checked': ''%>>
+                </div>
+            </div>
+        </div>
+
+        <!-- Public guild toggle -->
+        <div class="mb-4 row">
+            <div class="col">
+                <label class="heading-sm-weak mb-2" for="publicGuild">
+                    Make the guild public
+                </label>
+                <div class="body-sm-weak text-medium">
+                    Making the guild public is a really good way to let the public find the guild. To keep things private, just leave it as private.
+                </div>
+            </div>
+            <div class="col-md-2 d-flex justify-content-end">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="publicGuild" value="yes" <%= guild.publicProfile ? 'checked': ''%>>
+                </div>
+            </div>
+        </div>
+        <div id="publicOnlyGuild">
+            Your guild link is <a href="<%= guildLink %>" target="_blank"><%= guildLink %></a>
+        </div>
+        <div id="inviteOnlyGuild">
+            <label class="body-sm-weak text-medium">Use this referral link to invite guild creators and supporters</label>
+            <div class="input-group w-100">
+                <input type="text" class="form-control" id="guildInviteLink" readonly value="<%= inviteBase %><%= encodeURIComponent(guild.inviteCode) %>" />
+                <button class="btn btn-dark" id="copyGuildInvite">Copy link</button>
+            </div>
+        </div>
+    </div><!-- .card-body -->
+</div><!-- .card -->
+
+
+<%- contentFor('aside') %>
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<path fill-rule="evenodd" clip-rule="evenodd" d="M14 28C16.2091 28 18 26.2091 18 24C18 21.7909 16.2091 20 14 20C11.7909 20 10 21.7909 10 24C10 26.2091 11.7909 28 14 28ZM20.9297 20C19.5465 17.6088 16.9611 16 14 16C10.2723 16 7.14012 18.5495 6.25204 22H4C2.89543 22 2 22.8954 2 24C2 25.1046 2.89543 26 4 26H6.25204C7.14012 29.4505 10.2723 32 14 32C18.4183 32 22 28.4183 22 24H26C26 28.4183 29.5817 32 34 32C37.7277 32 40.8599 29.4505 41.748 26H44C45.1046 26 46 25.1046 46 24C46 22.8954 45.1046 22 44 22H41.748C40.8599 18.5495 37.7277 16 34 16C31.0389 16 28.4535 17.6088 27.0703 20H20.9297ZM30 24C30 26.2091 31.7909 28 34 28C36.2091 28 38 26.2091 38 24C38 21.7909 36.2091 20 34 20C31.7909 20 30 21.7909 30 24Z" fill="#1D1D23"/>
+</svg>
+	
+<h3 class="heading-lg-medium text-strong">What do we do with your information?</h3>
+<p class="body-sm-weak text-medium">We don’t store your payment info in our system (that remains with Stripe). Aside from that distinction, we do not share your info with third parties.</p>
+
+
+<script src="/js/up.js"></script>
+<% /*
+Note: only include data that up.js will use.
+*/ %>
+<data id="guildData" value="<%= JSON.stringify({
+	name: guild.name,
+	about: guild.about,
+	website: guild.website,
+	photo: guild.photo,
+	socialProfiles: guild.socialProfiles
+}) %>"></data>
+<script>
+// Pre-parse social profiles and add them into socialProfiles_* pseudo properties
+// for the edit view to use.
+const profileLookups = {
+	twitter: /(?:twitter|x).com\/(.*)/, 
+	youtube: /youtube.com\/(?:user\/|c\/|@)(.*)/,
+	instagram: /instagram.com\/(.*)/,
+	substack: /(?:https?:\/\/)?([^\.]*.substack.com)/,
+};
+
+function lookupSocialProfile(url) {
+	for(var key in profileLookups) {
+		var match = url.match(profileLookups[key]);
+		if(match) {
+			return [key, match[1]];
+		}
+	}
+	return [null, null];
+}
+(function() {
+	const model = JSON.parse(document.getElementById('guildData').value);
+	if(model.socialProfiles == null) {
+		model.socialProfiles = '';
+	}
+
+	// Pre-parse social guild profiles and add them into socialGuildProfiles_* pseudo properties 
+	// for the edit view to use.
+	const socialProfilesView = document.getElementById('socialGuildProfilesView');
+	socialProfilesView.addEventListener('beforeupdate', function() {
+		// Reset all pseudo properties
+		for(let key in profileLookups) {
+			model['socialGuildProfiles_' + key] = '';
+		}
+
+		const socialProfileUrls = model.socialProfiles.split('||');
+		for(let i = 0; i < socialProfileUrls.length; i++) {
+			const socialProfileUrl = socialProfileUrls[i];
+			const match = lookupSocialProfile(socialProfileUrl);
+			if(match) {
+				model['socialGuildProfiles_' + match[0]] = match[1];
+			}
+		}
+
+	});
+
+	const functions = { lookupSocialProfile };
+	const profileForm = document.getElementById('guildForm');
+	up.wire(profileForm, model, '/dashboard/guild', functions);
+
+	// Toggle switches
+	const toggleIds = [ 'displayGuildSupporterCount', 'displayGuildPledgeTotal', 'publicGuild' ];
+	toggleIds.forEach(function(toggleId) {
+		const toggle = document.getElementById(toggleId);
+		toggle.addEventListener('change', function() {
+			const data = new FormData();
+			data.append(toggleId, toggle.checked ? toggle.value : '');
+			fetch('/dashboard/guild', { method: 'post', body: data });
+		});
+	});
+
+	// Remove existing photo
+	const removeExistingPhoto = document.getElementById('removeExistingGuildPhoto');
+	removeExistingPhoto.addEventListener('click', function(e) {
+		e.preventDefault();
+		if(!confirm('Really remove the guild\'s existing photo?')) {
+			return;
+		}
+
+		const data = new FormData();
+		data.append('removeExistingPhoto', true);
+		fetch('/dashboard/guild', { method: 'post', body: data });
+		model.photo = null;
+		const edit = removeExistingPhoto.closest('[edit]');
+		edit.showView().update();
+	});
+
+	const publicProfile = document.getElementById('publicGuild');
+	const inviteOnly = document.getElementById('inviteOnlyGuild');
+	const publicOnly = document.getElementById('publicOnlyGuild');
+	function toggleInviteOnly() {
+		inviteOnly.style.display = publicProfile.checked ? 'none' : 'block';
+		publicOnly.style.display = publicProfile.checked ? 'block' : 'none';
+	}
+
+	publicProfile.addEventListener('change', toggleInviteOnly)
+	toggleInviteOnly();
+	const copyInvite = document.getElementById('copyGuildInvite');
+	const inviteLink = document.getElementById('guildInviteLink');
+	copyInvite.addEventListener('click', function(e) {
+		inviteLink.select();
+		inviteLink.setSelectionRange(0, inviteLink.value.length);
+		navigator.clipboard.writeText(inviteLink.value);
+		copyInvite.dataset.origText = copyInvite.textContent;
+		copyInvite.textContent = 'Copied!'
+		setTimeout(function() {
+			copyInvite.textContent = copyInvite.dataset.origText;
+			delete copyInvite.dataset.origText;
+		}, 1000);
+	})
+})();
+</script>

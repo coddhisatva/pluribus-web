@@ -44,13 +44,7 @@ router.get('/profile', auth.authorizeRole('creator'), async function(req, res, n
 	const inviteBase = `${protocol}://${req.headers.host}/invite/`;
 	const profileLink = `${protocol}://${req.headers.host}/creators/${creator.id}`;
 	
-	const guild = user.Guild;
-	let guildLink = null;
-	if (guild) {
-		guildLink = `${protocol}://${req.headers.host}/guilds/${guild.id}`;
-	}
-
-	res.render('dashboard/profile', { user, creator, guild, inviteBase, profileLink, guildLink });
+	res.render('dashboard/profile', { user, creator, inviteBase, profileLink }); 
 });
 
 // Social profiles are passed in using pseudo properties from client and need to
@@ -174,6 +168,23 @@ router.post('/profile', auth.authorizeRole('creator'), upload.single('newPhoto')
 
 	res.send(sync);
 });
+
+router.get('/guild', auth.authorizeRole('guildAdmin'), async function(req, res, next) { 
+	const user = await User.findByPk(req.authUser.id,
+		{ include: [ { model: Guild, required: false } ] }   
+	);
+	const guild = user.Guild
+	if(!guild) {
+		res.status(404).send("Guild not found.");
+		return;
+	}
+
+	const protocol = req.app.get('env') == 'production' ? 'https' : 'http';
+	const inviteBase = `${protocol}://${req.headers.host}/invite/`;
+	let guildLink = `${protocol}://${req.headers.host}/guilds/${guild.id}`;
+	res.render('dashboard/guild', { user, guild, inviteBase, guildLink }); 
+});
+
 
 router.post('/guild', auth.authorizeRole('guildAdmin'), upload.single('newGuildPhoto'), async function(req, res, next) {
 	const user = await User.findByPk(req.authUser.id);
@@ -970,7 +981,7 @@ router.get('/guilds', auth.authorizeRole('creator'), async function(req, res, ne
 
 	var guild = await Guild.findOne({ where: { userId: res.locals.authUser.id } });
 	if (guild) {
-		res.redirect('/guilds/' + guild.id);
+		res.redirect('/dashboard/guild');
 		return;
 	}
 
