@@ -144,7 +144,7 @@ router.post('/new/policy',
 
 		req.session.authUser.roles.push('guildAdmin');
 
-		res.redirect('/dashboard/profile');
+		res.redirect('/dashboard/guild-subscribe');
 	}
 );
 

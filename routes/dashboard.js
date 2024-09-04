@@ -1058,7 +1058,7 @@ router.post('/guild-subscribe', auth.authorize, csrf.validateToken, async(req, r
 
 	req.flash.notice = 'Subscription was created successfully';
 
-	return res.redirect('/dashboard/guild-subscription');
+	return res.redirect('/dashboard/guild');
 });
 
 router.get('/guild-subscription', auth.authorize, async (req, res) => {
