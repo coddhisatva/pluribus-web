@@ -115,9 +115,11 @@ _locals.headScripts = [ '/js/htmx.min.js' ];
 ​
 		<section class="card">
 			<div class="flow card-body">
+				<% if (guild.about) { %>
 				<h2>About</h2>
 				<p><%= guild.about %></p>
-				
+				<% } %>
+
 				<h2 class="mb-0">Creators</h2>
 				<ul>
 					<% guild.GuildCreators.forEach(function(guildCreator) { %>

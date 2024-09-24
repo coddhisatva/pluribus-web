@@ -1,5 +1,5 @@
 /*
-© Pluribus 2022
+© Pluribus 2024
 
 Used to wire up multi-section forms with inline editing
 on each section and partial updates via server API calls.

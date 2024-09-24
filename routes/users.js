@@ -80,7 +80,7 @@ router.post('/login',
  * GET /logout
  */
 router.get('/logout', async function(req, res, next) {
-	req.session.authUser = null;
+	req.session = null;
 	req.flash.notice = 'You\'ve been logged out.';
 	res.redirect('/');
 });

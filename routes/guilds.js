@@ -11,12 +11,6 @@ const credentials = require('../config/credentials');
 const settings = require('../config/settings');
 require('../utils/handleAsyncErrors').fixRouter(router);
 
-router.get('/', async function(req, res, next) {
-	var guild = await Guild.findOne({ where: { userId: res.locals.authUser.id } });
-	var guilds = await Guild.findAll({ where: { publicProfile: true }});
-	res.render('guilds/index', { guilds, guild });
-});
-
 async function ensureNoGuild(req, res, next) {
 	// If there's no logged in user, redirect to user registration
 	// with continue=guild
@@ -35,8 +29,35 @@ async function ensureNoGuild(req, res, next) {
 	next();
 }
 
+async function checkGuildNameUnique(req, res, next) {
+	const name = req.body.name;
+	try {
+		if (name) {
+			const existingGuild = await Guild.findOne({ name: name });
+			if (existingGuild) {
+				req.validationErrors = validationResult(req).array();
+				req.validationErrors.push({
+					param: 'name',
+					msg: 'Guild name already in use',
+					value: name
+				});
+			}
+		}
+
+		next();
+	} catch (error) {
+		next(error);
+	}
+}
+
+router.get('/', async function(req, res, next) {
+	var guild = await Guild.findOne({ where: { userId: res.locals.authUser.id } });
+	var guilds = await Guild.findAll({ where: { publicProfile: true }});
+	res.render('guilds/index', { guilds, guild });
+});
+
 router.get('/new', ensureNoGuild, async function(req, res, next) {
-	res.redirect('/guilds/new/categories');
+	res.redirect('/guilds/new/name');
 });
 
 router.get('/new/categories', ensureNoGuild, async function(req, res, next) {
@@ -71,6 +92,10 @@ router.post('/new/about',
 				return;
 			}
 	
+			if(!req.session.guildSignup) {
+				req.session.guildSignup = { };
+			}
+
 			req.session.guildSignup.about = req.body.about;
 		}
 		
@@ -85,12 +110,17 @@ router.get('/new/name', ensureNoGuild, function(req, res) {
 router.post('/new/name',
 	ensureNoGuild,
 	body('name').trim().isLength({ min: 1 }).withMessage('Please enter your name'),
+	checkGuildNameUnique,
 	async function(req, res, next) {
 		if(!req.body.skip) {
 			var errors = validationResult(req);
 			if(!errors.isEmpty()) {
 				res.render('guilds/new-name', { errors });
 				return;
+			}
+
+			if(!req.session.guildSignup) {
+				req.session.guildSignup = { };
 			}
 
 			req.session.guildSignup.name = req.body.name;
@@ -138,7 +168,7 @@ router.post('/new/policy',
 			inviteCode
 		});
 
-		// Categories
+		// Categories	
 		await GuildCategory.bulkCreate((req.session.guildSignup?.categories || []).map(category => ({ guildId: guild.id, category })));
 		await GuildCreator.create({ guildId: guild.id, creatorId: c.id, status: 'approved', requestedAt: new Date(), approvedAt: new Date(), requiredYeaVotes: 0 });
 
