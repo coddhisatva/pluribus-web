@@ -17,6 +17,13 @@ npx sequelize db:migrate
 
 # Restart the server
 pkill -f /root/dev/bin/www
+
+# Check if the session exists, if not create it
+screen -list | grep -q "dev"
+if [ $? -ne 0 ]; then
+    screen -dmS dev
+fi
+
 screen -S dev -X stuff 'cd /root/dev\n'
 screen -S dev -X stuff 'node /root/dev/bin/www\n'
 
