@@ -816,23 +816,47 @@ router.get('/referrals', async function(req, res, next) {
 });
 
 router.get('/search', async (req, res) => {
-	let q = req.query['q'];
-	let results = null;
-	if(q) {
-		var terms = q.split(' ');
-		var whereClause = 'where publicProfile = 1 and (';
-		for(var i = 0; i < terms.length; i++) {
-			var term = terms[i].replace(/['"']/g, '\\$&');
-			if(i > 0) { whereClause += ' or '};
-			whereClause += "name like '%" + term + "%'";
-		}
-		whereClause += ')';
-		[ results, metadata ] = await sequelize.query("select * from Creators " + whereClause);
-		console.log(results);
-	}
+    const q = req.query.q || '';
+    if (!q) {
+        return res.render('dashboard/search', { results: [], q });
+    }
 
+	const results = await searchPublicProfiles(q);
 	res.render('dashboard/search', { results, q });
 });
+
+async function searchPublicProfiles(q) {
+    // Split the query into terms
+    const terms = q.trim().split(/\s+/);
+
+    // Escape special characters for MySQL full-text search
+    const escapedTerms = terms.map(term => term.replace(/['"]/g, '\\$&'));
+
+    // Construct the search string for BOOLEAN MODE
+    const searchString = escapedTerms.join(' ');
+
+    // Raw SQL query combining Creators and Guilds with UNION
+    const sql = `
+	(SELECT 'Creator' AS type, id, name, publicProfile, photo, about,
+			MATCH(name) AGAINST(:search IN BOOLEAN MODE) AS score
+		FROM Creators
+		WHERE publicProfile = 1	)
+	UNION
+	(SELECT 'Guild' AS type, id, name, publicProfile, photo, about,
+			MATCH(name) AGAINST(:search IN BOOLEAN MODE) AS score
+		FROM Guilds
+		WHERE publicProfile = 1)
+	ORDER BY score DESC, name ASC
+	LIMIT 100
+    `;
+
+	const results = await sequelize.query(sql, {
+		replacements: { search: searchString },
+		type: sequelize.QueryTypes.SELECT,
+	});
+
+	return results;
+}
 
 router.get('/pledges', auth.authorize, async (req, res) => {
 	const user = await User.findOne({ 

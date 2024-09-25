@@ -28,25 +28,38 @@ _locals.noSidenav = true;
 <h1 class="heading-xl-medium mb-4">Search Pluribus</h1>
 <form>
 	<div class="form-floating">
-		<input type="search" id="searchInput" name="q" class="form-control" placeholder="Search a name" value="<%= query['q'] %>" <%= !q ? "autofocus" : ""%> />
-		<label for="searchInput">Search a name or account number</label>
+		<input type="search" id="searchInput" name="q" class="form-control" placeholder="Search for a creator or guild" value="<%= query['q'] %>" <%= !q ? "autofocus" : ""%>>
+		<label for="searchInput">Search for a creator or guild</label>
 	</div>
 </form>
 
 <% if(locals.results != null && locals.results.length) { %>
 <div class="border rounded bg-white mt-4 p-3">
-	<% for(var i = 0; i < results.length; i++) {
-		var creator = results[i]; %>
+	<% locals.results.forEach(function(result, i) { %>
+		<% if(result.type == 'Creator') {
+		     const creator = result; %>
 		<a class="result text-decoration-none rounded" href="/creators/<%= creator.id %>">
 			<figure class="border rounded-circle">
 				<img src="<%= creator.photo != null ? ('/images/uploads/creators/' + creator.id + '/' + creator.photo) : '/images/ui/avatar-unknown.svg' %>" />
 			</figure>
 			<div>
 				<div><%= creator.name %></div>
-				<div class="result-about fw-normal"><%= truncate(creator.about, 50) %></div>
+				<% if (creator.about) { %><div class="result-about fw-normal"><%= truncate(creator.about, 50) %></div><% } %>
 			</div>
 		</a>
-	<% } %>
+		<% } else if (result.type === 'Guild') { 
+			const guild = result; %>
+			<a class="result text-decoration-none rounded" href="/creators/<%= guild.id %>">
+			<figure class="border rounded-circle">
+				<img src="<%= guild.photo != null ? ('/images/uploads/guilds/' + guild.id + '/' + guild.photo) : '/images/ui/avatar-unknown.svg' %>" />
+			</figure>
+			<div>
+				<div><%= guild.name %></div>
+				<% if (guild.about) { %><div class="result-about fw-normal"><%= truncate(guild.about, 50) %></div><% } %>
+			</div>
+		</a>
+		<% } %>
+<% }) %>
 </div>
 <% } else if(q) { %>
 	<div class="alert alert-warning my-3">No creators matched your search.</div>
