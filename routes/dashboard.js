@@ -888,15 +888,12 @@ router.get('/pledges', auth.authorize, async (req, res) => {
 });
 
 router.get('/subscription', auth.authorize, async (req, res) => {
-	const user = await User.findByPk(req.authUser.id);
-	const creator = await Creator.findOne({ where: { userid: user.id }});
-
+	const creator = await Creator.findOne({ where: { userid: req.authUser.id }});
 	res.render('dashboard/subscription', { creator });
 });
 
 router.get('/subscribe', auth.authorize, async (req, res) => {
 	const user = await User.findByPk(req.authUser.id);
-
 	const creator = await Creator.findOne({ where: { userid: user.id }});
 
 	if(creator.stripeSubscriptionId) {
@@ -964,7 +961,7 @@ router.post('/subscribe', auth.authorize, csrf.validateToken, async(req, res) =>
 		await sequelize.query('update Creators set subscriberNum = (select subNum from (select coalesce(max(subscriberNum), 0) + 1 subNum from Creators) x) where id = :id', { replacements: { id: creator.id } });
 	}
 
-	req.flash.notice = 'Subscription was created successfully';
+	req.flash.	notice = 'Subscription was created successfully';
 
 	return res.redirect('/dashboard/subscription');
 });
