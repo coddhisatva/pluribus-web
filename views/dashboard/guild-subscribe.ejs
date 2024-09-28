@@ -132,7 +132,7 @@ _locals.headScripts = [ 'https://js.stripe.com/v3/' ];
 		const {error} = await stripe.confirmSetup({
 			elements: stripeElements,
 			confirmParams: {
-				return_url: '<%= `${req.app.get("env") == "production" ? "https" : "http"}://${req.headers.host}/dashboard/payments/card-added` %>?subscribe=1',
+				return_url: '<%= `${req.app.get("env") == "production" ? "https" : "http"}://${req.headers.host}/dashboard/payments/card-added` %>?guild_subscribe=1',
 				payment_method_data: {
 					metadata: {
 						nickname,

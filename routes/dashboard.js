@@ -340,6 +340,12 @@ router.get('/payments/card-added', auth.authorize, async function(req, res, next
 		res.redirect('/dashboard/subscribe');
 		return;
 	}
+
+	if(req.query.guild_subscribe) { 
+		// Redirect back to guild-subscribe
+		res.redirect('/dashboard/guild-subscribe');
+		return;
+	}
 	
 	res.redirect('/dashboard/payments');
 });
