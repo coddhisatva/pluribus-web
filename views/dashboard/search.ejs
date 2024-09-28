@@ -49,7 +49,7 @@ _locals.noSidenav = true;
 		</a>
 		<% } else if (result.type === 'Guild') { 
 			const guild = result; %>
-			<a class="result text-decoration-none rounded" href="/creators/<%= guild.id %>">
+			<a class="result text-decoration-none rounded" href="/guilds/<%= guild.id %>">
 			<figure class="border rounded-circle">
 				<img src="<%= guild.photo != null ? ('/images/uploads/guilds/' + guild.id + '/' + guild.photo) : '/images/ui/avatar-unknown.svg' %>" />
 			</figure>
