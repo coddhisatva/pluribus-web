@@ -57,7 +57,7 @@ _locals.headScripts = [ '/js/htmx.min.js' ];
 						</button>
 						<% if (showJoin) { %>
 						<button id="joinBtn" class="btn btn-primary" <%= canJoin ? '' : 'disabled' %>>
-							<%= isFull ? 'Closed' : (canJoin ? 'Join' : '...') %>  
+							<%= isFull ? 'Closed' : (canJoin ? 'Join' : 'Pending Acceptance') %>  
 						</button>
 						<% } %>
 						<ul class="dropdown-menu" aria-labelledby="followBtn" id="followBtnDropdown">
@@ -176,7 +176,7 @@ _locals.headScripts = [ '/js/htmx.min.js' ];
 	});
 
 	joinBtn.addEventListener('click', function() {
-		joinBtn.innerHTML = '...';
+		joinBtn.innerHTML = 'Pending Acceptance';
 		joinBtn.disabled = true;
 		fetch('/guilds/<%= guild.id %>/join', { method: 'POST' })
 			.then(null, () => alert('Error!'));
