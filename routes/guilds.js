@@ -198,6 +198,7 @@ router.get('/:id', async function(req, res, next) {
 	let pledge = null;
 	let canJoin = false;
 	let candidates = [];
+	let isCreator = false;
 	if(req.authUser && req.authUser.id) {
 		const follow = await GuildFollow.findOne({ where: { userId: req.authUser.id, guildId: guild.id } });
 		if(follow !== null) {
@@ -242,6 +243,8 @@ router.get('/:id', async function(req, res, next) {
 				AND gc.status IN ('requested', 'approved')
 				)`,
 				{ replacements: { userId: req.authUser.id }, plain: true, raw: true })) !== null;
+			isCreator = (await sequelize.query(`SELECT 1 FROM Creators c WHERE c.userId = :userId`,
+				{ replacements: { userId: req.authUser.id }, plain: true, raw: true })) !== null;
 		}
 	}
 
@@ -269,7 +272,7 @@ router.get('/:id', async function(req, res, next) {
 		pledgeTotal, 
 		pledge, 
 		guildViewingOwnProfile,
-		showJoin: !guildViewingOwnProfile,
+		showJoin: !guildViewingOwnProfile && isCreator,
 		isFull: guild.maxAllowedCreators <= creatorCount,
 		canJoin,
 		isMember,
