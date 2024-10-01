@@ -4,6 +4,7 @@ const { body, validationResult } = require('express-validator');
 const auth = require('../utils/auth');
 const csrf = require('../utils/csrf');
 const { sequelize, User, Creator, Follow, Guild, GuildCreator, GuildFollow, GuildPledge, CardPaymentMethod, Pledge, PolicyExecution, PolicyExecutionSupporter } = require('../models');
+const { Op } = require('sequelize');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/tmp' });
 const fs = require('fs/promises');
@@ -1012,7 +1013,39 @@ router.get('/guilds', auth.authorizeRole('creator'), async function(req, res, ne
 		return;
 	}
 
-	res.render('dashboard/guilds');
+	var guildMember = await GuildCreator.findOne(
+		{ 
+			where: { status: 'approved' },
+			include: [{
+				required: true,
+				model: 	Creator,
+				where: { 
+					userId: req.authUser.id 
+				},
+				attributes: []
+			}],
+			attributes: ['guildId']
+		});
+	if (guildMember) {
+		res.redirect('/guilds/' + guildMember.guildId);
+		return;
+	}
+
+	// Get public guilds and not fully loaded creators
+	var publicGuilds = await Guild.findAll(
+		{ where: { 
+			publicProfile: true,
+		    [Op.and]: [
+				sequelize.literal(`(
+					SELECT COUNT(*)
+					FROM GuildCreators AS gc
+					WHERE gc.guildId = Guild.id
+					AND gc.status = 'approved'
+				) < Guild.maxAllowedCreators`)
+			]
+		}}); 
+
+	res.render('dashboard/guilds', { publicGuilds });
 });
 
 router.get('/guild-subscribe', auth.authorize, async (req, res) => {

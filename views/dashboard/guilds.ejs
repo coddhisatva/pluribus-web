@@ -7,9 +7,54 @@ _locals.nav = 'guilds';
 	<h1 class="display-xxs">Guilds</h1>
 </header>
 
-<div class="card">
+<div class="card mb-3">
 	<div class="card-body">
         <p class="body-sm-weak text-medium">A guild can &hellip;</p>
         <a href="/guilds/new" class="btn btn-primary mb-1" id="addGuildBtn">Create Guild</a>
     </div>
 </div>
+
+<% if(publicGuilds.length > 0) { %>
+<style>
+	/* Temporary styling - delete once John has done it properly ! */
+	.result {
+		display: flex;
+		padding: 16px;
+	}
+	.result:hover {
+		background-color: rgba(0,0,0,0.05);
+	}
+	.result figure {
+		margin: 0 24px 0 0;
+		width: 52px;
+		height: 52px;
+		overflow: hidden;
+	}
+
+	.result > div a {
+		display: block;
+		font-size: var(--heading-sm);
+    	font-weight: 500;
+	}
+
+</style>
+<div class="card">
+    <div class="card-body">
+        <p class="body-sm-weak text-medium">&hellip; otherwise, consider joining one of these guilds:</p>
+    <% publicGuilds.forEach(function(guild) { %>
+        <div class="border rounded bg-white mt-4 p-3">
+            <a class="result text-decoration-none rounded" href="/guilds/<%= guild.id %>">
+                <figure class="border rounded-circle">
+                    <img src="<%= guild.photo != null ? ('/images/uploads/guilds/' + guild.id + '/' + guild.photo) : '/images/ui/avatar-unknown.svg' %>" />
+                </figure>
+                <div>
+                    <div><%= guild.name %></div>
+                    <% if (guild.about) { %><div class="result-about fw-normal"><%= truncate(guild.about, 50) %></div><% } %>
+                </div>
+            </a>
+        </div>
+    <% }) %>
+    </div>
+</div>
+
+<% } %>
