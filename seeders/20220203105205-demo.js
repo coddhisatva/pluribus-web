@@ -10,10 +10,11 @@ const auth = require('../utils/auth');
  * @returns A date-time string in a format that MySQL likes
  */
 function mysqlDatetime(date) {
-	return date.getFullYear() + '-' + String(date.getMonth()).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0')
+	return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0')
 	+ ' ' + String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0')
 	+ ':' + String(date.getSeconds()).padStart(2, '0');
 }
+
 
 /**
  * Set createdAt, updatedAt timestamps for each of the supplied records.
@@ -84,10 +85,11 @@ module.exports = {
 
 		addTimestamps(creators);
 
-		// Set defaults
-		creators.forEach(creator => {
-			creator.displaySupporterCount = true,
-			creator.publicProfile = false
+		// Make the first two creators public
+		creators.forEach((creator, index) => {
+			creator.displaySupporterCount = true;
+			creator.publicProfile = (index < 2);  // First two will be true, rest false
+			console.log(`Creator ${creator.name}: publicProfile = ${creator.publicProfile}`);
 		});
 
 		console.log('Inserting creators');

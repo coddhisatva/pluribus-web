@@ -164,18 +164,18 @@ router.get('/:id', async function(req, res, next) {
 		pledge = await Pledge.findOne({ where: { creatorId: creator.id, userId: req.authUser.id }});
 	}
 
-	var followerCount = await Follow.count({ where: { creatorId: creator.id } });
-	var pledgeSummary = (await sequelize.query('select count(amount) supporterCount, sum(amount) pledgeTotal from Pledges where creatorid = :creatorid',
-		{ replacements: { creatorid: creator.id }, plain: true, raw: true }));
-
-	var supporterCount = new Number(pledgeSummary.supporterCount);
-	var pledgeTotal = new Number(pledgeSummary.pledgeTotal);
-
 	// Don't let users view a Creator's private profile if they're not already invited or following them
-	if(!isFollowing && !creator.publicProfile && !req.authUser.roles.includes(`view-creator-${creator.id}`)) {
+	if(!creator.publicProfile && (!req.authUser || (!isFollowing && !req.authUser.roles?.includes(`view-creator-${creator.id}`)))) {
 		res.status(403).send("This creator's profile is only visible to their followers.");
 		return;
 	}
+
+	var followerCount = await Follow.count({ where: { creatorId: creator.id } });
+	var pledgeSummary = await sequelize.query('select count(amount) supporterCount, sum(amount) pledgeTotal from Pledges where creatorid = :creatorid',
+		{ replacements: { creatorid: creator.id }, plain: true, raw: true });
+
+	var supporterCount = new Number(pledgeSummary.supporterCount);
+	var pledgeTotal = new Number(pledgeSummary.pledgeTotal);
 
 	var creatorViewingOwnProfile = req.authUser && (creator.User.id == req.authUser.id);
 

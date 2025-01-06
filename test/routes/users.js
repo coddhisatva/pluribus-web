@@ -10,7 +10,8 @@ module.exports = (config) => {
 				var res = await fetch(baseURL + '/users/login');
 				assert(res.status == 200);
 				var html = await res.text();
-				assert(/<h1>Log in to Pluribus<\/h1>/.test(html));
+				console.log('Login page h1:', html.match(/<h1[^>]*>(.*?)<\/h1>/)?.[0]);
+				assert(/<h1[^>]*>Log in to Pluribus<\/h1>/.test(html));
 			})
 		});
 	});
