@@ -18,3 +18,26 @@ services:
       - "8025:8025"
       - "1025:1025"
     
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_HOST=db
+      - MYSQL_ROOT_PASSWORD=goop
+    depends_on:
+      - db
+      
+  phpmyadmin-prod:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-prod
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_HOST=host.docker.internal
+      - PMA_PORT=3307
+      - MYSQL_ROOT_PASSWORD=pluribus-w3b
+    volumes:
+      - /run/mysqld/mysqld.sock:/run/mysqld/mysqld.sock
+    
