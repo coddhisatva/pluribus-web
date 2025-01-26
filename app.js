@@ -11,6 +11,7 @@ const email = require('./utils/email');
 const viewUtils = require('./utils/viewUtils');
 const fs = require('fs');
 const helpers = require('./utils/helpers');
+const { startScheduler } = require('./utils/scheduler');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -161,5 +162,9 @@ app.locals.validationMessage = function(paramName) {
 }
 
 app.locals.truncate = helpers.truncate;
+
+if (process.env.NODE_ENV !== 'test') {
+	startScheduler();
+}
 
 module.exports = app;

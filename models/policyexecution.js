@@ -18,7 +18,17 @@ module.exports = (sequelize, DataTypes) => {
     reason: DataTypes.STRING,
     executedAt: DataTypes.DATE,
     // A policy execution has finished processing when all supporters have responded or the response period elapses.
-    processedAt: DataTypes.DATE
+    processedAt: DataTypes.DATE,
+    // Add new fields
+    expiresAt: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    status: {
+      type: DataTypes.ENUM('pending', 'approved', 'rejected'),
+      defaultValue: 'pending',
+      allowNull: false
+    }
   }, {
     sequelize,
     modelName: 'PolicyExecution',
