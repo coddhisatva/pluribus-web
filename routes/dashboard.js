@@ -35,7 +35,20 @@ router.get('/', auth.authorize, async function(req, res, next) {
 	const guild = user.Guild;
 	var following = await Follow.findAll({ where: { userId: user.id }, include: Creator });
 	var guildFollowing = await GuildFollow.findAll({ where: { userId: user.id }, include: Guild });
-	var executed = await PolicyExecutionSupporter.findAll({ where: { userId: user.id, agree: null }, include: { model: PolicyExecution, include: Creator } });
+	var executed = await PolicyExecutionSupporter.findAll({ 
+		where: { 
+			userId: user.id,
+		},
+		include: { 
+			model: PolicyExecution,
+			where: {
+				expiresAt: {
+					[Op.gt]: new Date()
+				}
+			},
+			include: Creator 
+		} 
+	});
 
 	res.render('dashboard/index', { user, creator, guild, following, guildFollowing, executed });
 });

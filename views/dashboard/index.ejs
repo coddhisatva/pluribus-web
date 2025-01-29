@@ -48,12 +48,21 @@
 						</blockquote>
 					</div>
 				</div><!-- .card-body -->
-				<div class="card-footer bg-transparent p-4 d-flex align-items-center justify-content-between">
-					<div class="heading-xs-medium text-strong">Does this meet the criteria you agreed to when you donated?</div>
-					<div>
-						<button onclick="handleVote(<%= execution.PolicyExecution.id %>, false)" class="btn btn-outline px-4 me-2">No</button>
-						<button onclick="handleVote(<%= execution.PolicyExecution.id %>, true)" class="btn btn-primary px-4">Yes</button>
-					</div>
+				<div class="card-footer">
+					<% if (execution.respondedAt) { %>
+						<div class="text-strong">
+							Your vote: <%= execution.agree ? 'Agreed' : 'Disagreed' %>
+						</div>
+						<div class="text-medium">
+							Voting ends <%= when(execution.PolicyExecution.expiresAt) %>
+						</div>
+					<% } else { %>
+						<div>Does this meet the criteria you agreed to when you donated?</div>
+						<div>
+							<button onclick="handleVote(<%= execution.PolicyExecution.id %>, false)" class="btn btn-outline px-4 me-2">No</button>
+							<button onclick="handleVote(<%= execution.PolicyExecution.id %>, true)" class="btn btn-primary px-4">Yes</button>
+						</div>
+					<% } %>
 				</div>
 			</div>
 		<% }) %>
