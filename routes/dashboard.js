@@ -24,6 +24,13 @@ router.get('/', auth.authorize, async function(req, res, next) {
 		include: [
 			{ model: Creator, required: false }, 
 			{ model: Guild, required: false } ] });
+
+	if (!user) {
+		// User in session but not in DB - clear session and redirect to login
+		req.session = null;
+		return res.redirect('/users/login');
+	}
+
 	const creator = user.Creator;
 	const guild = user.Guild;
 	var following = await Follow.findAll({ where: { userId: user.id }, include: Creator });

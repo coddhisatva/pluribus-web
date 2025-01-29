@@ -2,6 +2,7 @@ const assert = require('assert');
 const { PolicyExecution, PolicyExecutionSupporter, Creator, User, Pledge } = require('../../models');
 const auth = require('../../utils/auth');
 const fetch = require('node-fetch');
+const stripe = require('stripe');
 
 describe('Policy Execution Flow', () => {
   let testCreator, testSupporter, creator, baseURL;
@@ -137,7 +138,26 @@ describe('Policy Execution Flow', () => {
       where: { policyExecutionId: executions[0].id }
     });
     assert(supporters.length > 0, 'Should create supporter records');
-    assert(supporters[0].stripePaymentIntentId, 'Should create Stripe hold');
+
+    // New assertions for Stripe holds
+    for (const supporter of supporters) {
+      // Verify payment intent ID format
+      assert(supporter.stripePaymentIntentId.startsWith('pi_test_hold_'), 
+        'Should create Stripe hold with correct ID format');
+      
+      // Verify holdPlacedAt timestamp
+      assert(supporter.holdPlacedAt, 'Should record when hold was placed');
+
+      // Get associated pledge to verify amount
+      const pledge = await Pledge.findByPk(supporter.pledgeId);
+      assert(pledge, 'Should have associated pledge');
+
+      // Verify Stripe mock received correct parameters
+      const paymentIntent = await stripe.paymentIntents.retrieve(supporter.stripePaymentIntentId);
+      assert.equal(paymentIntent.amount, pledge.amount * 100, 'Should create hold for correct amount');
+      assert.equal(paymentIntent.status, 'requires_capture', 'Hold should be pending capture');
+      assert.equal(paymentIntent.capture_method, 'manual', 'Should be created as a hold');
+    }
   });
 
   it('should process supporter responses', async () => {
