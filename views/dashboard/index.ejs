@@ -95,13 +95,17 @@ async function handleVote(executionId, vote) {
 	const btns = card.querySelectorAll('button');
 	
 	try {
+		console.log('Vote value:', vote);  // true for Yes, false for No
 		const response = await fetch(`/dashboard/policy-execution-response/${executionId}`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { 
+				'Content-Type': 'application/json'
+			},
 			body: JSON.stringify({ response: vote ? 'agree' : 'disagree' })
 		});
 		
 		const result = await response.json();
+		console.log('Server response:', result);  // See what the server sends back
 		
 		if (result.status === 'success' || result.status === 'already-voted') {
 			// Disable buttons

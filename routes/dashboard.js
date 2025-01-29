@@ -683,6 +683,10 @@ router.get('/execute-policy/executed', (req, res) => {
 
 router.post('/policy-execution-response/:id', auth.authorize, async (req, res) => {
 	try {
+		console.log('=== Policy Execution Response ===');
+		console.log('Request body:', req.body);
+		console.log('Response value:', req.body.response);
+
 		const execution = await PolicyExecution.findByPk(req.params.id);
 		const supporter = await PolicyExecutionSupporter.findOne({
 			where: {
@@ -702,15 +706,22 @@ router.post('/policy-execution-response/:id', auth.authorize, async (req, res) =
 			});
 		}
 
+		console.log('Before setting agree - response is:', req.body.response);
 		supporter.agree = req.body.response === 'agree';
+		console.log('After setting agree:', supporter.agree);
 		supporter.respondedAt = new Date();
 		await supporter.save();
+
+		const message = supporter.agree ? 
+			'Your agreement has been recorded. The funds will be released to the creator.' :
+			'Your disagreement has been recorded. If more than 50% of supporters disagree within 7 days, the policy execution will be cancelled.';
+		console.log('Sending message:', message);
 
 		res.json({
 			status: 'success',
 			agree: supporter.agree,
 			message: supporter.agree ? 
-				'Your support has been recorded' : 
+				'Your agreement has been recorded. The funds will be released to the creator.' :
 				'Your disagreement has been recorded. If more than 50% of supporters disagree within 7 days, the policy execution will be cancelled.'
 		});
 	} catch (err) {
