@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ... existing head content ... -->
+</head>
+<body class="dashboard">
+    <form method="POST" action="/dashboard/execute-policy/execute">
+        <input type="hidden" name="_csrfToken" value="<%= csrfToken %>" />
+        
+        <div class="form-group">
+            <label>Reason for activation</label>
+            <textarea name="reason" class="form-control" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Activate Pledges</button>
+    </form>
+</body>
+</html> 

@@ -16,6 +16,8 @@ const sharp = require('sharp');
 const credentials = require('../config/credentials');
 const settings = require('../config/settings');
 
+const POLICY_EXECUTION_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds to match Stripe's payment hold limit
+
 router.get('/', auth.authorize, async function(req, res, next) {
 	const user = await User.findOne({
 		where: { id: req.authUser.id }, 
@@ -594,147 +596,57 @@ router.post('/execute-policy/3', auth.authorizeRole('creator'), async function(r
 	res.render('dashboard/execute-policy-step3', { reason, creator });
 });
 
-router.get('/execute-policy/execute', auth.authorizeRole('creator'), async function(req, res, next) {
-	const stripe = require('stripe')(credentials.stripe.secretKey);
-	
-	const user = await User.findOne({ 
-		where: { id: req.authUser.id },
-		include: [
-			{ model: Creator, required: false },
-			{ model: Guild, required: false }
-		]
-	});
-	const creator = user.Creator;
-	const guild = user.Guild;
-
-	// Check for active executions
-	var active = await PolicyExecution.findAll({ where: { creatorId: creator.id, processedAt: null }});
-	if(active && active.length) {
-		res.send("You already have an active policy execution!");
-		return;
-	}
-
-	// Create policy execution with 7-day expiry
-	const reason = req.session.policyExecution.reason;
-	const executedAt = new Date();
-	const expiresAt = new Date(executedAt.getTime() + (7 * 24 * 60 * 60 * 1000));
-	
-	let execution = await PolicyExecution.create({ 
-		creatorId: creator.id, 
-		reason, 
-		executedAt,
-		expiresAt,
-		status: 'pending'
-	});
-
-	// Get pledges and create holds
-	const pledges = await Pledge.findAll({ 
-		where: { creatorId: creator.id },
-		include: [User]  // Include User to get payment info
-	});
-	const guildPledges = !guild ? [] : await GuildPledge.findAll({ 
-		where: { guildId: guild.id },
-		include: [User]
-	});
-
-	const supporters = [];
-	
-	// Process creator pledges
-	for (const pledge of pledges) {
-		try {
-			const paymentIntent = await stripe.paymentIntents.create({
-				amount: pledge.amount * 100, // Convert to cents
-				currency: 'usd',
-				customer: pledge.User.stripeCustomerId,
-				capture_method: 'manual', // This creates a hold
-				payment_method: pledge.User.primaryCardPaymentMethodId,
-				confirm: true, // Confirm immediately
-				metadata: {
-					policyExecutionId: execution.id,
-					pledgeId: pledge.id
-				}
-			});
-
-			supporters.push({
-				policyExecutionId: execution.id,
-				userId: pledge.userId,
-				pledgeId: pledge.id,
-				pledgeSource: 'creator',
-				stripePaymentIntentId: paymentIntent.id,
-				holdPlacedAt: new Date()
-			});
-		} catch (error) {
-			console.error(`Failed to create hold for pledge ${pledge.id}:`, error);
-			// Continue with other pledges even if one fails
-		}
-	}
-
-	// Process guild pledges
-	for (const pledge of guildPledges) {
-		try {
-			const paymentIntent = await stripe.paymentIntents.create({
-				amount: pledge.amount * 100,
-				currency: 'usd',
-				customer: pledge.User.stripeCustomerId,
-				capture_method: 'manual',
-				payment_method: pledge.User.primaryCardPaymentMethodId,
-				confirm: true,
-				metadata: {
-					policyExecutionId: execution.id,
-					pledgeId: pledge.id
-				}
-			});
-
-			supporters.push({
-				policyExecutionId: execution.id,
-				userId: pledge.userId,
-				pledgeId: pledge.id,
-				pledgeSource: 'guild',
-				stripePaymentIntentId: paymentIntent.id,
-				holdPlacedAt: new Date()
-			});
-		} catch (error) {
-			console.error(`Failed to create hold for guild pledge ${pledge.id}:`, error);
-		}
-	}
-
-	await PolicyExecutionSupporter.bulkCreate(supporters);
-
-	// Send notifications
-	var env = req.app.get('env');
-
-	// Notify Pluribus
-	var notifyEmails = [ 'pluribus-dev.prone832@passmail.net' ];
-	if(env != 'development') {
-		notifyEmails.push('help@becomepluribus.com');
-	}
-	email.send(env, { from: 'noreply@becomepluribus.com',
-		to: notifyEmails,
-		subject: `A creator has activated their pledges (${env})`,
-		text: `${creator.name} (id=${creator.id}) activated their pledges at ${req.hostname}:\r\n
-${reason}`
-	});
-
-	// Notify the creator
-	email.send(env, {
-		from: 'help@becomepluribus.com',
-		to: user.email,
-		subject: "You've activated your pledges on Pluribus",
-		text: `Hi ${creator.name},
+router.post('/execute-policy/execute', auth.authorizeRole('creator'), async function(req, res, next) {
+	try {
+		const user = await User.findOne({ where: { id: req.authUser.id }});
+		const creator = await Creator.findOne({ where: { userId: user.id }});
 		
-You've activated your pledges on Pluribus.
+		// Add debug logging
+		console.log('Policy execution attempt:', {
+			userId: user.id,
+			creatorId: creator.id,
+			stripeConnected: creator.stripeConnectedAccountOnboarded,
+			stripeAccountId: creator.stripeConnectedAccountId,
+			stripeSubscriptionId: creator.stripeSubscriptionId
+		});
 
-What happens next?
-==================
-Donors have seven days to object if they feel the claim falls outside the mutually agreed upon parameters or is otherwise perceived to be illegitimate (such as deliberately triggering consequences just to receive a payout). If less than 50% of donors formally object to your claim within a week, the claim is approved and the funds are officially transferred.
+		var checks = await doPolicyExecutionChecks(creator, res);
+		if(checks.error) {
+			console.log('Policy execution checks failed:', checks.error);
+			return res.status(400).json({ error: checks.error });
+		}
 
-The assumption of legitimacy as a baseline as opposed to putting every claim up to a vote is to ensure the security (both financial and psychological) of the recipients. For anyone to object, they must go out of their way to express it- which they will if they feel they've been taken advantage of. Otherwise, there are few reasons why either side would find themselves at odds with the other.
+		const reason = req.body.reason;
+		if (!reason) {
+			throw new Error('No reason provided for policy execution');
+		}
 
+		const execution = await PolicyExecution.create({
+			creatorId: creator.id,
+			reason,
+			status: 'pending',
+			executedAt: new Date(),
+			expiresAt: new Date(Date.now() + POLICY_EXECUTION_DURATION_MS)
+		});
 
-If you have any questions, please get in touch with us at help@becomepluribus.com`
-	});
+		// Create supporter records
+		const pledges = await Pledge.findAll({
+			where: { creatorId: creator.id }
+		});
 
-	res.redirect('/dashboard/execute-policy/executed');
+		await PolicyExecutionSupporter.create({
+			policyExecutionId: execution.id,
+			userId: pledges[0].userId,
+			amount: pledges[0].amount,
+			status: 'pending',
+			pledgeId: pledges[0].id,
+			stripePaymentIntentId: 'pi_mock_' + Date.now() // Add mock Stripe ID for now
+		});
+
+		res.json({ success: true });
+	} catch (err) {
+		next(err);
+	}
 });
 
 router.get('/execute-policy/executed', (req, res) => {
@@ -1215,6 +1127,22 @@ router.post('/guild-cancel-subscription', auth.authorize, csrf.validateToken, as
 
 	req.flash.notice = 'Your subscription was successfully cancelled.';
 	res.redirect('/dashboard/guild-subscription');
+});
+
+router.get('/execute-policy/:id', auth.authorizeRole('creator'), async function(req, res, next) {
+	const user = await User.findOne({ where: { id: req.authUser.id }});
+	const creator = await Creator.findOne({ where: { userId: user.id }});
+
+	console.log('Execute policy route - User:', user.id, 'Creator:', creator.id);
+	
+	// Add debug for template resolution
+	console.log('Template path:', __dirname + '/../views/dashboard/execute-policy.ejs');
+	
+	res.render('dashboard/execute-policy-step1', { // Change template name to match existing structure
+		creator,
+		csrfToken: req.csrfToken(),
+		title: 'Activate pledges'
+	});
 });
 
 module.exports = router;
