@@ -4,9 +4,15 @@
   "private": true,
   "scripts": {
     "devstart": "nodemon --unhandled-rejections=strict ./bin/www",
-    "test": "mocha"
+    "test": "mocha",
+    "test:reset": "docker compose exec db mysql -u root -pgoop -e \"DROP DATABASE IF EXISTS pluribus_test; CREATE DATABASE pluribus_test; GRANT ALL PRIVILEGES ON pluribus_test.* TO 'pluribus-web'@'%';\"",
+    "test:migrate": "NODE_ENV=test npx sequelize-cli db:migrate",
+    "test:seed": "NODE_ENV=test npx sequelize-cli db:seed:all",
+    "test:run": "node -r ./test/setup.js node_modules/.bin/mocha test/test.js",
+    "test:full": "npm run test:reset && npm run test:migrate && npm run test:seed && npm run test:run"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "cookie-parser": "~1.4.4",
     "cookie-session": "^2.0.0",
     "debug": "~2.6.9",

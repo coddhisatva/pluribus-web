@@ -1,25 +1,24 @@
 const nodemailer = require('nodemailer');
-const emailConfig = require('../config/email');
+const config = require('../config/credentials');
 const fs = require('fs/promises');
 
 var email = {
 	dir: 'data/email',
-	send: async function(env, message) {
-		var emailer = nodemailer.createTransport(emailConfig[env]);
-		var info = await emailer.sendMail(message);
+	send: async function(to, subject, text) {
+		// In test mode, just log the email
+		if (process.env.NODE_ENV === 'test') {
+			console.log('Mock email:', { to, subject, text });
+			return;
+		}
 
-		// Save the email
-		var date = new Date();
-		var timestamp = date.getFullYear() + String(date.getMonth()).padStart(2, '0') + String(date.getDate()).padStart(2, '0')
-		+ String(date.getHours()).padStart(2, '0') + String(date.getMinutes()).padStart(2, '0')
-		+ String(date.getSeconds()).padStart(2, '0');
-
-		var filename = timestamp + '-' + message.to + '.json';
-		await fs.mkdir(email.dir, { recursive: true });
-		message.info = info;
-		await fs.writeFile(email.dir + '/' + filename, JSON.stringify(message));		
-
-		return info;
+		// Real email sending for other environments
+		var transporter = nodemailer.createTransport(config.email);
+		await transporter.sendMail({
+			from: config.email.from,
+			to: to,
+			subject: subject,
+			text: text
+		});
 	},
 
 	getSentEmails: async function(page, pageSize) {

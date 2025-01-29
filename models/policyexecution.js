@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       PolicyExecution.belongsTo(models.Creator);
+      PolicyExecution.hasMany(models.PolicyExecutionSupporter);
     }
   }
   PolicyExecution.init({
