@@ -9,7 +9,9 @@
     "test:migrate": "NODE_ENV=test npx sequelize-cli db:migrate",
     "test:seed": "NODE_ENV=test npx sequelize-cli db:seed:all",
     "test:run": "node -r ./test/setup.js node_modules/.bin/mocha test/test.js",
-    "test:full": "npm run test:reset && npm run test:migrate && npm run test:seed && npm run test:run"
+    "test:full": "npm run test:reset && npm run test:migrate && npm run test:seed && npm run test:run",
+    "seed:test-policy": "npx sequelize-cli db:seed --seed 20240320000002-test-policy-execution.js",
+    "setup:test-policy": "NODE_ENV=development node scripts/setupTestPolicyExecution.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
