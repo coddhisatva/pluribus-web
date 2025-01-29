@@ -1,3 +1,6 @@
+// Add storage for created payment intents
+const paymentIntents = new Map();
+
 module.exports = {
   accounts: {
     create: async () => ({ id: 'acct_test123' }),
@@ -9,12 +12,22 @@ module.exports = {
       if (params.capture_method !== 'manual') {
         throw new Error('Payment intent must be created with capture_method: manual');
       }
-      return { 
+      const paymentIntent = { 
         id: 'pi_test_hold_' + Date.now(),
         status: 'requires_capture',
         amount: params.amount,
-        currency: params.currency
+        currency: params.currency,
+        capture_method: params.capture_method
       };
+      paymentIntents.set(paymentIntent.id, paymentIntent);
+      return paymentIntent;
+    },
+    retrieve: async (id) => {
+      const paymentIntent = paymentIntents.get(id);
+      if (!paymentIntent) {
+        throw new Error(`No such payment intent: ${id}`);
+      }
+      return paymentIntent;
     }
   },
   products: {

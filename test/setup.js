@@ -50,8 +50,3 @@ stripeMock.products = {
 };
 
 const testServer = require('./testServer');
-
-// Remove the before/after hooks from here
-
-// Add to test setup
-jest.mock('stripe', () => require('./mocks/stripe'));
