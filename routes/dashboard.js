@@ -621,31 +621,52 @@ router.post('/execute-policy/execute', auth.authorizeRole('creator'), async func
 			throw new Error('No reason provided for policy execution');
 		}
 
-		const execution = await PolicyExecution.create({
-			creatorId: creator.id,
-			reason,
-			status: 'pending',
-			executedAt: new Date(),
-			expiresAt: new Date(Date.now() + POLICY_EXECUTION_DURATION_MS)
-		});
+		const stripe = require('stripe')(credentials.stripe.secretKey);
 
 		// Create supporter records
 		const pledges = await Pledge.findAll({
 			where: { creatorId: creator.id }
 		});
 
-		await PolicyExecutionSupporter.create({
-			policyExecutionId: execution.id,
-			userId: pledges[0].userId,
-			amount: pledges[0].amount,
-			status: 'pending',
-			pledgeId: pledges[0].id,
-			stripePaymentIntentId: 'pi_mock_' + Date.now() // Add mock Stripe ID for now
+		// Create the policy execution record
+		const execution = await PolicyExecution.create({
+			creatorId: creator.id,
+			reason: reason,
+			executedAt: new Date(),
+			expiresAt: new Date(Date.now() + POLICY_EXECUTION_DURATION_MS),
+			status: 'pending'
 		});
+
+		// Create payment holds for each pledge
+		for (const pledge of pledges) {
+			const paymentIntent = await stripe.paymentIntents.create({
+				amount: pledge.amount * 100,
+				currency: 'usd',
+				payment_method_types: ['card'],
+				capture_method: 'manual',
+				confirm: true,
+				customer: user.stripeCustomerId,
+				payment_method: user.primaryCardPaymentMethodId,
+				application_fee_amount: Math.round(pledge.amount * 0.1 * 100),
+				transfer_data: {
+					destination: creator.stripeConnectedAccountId,
+				},
+			});
+
+			// Create supporter record with payment intent
+			await PolicyExecutionSupporter.create({
+				policyExecutionId: execution.id,
+				userId: pledge.userId,
+				pledgeId: pledge.id,
+				stripePaymentIntentId: paymentIntent.id,
+				holdPlacedAt: new Date()
+			});
+		}
 
 		res.json({ success: true });
 	} catch (err) {
-		next(err);
+		console.error('Policy execution failed:', err);
+		res.status(500).json({ error: err.message });
 	}
 });
 
@@ -663,7 +684,9 @@ router.post('/policy-execution-response/:id', auth.authorize, async (req, res) =
 		return;
 	}
 
-	const policyExecutionSupporter = await PolicyExecutionSupporter.findOne({ where: { policyExecutionId: policyExecution.id, userId: user.id }});
+	const policyExecutionSupporter = await PolicyExecutionSupporter.findOne({ 
+		where: { policyExecutionId: policyExecution.id, userId: user.id }
+	});
 	if(!policyExecutionSupporter) {
 		res.status(404).send('You can not respond to this policy');
 		return;

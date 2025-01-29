@@ -15,9 +15,18 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   PolicyExecution.init({
-    creatorId: DataTypes.INTEGER,
-    reason: DataTypes.STRING,
-    executedAt: DataTypes.DATE,
+    creatorId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    reason: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    executedAt: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
     // A policy execution has finished processing when all supporters have responded or the response period elapses.
     processedAt: DataTypes.DATE,
     // Add new fields
@@ -26,8 +35,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     status: {
-      type: DataTypes.ENUM('pending', 'approved', 'rejected'),
-      defaultValue: 'pending',
+      type: DataTypes.STRING,
       allowNull: false
     }
   }, {

@@ -4,10 +4,18 @@ module.exports = {
     retrieve: async () => ({ charges_enabled: true })
   },
   paymentIntents: {
-    create: async () => ({ 
-      id: 'pi_test123',
-      client_secret: 'pi_test123_secret' 
-    })
+    create: async (params) => {
+      // Verify correct params for holds
+      if (params.capture_method !== 'manual') {
+        throw new Error('Payment intent must be created with capture_method: manual');
+      }
+      return { 
+        id: 'pi_test_hold_' + Date.now(),
+        status: 'requires_capture',
+        amount: params.amount,
+        currency: params.currency
+      };
+    }
   },
   products: {
     retrieve: async () => ({
