@@ -712,13 +712,6 @@ router.post('/policy-execution-response/:id', auth.authorize, async (req, res) =
 			return res.status(404).json({ error: 'Policy execution not found' });
 		}
 
-		if (supporter.respondedAt) {
-			return res.json({ 
-				status: 'already-voted',
-				agree: supporter.agree 
-			});
-		}
-
 		console.log('Before setting agree - response is:', req.body.response);
 		supporter.agree = req.body.response === 'agree';
 		console.log('After setting agree:', supporter.agree);
@@ -733,9 +726,7 @@ router.post('/policy-execution-response/:id', auth.authorize, async (req, res) =
 		res.json({
 			status: 'success',
 			agree: supporter.agree,
-			message: supporter.agree ? 
-				'Your agreement has been recorded. The funds will be released to the creator.' :
-				'Your disagreement has been recorded. If more than 50% of supporters disagree within 7 days, the policy execution will be cancelled.'
+			message: message
 		});
 	} catch (err) {
 		console.error(err);

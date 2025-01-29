@@ -50,11 +50,19 @@
 				</div><!-- .card-body -->
 				<div class="card-footer">
 					<% if (execution.respondedAt) { %>
-						<div class="text-strong">
-							Your vote: <%= execution.agree ? 'Agreed' : 'Disagreed' %>
-						</div>
-						<div class="text-medium">
-							Voting ends <%= when(execution.PolicyExecution.expiresAt) %>
+						<div class="d-flex justify-content-between align-items-center">
+							<div>
+								<div class="text-strong">
+									Your vote: <%= execution.agree ? 'Agreed' : 'Disagreed' %>
+								</div>
+								<div class="text-medium">
+									Voting ends <%= when(execution.PolicyExecution.expiresAt) %>
+								</div>
+							</div>
+							<button onclick="handleVote(<%= execution.PolicyExecution.id %>, <%= !execution.agree %>)" 
+									class="btn btn-outline btn-sm">
+								Change Vote
+							</button>
 						</div>
 					<% } else { %>
 						<div>Does this meet the criteria you agreed to when you donated?</div>
@@ -117,14 +125,8 @@ async function handleVote(executionId, vote) {
 		console.log('Server response:', result);  // See what the server sends back
 		
 		if (result.status === 'success' || result.status === 'already-voted') {
-			// Disable buttons
-			btns.forEach(b => b.disabled = true);
-			
-			// Show message
-			const msg = document.createElement('div');
-			msg.className = 'alert alert-info mt-3';
-			msg.textContent = result.message;
-			card.appendChild(msg);
+			// Refresh the page to show updated state
+			window.location.reload();
 		}
 	} catch (err) {
 		console.error(err);
