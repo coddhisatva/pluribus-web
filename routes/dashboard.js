@@ -682,40 +682,40 @@ router.get('/execute-policy/executed', (req, res) => {
 });
 
 router.post('/policy-execution-response/:id', auth.authorize, async (req, res) => {
-	const response = req.body.response;
+	try {
+		const execution = await PolicyExecution.findByPk(req.params.id);
+		const supporter = await PolicyExecutionSupporter.findOne({
+			where: {
+				policyExecutionId: execution.id,
+				userId: req.authUser.id
+			}
+		});
 
-	const user = await User.findByPk(req.authUser.id);
-	const policyExecution = await PolicyExecution.findByPk(req.params.id);
-	if(!policyExecution) {
-		res.status(404).send('Policy execution not found');
-		return;
-	}
+		if (!supporter) {
+			return res.status(404).json({ error: 'Policy execution not found' });
+		}
 
-	const policyExecutionSupporter = await PolicyExecutionSupporter.findOne({ 
-		where: { policyExecutionId: policyExecution.id, userId: user.id }
-	});
-	if(!policyExecutionSupporter) {
-		res.status(404).send('You can not respond to this policy');
-		return;
-	}
+		if (supporter.respondedAt) {
+			return res.json({ 
+				status: 'already-voted',
+				agree: supporter.agree 
+			});
+		}
 
-	switch(response) {
-		case 'agree':
-			policyExecutionSupporter.agree = true;
-			policyExecutionSupporter.respondedAt = new Date();
-			await policyExecutionSupporter.save();
-			req.flash.notice = "Your answer has been recorded. Thanks!";
-			res.redirect(`/dashboard/policy-execution-response/${req.params.id}/agreed`);
-			return;
-		case 'disagree':
-			policyExecutionSupporter.agree = false;
-			policyExecutionSupporter.respondedAt = new Date();
-			await policyExecutionSupporter.save();
-			res.render('/dashboard/policy-execution-response-disagreed');
-			return;
-		default:
-			res.status(400).send('Invalid response');
-			return;
+		supporter.agree = req.body.response === 'agree';
+		supporter.respondedAt = new Date();
+		await supporter.save();
+
+		res.json({
+			status: 'success',
+			agree: supporter.agree,
+			message: supporter.agree ? 
+				'Your support has been recorded' : 
+				'Your disagreement has been recorded. If more than 50% of supporters disagree within 7 days, the policy execution will be cancelled.'
+		});
+	} catch (err) {
+		console.error(err);
+		res.status(500).json({ error: 'Server error' });
 	}
 });
 

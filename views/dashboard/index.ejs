@@ -50,10 +50,10 @@
 				</div><!-- .card-body -->
 				<div class="card-footer bg-transparent p-4 d-flex align-items-center justify-content-between">
 					<div class="heading-xs-medium text-strong">Does this meet the criteria you agreed to when you donated?</div>
-					<form method="post" action="/dashboard/policy-execution-response/<%= execution.id %>">
-						<button name="response" value="disagree" class="btn btn-outline px-4 me-2">No</a>
-						<button name="response" value="agree" class="btn btn-primary px-4">Yes</a>
-					</form>
+					<div>
+						<button onclick="handleVote(<%= execution.PolicyExecution.id %>, false)" class="btn btn-outline px-4 me-2">No</button>
+						<button onclick="handleVote(<%= execution.PolicyExecution.id %>, true)" class="btn btn-primary px-4">Yes</button>
+					</div>
 				</div>
 			</div>
 		<% }) %>
@@ -87,3 +87,35 @@
 </div>
 
 <%- contentFor('aside') %>
+
+<script>
+async function handleVote(executionId, vote) {
+	const btn = event.target;
+	const card = btn.closest('.execution');
+	const btns = card.querySelectorAll('button');
+	
+	try {
+		const response = await fetch(`/dashboard/policy-execution-response/${executionId}`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ response: vote ? 'agree' : 'disagree' })
+		});
+		
+		const result = await response.json();
+		
+		if (result.status === 'success' || result.status === 'already-voted') {
+			// Disable buttons
+			btns.forEach(b => b.disabled = true);
+			
+			// Show message
+			const msg = document.createElement('div');
+			msg.className = 'alert alert-info mt-3';
+			msg.textContent = result.message;
+			card.appendChild(msg);
+		}
+	} catch (err) {
+		console.error(err);
+		alert('Error recording vote');
+	}
+}
+</script>
