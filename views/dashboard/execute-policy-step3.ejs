@@ -5,17 +5,20 @@ _locals.noSidenav = true;
 <link rel="stylesheet" href="/css/steps.css" />
 
 <div id="step3" class="step rounded border bg-white p-4 mb-5">
-	<h5 class="heading-md-weak text-strong">Step 3 of 3</h5>
-	<h1 class="display-xxs text-strong">Review your protection plan</h1>
-	<p>
-		Please review the message your supporters will see.
-	</p>
-	<div class="rounded fill-neutral-light p-3" style="white-space:pre-wrap;"><%= reason %></div>
+	<form method="post" action="/dashboard/execute-policy/execute">
+		<input type="hidden" name="reason" value="<%= reason %>" />
+		<h5 class="heading-md-weak text-strong">Step 3 of 3</h5>
+		<h1 class="display-xxs text-strong">Review your protection plan</h1>
+		<p>
+			Please review the message your supporters will see.
+		</p>
+		<div class="rounded fill-neutral-light p-3" style="white-space:pre-wrap;"><%= reason %></div>
 
-	<div class="my-3 text-end">
-		<a href="#" id="backBtn" class="btn btn-outline btn-lg me-2">Back</a>
-		<button id="continueBtn" class="btn btn-primary btn-lg">Activate pledges</button>
-	</div>
+		<div class="my-3 text-end">
+			<a href="#" id="backBtn" class="btn btn-outline btn-lg me-2">Back</a>
+			<button type="submit" id="continueBtn" class="btn btn-primary btn-lg">Activate pledges</button>
+		</div>
+	</form>
 </div>
 
 <script>
@@ -32,8 +35,7 @@ _locals.noSidenav = true;
 		history.go(-1);
 	});
 
-	// Add loading state when form submits
-	document.querySelector('form').addEventListener('submit', function() {
+	document.querySelector('form').addEventListener('submit', function(e) {
 		document.body.classList.add('page-loading');
 	});
 </script>
