@@ -9,7 +9,7 @@ module.exports = {
   paymentIntents: {
     create: async (params) => {
       const paymentIntent = {
-        id: 'pi_test_hold_' + Math.random().toString(36).substring(7),
+        id: params.id || 'pi_test_hold_' + Math.random().toString(36).substring(7),
         amount: params.amount,
         currency: params.currency,
         status: 'requires_capture',

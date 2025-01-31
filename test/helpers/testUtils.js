@@ -58,7 +58,7 @@ async function createSupportersWithPledges(numSupporters, creator) {
   return supporters;
 }
 
-async function executePolicyWithReason(baseURL, authCookies, csrfToken, reason) {
+async function executePolicyWithReason(baseURL, authCookies, csrfToken, reason, options = {}) {
   // Step 1 - Initial page
   await fetch(`${baseURL}/dashboard/execute-policy/1`, {
     headers: { Cookie: authCookies.join('; ') }
@@ -76,17 +76,25 @@ async function executePolicyWithReason(baseURL, authCookies, csrfToken, reason) 
       'Content-Type': 'application/x-www-form-urlencoded',
       Cookie: authCookies.join('; ')
     },
-    body: new URLSearchParams({ _csrfToken: csrfToken, reason }).toString()
+    body: new URLSearchParams({ 
+      _csrfToken: csrfToken, 
+      reason,
+      skipStripeChecks: options.skipStripeChecks 
+    }).toString()
   });
 
-  // Execute policy - no need to send reason again
+  // Step 4 - Execute policy
   return await fetch(`${baseURL}/dashboard/execute-policy/execute`, {
     method: 'POST',
     headers: { 
       'Content-Type': 'application/x-www-form-urlencoded',
       Cookie: authCookies.join('; ')
     },
-    body: new URLSearchParams({ _csrfToken: csrfToken, reason }).toString()
+    body: new URLSearchParams({ 
+      _csrfToken: csrfToken, 
+      reason,
+      skipStripeChecks: options.skipStripeChecks
+    }).toString()
   });
 }
 
