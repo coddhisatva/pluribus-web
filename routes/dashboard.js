@@ -526,13 +526,16 @@ router.get('/policy', auth.authorizeRole('creator'), async function(req, res, ne
 				[Op.gt]: new Date()
 			}
 		},
+		raw: true,
 		attributes: {
 			include: [
-				[sequelize.literal('(SELECT COUNT(*) FROM PolicyExecutionSupporters WHERE PolicyExecutionSupporters.policyExecutionId = PolicyExecution.id AND agree = true)'), 'agreeCount'],
-				[sequelize.literal('(SELECT COUNT(*) FROM PolicyExecutionSupporters WHERE PolicyExecutionSupporters.policyExecutionId = PolicyExecution.id AND agree = false)'), 'disagreeCount']
+				[sequelize.literal('COALESCE((SELECT COUNT(*) FROM PolicyExecutionSupporters WHERE PolicyExecutionSupporters.policyExecutionId = PolicyExecution.id AND agree = true), 0)'), 'agreeCount'],
+				[sequelize.literal('COALESCE((SELECT COUNT(*) FROM PolicyExecutionSupporters WHERE PolicyExecutionSupporters.policyExecutionId = PolicyExecution.id AND agree = false), 0)'), 'disagreeCount']
 			]
 		}
 	});
+
+	console.log('Active execution:', activeExecution);
 
 	var pledgeTotal = new Number(totalPledges.pledgeTotal);
 	res.render('dashboard/policy', { 

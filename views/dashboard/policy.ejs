@@ -45,6 +45,7 @@ _locals.nav = 'policy';
 			<h4>Active Policy Execution</h4>
 			<p>Your policy protection was activated on <%= activeExecution.executedAt.toLocaleDateString() %></p>
 			<p>Reason: <%= activeExecution.reason %></p>
+			<% console.log('Template values:', activeExecution.agreeCount, activeExecution.disagreeCount) %>
 			<p>Votes: <span class="text-success"><%= activeExecution.agreeCount %> agree</span> / <span class="text-danger"><%= activeExecution.disagreeCount %> disagree</span></p>
 			<p>Voting period ends: <%= activeExecution.expiresAt.toLocaleDateString() %></p>
 			<div class="progress mt-2">
