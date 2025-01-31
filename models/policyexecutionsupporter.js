@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
   class PolicyExecutionSupporter extends Model {
     static associate(models) {
       PolicyExecutionSupporter.belongsTo(models.PolicyExecution);
+      PolicyExecutionSupporter.belongsTo(models.User);
     }
   }
   PolicyExecutionSupporter.init({

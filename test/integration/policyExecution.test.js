@@ -1,8 +1,11 @@
 const assert = require('assert');
+const { expect } = require('chai');
 const { PolicyExecution, PolicyExecutionSupporter, Creator, User, Pledge } = require('../../models');
 const auth = require('../../utils/auth');
 const fetch = require('node-fetch');
-const stripe = require('stripe');
+const stripe = require('../mocks/stripe');
+const email = require('../../utils/email');
+const { loginAsCreator, createSupportersWithPledges, executePolicyWithReason } = require('../helpers/testUtils');
 
 describe('Policy Execution Flow', () => {
   let testCreator, testSupporter, creator, baseURL;
@@ -25,19 +28,6 @@ describe('Policy Execution Flow', () => {
       displayPledgeTotal: true
     });
 
-    testSupporter = await User.create({
-      email: 'testsupporter@test.com',
-      password: auth.hashPassword('test123')
-    });
-
-    // Create a pledge
-    await Pledge.create({
-      userId: testSupporter.id,
-      creatorId: creator.id,
-      amount: 50,
-      frequency: 'one-time'
-    });
-
     // Add required Stripe setup
     creator.stripeConnectedAccountId = 'acct_test123';
     creator.stripeConnectedAccountOnboarded = true;
@@ -57,75 +47,14 @@ describe('Policy Execution Flow', () => {
   it('should create a policy execution with holds', async function() {
     this.timeout(10000);
     
-    // 1. Get login page to get CSRF token
-    const loginPageRes = await fetch(baseURL + '/users/login');
-    const loginHtml = await loginPageRes.text();
-    const csrfMatch = loginHtml.match(/<input[^>]*name="_csrfToken"[^>]*value="([^"]*)"[^>]*>/);
-    const csrfToken = csrfMatch[1];
+    const { csrfToken, authCookies } = await loginAsCreator(baseURL, 'testcreator@test.com', 'test123');
 
-    // 2. Login as creator
-    const loginRes = await fetch(baseURL + '/users/login', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Cookie': loginPageRes.headers.raw()['set-cookie'].join('; ')
-      },
-      redirect: 'manual',
-      body: new URLSearchParams({
-        email: 'testcreator@test.com',
-        password: 'test123',
-        _csrfToken: csrfToken
-      }).toString()
-    });
+    // Create supporters first
+    const supporters = await createSupportersWithPledges(3, creator);
+    console.log('Created test supporters:', supporters.map(s => s.email));
 
-    const authCookies = loginRes.headers.raw()['set-cookie'];
-
-    // 3. Step 1 - Initial page
-    const step1Res = await fetch(baseURL + '/dashboard/execute-policy/1', {
-      headers: { 
-        Cookie: authCookies.join('; ')
-      }
-    });
-
-    // 4. Step 2 - Enter reason
-    const step2Res = await fetch(baseURL + '/dashboard/execute-policy/2', {
-      headers: { 
-        Cookie: authCookies.join('; ')
-      }
-    });
-
-    // 5. Step 3 - Submit reason
-    const step3Res = await fetch(baseURL + '/dashboard/execute-policy/3', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Cookie: authCookies.join('; ')
-      },
-      body: new URLSearchParams({
-        _csrfToken: csrfToken,
-        reason: 'Test execution'
-      }).toString()
-    });
-
-    // 6. Execute policy
-    const executionRes = await fetch(baseURL + '/dashboard/execute-policy/execute', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Cookie: authCookies.join('; ')
-      },
-      body: new URLSearchParams({
-        _csrfToken: csrfToken,
-        reason: 'Test execution'
-      }).toString()
-    });
-
-    // Add debug logging
-    console.log('Execution response status:', executionRes.status);
-    const executionResponseText = await executionRes.text();
-    console.log('Execution response:', executionResponseText);
-
-    assert.equal(executionRes.status, 200, 'Should execute policy successfully');
+    const response = await executePolicyWithReason(baseURL, authCookies, csrfToken, 'Test execution');
+    assert.equal(response.status, 200, 'Should execute policy successfully');
 
     // 7. Verify supporter records and holds were created
     const executions = await PolicyExecution.findAll({
@@ -134,13 +63,13 @@ describe('Policy Execution Flow', () => {
     console.log('Found executions:', executions);
     assert(executions.length > 0, 'Should create policy execution');
 
-    const supporters = await PolicyExecutionSupporter.findAll({
+    const supportersCreated = await PolicyExecutionSupporter.findAll({
       where: { policyExecutionId: executions[0].id }
     });
-    assert(supporters.length > 0, 'Should create supporter records');
+    assert(supportersCreated.length > 0, 'Should create supporter records');
 
     // New assertions for Stripe holds
-    for (const supporter of supporters) {
+    for (const supporter of supportersCreated) {
       // Verify payment intent ID format
       assert(supporter.stripePaymentIntentId.startsWith('pi_test_hold_'), 
         'Should create Stripe hold with correct ID format');
@@ -166,6 +95,38 @@ describe('Policy Execution Flow', () => {
 
   it('should handle execution expiration', async () => {
     // Test what happens when execution period ends
+  });
+
+  it('should send emails to supporters when policy is executed', async function() {
+    this.timeout(10000);
+    
+    const { csrfToken, authCookies } = await loginAsCreator(baseURL, 'testcreator@test.com', 'test123');
+
+    await createSupportersWithPledges(3, creator);
+
+    const response = await executePolicyWithReason(baseURL, authCookies, csrfToken, 'Test execution reason');
+    expect(response.status).to.equal(200);
+    
+    // Verify emails were sent
+    const sentEmails = await email.getSentEmails(1);
+    console.log('Sent emails:', sentEmails);
+    expect(sentEmails.emails.length).to.equal(3); // Should send to all supporters
+
+    // Verify first email content
+    const firstEmail = sentEmails.emails[0];
+    expect(firstEmail.to).to.equal('testsupporter@test.com');
+    expect(firstEmail.subject).to.contain('has activated their policy protection');
+    expect(firstEmail.text).to.contain('Test execution reason'); // Verify reason included
+    expect(firstEmail.text).to.contain('7 days to review'); // Verify voting window mentioned
+    expect(firstEmail.text).to.contain('Test Creator'); // Verify creator name
+
+    // Verify all supporters received emails
+    const emailRecipients = sentEmails.emails.map(e => e.to).sort();
+    expect(emailRecipients).to.deep.equal([
+      'testsupporter1@test.com',
+      'testsupporter2@test.com',
+      'testsupporter3@test.com'
+    ].sort());
   });
 
   // Add more test cases

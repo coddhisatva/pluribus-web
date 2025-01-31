@@ -3,6 +3,7 @@ const config = {
 };
 
 const testServer = require('./testServer');
+const fs = require('fs').promises;
 
 // Add timeout configuration
 const TEST_TIMEOUT = 30000; // Increase to 30 seconds
@@ -10,12 +11,19 @@ const TEST_TIMEOUT = 30000; // Increase to 30 seconds
 // Start server before all tests
 before(async function() {
 	this.timeout(TEST_TIMEOUT);
+	// Create test email directory
+	await fs.mkdir('data/test/email', { recursive: true });
 	await testServer.start();
 });
 
 // Stop server after all tests
 after(async function() {
 	this.timeout(TEST_TIMEOUT);
+	try {
+		await fs.rm('data/test/email', { recursive: true });
+	} catch (err) {
+		console.log('Could not remove test email directory:', err);
+	}
 	await testServer.stop();
 });
 

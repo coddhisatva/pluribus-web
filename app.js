@@ -12,6 +12,7 @@ const viewUtils = require('./utils/viewUtils');
 const fs = require('fs');
 const helpers = require('./utils/helpers');
 const { startScheduler } = require('./utils/scheduler');
+const credentials = require('./config/credentials');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');

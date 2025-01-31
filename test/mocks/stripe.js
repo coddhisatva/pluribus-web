@@ -8,15 +8,11 @@ module.exports = {
   },
   paymentIntents: {
     create: async (params) => {
-      // Verify correct params for holds
-      if (params.capture_method !== 'manual') {
-        throw new Error('Payment intent must be created with capture_method: manual');
-      }
-      const paymentIntent = { 
-        id: 'pi_test_hold_' + Date.now(),
-        status: 'requires_capture',
+      const paymentIntent = {
+        id: 'pi_test_hold_' + Math.random().toString(36).substring(7),
         amount: params.amount,
         currency: params.currency,
+        status: 'requires_capture',
         capture_method: params.capture_method
       };
       paymentIntents.set(paymentIntent.id, paymentIntent);

@@ -15,6 +15,8 @@ require('../utils/handleAsyncErrors').fixRouter(router);
 const sharp = require('sharp');
 const credentials = require('../config/credentials');
 const settings = require('../config/settings');
+const ejs = require('ejs');
+const config = require('../config/credentials');
 
 const POLICY_EXECUTION_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds to match Stripe's payment hold limit
 
@@ -612,7 +614,6 @@ router.post('/execute-policy/3', auth.authorizeRole('creator'), async function(r
 	}
 
 	const reason = req.body.reason;
-	req.session.policyExecution = { reason };
 	res.render('dashboard/execute-policy-step3', { reason, creator });
 });
 
@@ -643,7 +644,7 @@ router.post('/execute-policy/execute', auth.authorizeRole('creator'), async func
 
 		const stripe = require('stripe')(credentials.stripe.secretKey);
 
-		// Create supporter records
+		// Get all pledges for this creator
 		const pledges = await Pledge.findAll({
 			where: { creatorId: creator.id }
 		});
@@ -657,30 +658,61 @@ router.post('/execute-policy/execute', auth.authorizeRole('creator'), async func
 			status: 'pending'
 		});
 
+		// Reload execution with Creator data for the email
+		const executionWithCreator = await PolicyExecution.findByPk(execution.id, {
+			include: [Creator]
+		});
+
+		// Get all supporters who have pledged to this creator
+		const supporters = await PolicyExecutionSupporter.findAll({
+			where: { policyExecutionId: execution.id },
+			include: [
+				{ 
+					model: User,
+					attributes: ['email', 'name']
+				}
+			]
+		});
+
 		// Create payment holds for each pledge
 		for (const pledge of pledges) {
+			const supporter = await User.findByPk(pledge.userId);
 			const paymentIntent = await stripe.paymentIntents.create({
 				amount: pledge.amount * 100,
 				currency: 'usd',
 				payment_method_types: ['card'],
 				capture_method: 'manual',
-				confirm: true,
-				customer: user.stripeCustomerId,
-				payment_method: user.primaryCardPaymentMethodId,
-				application_fee_amount: Math.round(pledge.amount * 0.1 * 100),
-				transfer_data: {
-					destination: creator.stripeConnectedAccountId,
-				},
+				customer: supporter.stripeCustomerId
 			});
 
 			// Create supporter record with payment intent
 			await PolicyExecutionSupporter.create({
 				policyExecutionId: execution.id,
-				userId: pledge.userId,
+				userId: supporter.id,
 				pledgeId: pledge.id,
 				stripePaymentIntentId: paymentIntent.id,
 				holdPlacedAt: new Date()
 			});
+
+			// Get creator info for email
+			const creator = await Creator.findByPk(execution.creatorId);
+			
+			// Send email to supporter
+			const siteUrl = config.siteUrl;
+			const emailText = await ejs.renderFile(
+				path.join(__dirname, '../views/emails/policy-execution-created.ejs'),
+				{ 
+					supporter: { User: supporter },
+					execution: { Creator: creator, reason },
+					siteUrl 
+				}
+			);
+			
+			await email.send(
+				supporter.email,
+				`${creator.name} has activated their policy protection`,
+				emailText
+			);
 		}
 
 		res.json({ success: true });

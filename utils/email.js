@@ -3,11 +3,20 @@ const config = require('../config/credentials');
 const fs = require('fs/promises');
 
 var email = {
-	dir: 'data/email',
+	dir: process.env.NODE_ENV === 'test' ? 'data/test/email' : 'data/email',
 	send: async function(to, subject, text) {
 		// In test mode, just log the email
 		if (process.env.NODE_ENV === 'test') {
-			console.log('Mock email:', { to, subject, text });
+			// Ensure directory exists
+			const fs = require('fs').promises;
+			await fs.mkdir(this.dir, { recursive: true });
+			console.log('Sending test email:', { to, subject, text });
+			// Save email for test verification
+			const timestamp = new Date().toISOString().replace(/[^0-9]/g, '').slice(0, 14);
+			await fs.writeFile(
+				`${this.dir}/${timestamp}-${Math.random().toString(36).substring(7)}.json`,
+				JSON.stringify({ to, subject, text })
+			);
 			return;
 		}
 
