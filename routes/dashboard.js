@@ -700,13 +700,12 @@ router.post('/execute-policy/execute', auth.authorizeRole('creator'), async func
 			
 			// Send email to supporter
 			if (req.body.skipEmails !== 'true') {
-				const siteUrl = config.siteUrl;
 				const emailText = await ejs.renderFile(
 					path.join(__dirname, '../views/emails/policy-execution-created.ejs'),
 					{ 
 						supporter: { User: supporter },
 						execution: { Creator: creator, reason },
-						siteUrl 
+						siteUrl: `${req.protocol}://${req.get('host')}`
 					}
 				);
 				

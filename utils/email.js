@@ -24,16 +24,13 @@ var email = {
 		}
 
 		// Real email sending for other environments
-		var transporter = nodemailer.createTransport({
-			host: emailConfig.host,
-			port: emailConfig.port,
-			auth: emailConfig.auth
-		});
+		var transporter = nodemailer.createTransport(emailConfig);
 		await transporter.sendMail({
 			from: emailConfig.from,
 			to: to,
 			subject: subject,
-			text: text
+			html: text,
+			text: text.text || text
 		});
 	},
 
