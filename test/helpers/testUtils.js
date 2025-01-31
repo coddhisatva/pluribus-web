@@ -70,17 +70,8 @@ async function executePolicyWithReason(baseURL, authCookies, csrfToken, reason, 
   });
 
   // Step 3 - Submit reason
-  await fetch(`${baseURL}/dashboard/execute-policy/3`, {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Cookie: authCookies.join('; ')
-    },
-    body: new URLSearchParams({ 
-      _csrfToken: csrfToken, 
-      reason,
-      skipStripeChecks: options.skipStripeChecks 
-    }).toString()
+  await fetch(`${baseURL}/dashboard/execute-policy/3?reason=${encodeURIComponent(reason)}`, {
+    headers: { Cookie: authCookies.join('; ') }
   });
 
   // Step 4 - Execute policy

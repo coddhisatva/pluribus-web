@@ -604,15 +604,21 @@ router.get('/execute-policy/2', auth.authorizeRole('creator'), async function(re
 	res.render('dashboard/execute-policy-step2');
 });
 
-router.post('/execute-policy/3', auth.authorizeRole('creator'), async function(req, res, next) {
+router.get('/execute-policy/3', auth.authorizeRole('creator'), async function(req, res, next) {
 	const user = await User.findOne({ where: { id: req.authUser.id }});
 	const creator = await Creator.findOne({ where: { userId: user.id }});
-	const reason = req.body.reason;
+	const reason = req.query.reason;
 	res.render('dashboard/execute-policy-step3', { reason, creator });
 });
 
 router.post('/execute-policy/execute', auth.authorizeRole('creator'), async function(req, res, next) {
 	try {
+		console.log('\n=== EXECUTE POLICY REQUEST ===');
+		console.log('Headers:', req.headers);
+		console.log('Body:', req.body);
+		console.log('Query:', req.query);
+		console.log('=== END REQUEST INFO ===\n');
+
 		const user = await User.findOne({ where: { id: req.authUser.id }});
 		const creator = await Creator.findOne({ where: { userId: user.id }});
 		
@@ -649,12 +655,6 @@ router.post('/execute-policy/execute', auth.authorizeRole('creator'), async func
 			status: 'pending'
 		});
 		console.log('Created execution:', execution.id);
-
-		// Get all supporters who have pledged to this creator
-		const supporters = await PolicyExecutionSupporter.findAll({
-			where: { policyExecutionId: execution.id },
-			include: [{ model: User }]
-		});
 
 		// Create payment holds for each pledge
 		for (const pledge of pledges) {
@@ -696,9 +696,6 @@ router.post('/execute-policy/execute', auth.authorizeRole('creator'), async func
 				holdPlacedAt: new Date()
 			});
 			console.log('Created supporter record');
-			
-			// Get creator info for email
-			const creator = await Creator.findByPk(execution.creatorId);
 			
 			// Send email to supporter
 			const siteUrl = config.siteUrl;

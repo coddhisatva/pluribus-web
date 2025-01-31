@@ -33,6 +33,9 @@ describe('Policy Execution Flow', () => {
     creator.stripeConnectedAccountOnboarded = true;
     creator.stripeSubscriptionId = 'sub_test123';
     await creator.save();
+
+    // Clear test emails before each test
+    await email.clearTestEmails();
   });
 
   afterEach(async () => {
@@ -48,13 +51,11 @@ describe('Policy Execution Flow', () => {
     this.timeout(10000);
     
     const { csrfToken, authCookies } = await loginAsCreator(baseURL, 'testcreator@test.com', 'test123');
-
-    // Create supporters first
     const supporters = await createSupportersWithPledges(3, creator);
-    console.log('Created test supporters:', supporters.map(s => s.email));
 
     const response = await executePolicyWithReason(baseURL, authCookies, csrfToken, 'Test execution', {
-      skipStripeChecks: false
+      skipStripeChecks: false,
+      skipEmails: true
     });
     assert.equal(response.status, 200, 'Should execute policy successfully');
 
@@ -106,11 +107,11 @@ describe('Policy Execution Flow', () => {
     const { csrfToken, authCookies } = await loginAsCreator(baseURL, 'testcreator@test.com', 'test123');
     console.log('Logged in as creator');
 
-    await createSupportersWithPledges(3, creator);
-    console.log('Created supporters with pledges');
+    const supporters = await createSupportersWithPledges(3, creator);
 
     const response = await executePolicyWithReason(baseURL, authCookies, csrfToken, 'Test execution reason', {
-      skipStripeChecks: true
+      skipStripeChecks: true,
+      skipEmails: false
     });
     console.log('Execute policy response:', response.status);
     

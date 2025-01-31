@@ -77,6 +77,18 @@ var email = {
 		}
 
 		return result;
+	},
+
+	clearTestEmails: async function() {
+		if (process.env.NODE_ENV !== 'test') {
+			throw new Error('clearTestEmails can only be called in test environment');
+		}
+		try {
+			await fs.rm(this.dir, { recursive: true, force: true });
+			await fs.mkdir(this.dir, { recursive: true });
+		} catch (err) {
+			console.error('Error clearing test emails:', err);
+		}
 	}
 };
 
