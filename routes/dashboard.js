@@ -17,6 +17,7 @@ const credentials = require('../config/credentials');
 const settings = require('../config/settings');
 const ejs = require('ejs');
 const config = require('../config/credentials');
+const nodemailer = require('nodemailer');
 
 const POLICY_EXECUTION_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds to match Stripe's payment hold limit
 
@@ -604,10 +605,10 @@ router.get('/execute-policy/2', auth.authorizeRole('creator'), async function(re
 	res.render('dashboard/execute-policy-step2');
 });
 
-router.get('/execute-policy/3', auth.authorizeRole('creator'), async function(req, res, next) {
+router.post('/execute-policy/3', auth.authorizeRole('creator'), async function(req, res, next) {
 	const user = await User.findOne({ where: { id: req.authUser.id }});
 	const creator = await Creator.findOne({ where: { userId: user.id }});
-	const reason = req.query.reason;
+	const reason = req.body.reason;
 	res.render('dashboard/execute-policy-step3', { reason, creator });
 });
 
@@ -698,22 +699,24 @@ router.post('/execute-policy/execute', auth.authorizeRole('creator'), async func
 			console.log('Created supporter record');
 			
 			// Send email to supporter
-			const siteUrl = config.siteUrl;
-			const emailText = await ejs.renderFile(
-				path.join(__dirname, '../views/emails/policy-execution-created.ejs'),
-				{ 
-					supporter: { User: supporter },
-					execution: { Creator: creator, reason },
-					siteUrl 
-				}
-			);
-			
-			console.log('Sending email to:', supporter.email);
-			await email.send(
-				supporter.email,
-				`${creator.name} has activated their policy protection`,
-				emailText
-			);
+			if (req.body.skipEmails !== 'true') {
+				const siteUrl = config.siteUrl;
+				const emailText = await ejs.renderFile(
+					path.join(__dirname, '../views/emails/policy-execution-created.ejs'),
+					{ 
+						supporter: { User: supporter },
+						execution: { Creator: creator, reason },
+						siteUrl 
+					}
+				);
+				
+				console.log('Sending email to:', supporter.email);
+				await email.send(
+					supporter.email,
+					`${creator.name} has activated their policy protection`,
+					emailText
+				);
+			}
 		}
 
 		console.log('\n=== EXECUTE POLICY ENDPOINT END ===\n');
@@ -1223,5 +1226,41 @@ router.get('/execute-policy/:id', auth.authorizeRole('creator'), async function(
 		title: 'Activate pledges'
 	});
 });
+
+// Only enabled in test environment
+if (process.env.NODE_ENV === 'test') {
+  router.get('/test/emails', async (req, res) => {
+    const emails = await email.getSentEmails(1);
+    res.render('test/emails', { emails: emails.emails });
+  });
+
+  // Manual test endpoint that bypasses test mode
+  router.post('/test/send-real-email', async (req, res) => {
+    try {
+      const { to, subject, text } = req.body;
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.TEST_EMAIL_USER,
+          pass: process.env.TEST_EMAIL_PASS
+        }
+      });
+      
+      await transporter.sendMail({
+        from: process.env.TEST_EMAIL_USER,
+        to,
+        subject,
+        html: text
+      });
+      
+      res.json({ success: true });
+    } catch (err) {
+      console.error('Failed to send real email:', err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+}
 
 module.exports = router;

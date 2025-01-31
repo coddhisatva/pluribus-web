@@ -38,10 +38,13 @@ _locals.noSidenav = true;
 	});
 
 	function toggleContinue() {
-		continueBtn.disabled = !reason.value
+		continueBtn.disabled = !reason.value.trim();
 	}
 
 	reason.addEventListener('input', toggleContinue);
 	window.addEventListener('load', toggleContinue);
 
+	document.querySelector('form').addEventListener('submit', function(e) {
+		document.body.classList.add('page-loading');
+	});
 </script>

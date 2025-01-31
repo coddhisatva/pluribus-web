@@ -32,16 +32,8 @@ _locals.noSidenav = true;
 		history.go(-1);
 	});
 
-	function toggleContinue() {
-		continueBtn.disabled = !reason.value
-	}
-
-	continueBtn.addEventListener('click', function(e) {
-		// Simulate sending the email to donors
+	// Add loading state when form submits
+	document.querySelector('form').addEventListener('submit', function() {
 		document.body.classList.add('page-loading');
-		setTimeout(function() {
-			document.location = '/dashboard/execute-policy/execute';
-		}, 2000);
-	})
-
+	});
 </script>
