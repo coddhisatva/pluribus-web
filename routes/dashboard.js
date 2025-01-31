@@ -517,8 +517,31 @@ router.get('/policy', auth.authorizeRole('creator'), async function(req, res, ne
 	var totalPledges = (await sequelize.query('select sum(amount) pledgeTotal from Pledges where creatorid = :creatorid',
 		{ replacements: { creatorid: creator.id }, plain: true, raw: true }));
 
+	// Get active policy execution
+	const activeExecution = await PolicyExecution.findOne({
+		where: {
+			creatorId: creator.id,
+			processedAt: null,
+			expiresAt: {
+				[Op.gt]: new Date()
+			}
+		},
+		attributes: {
+			include: [
+				[sequelize.literal('(SELECT COUNT(*) FROM PolicyExecutionSupporters WHERE PolicyExecutionSupporters.policyExecutionId = PolicyExecution.id AND agree = true)'), 'agreeCount'],
+				[sequelize.literal('(SELECT COUNT(*) FROM PolicyExecutionSupporters WHERE PolicyExecutionSupporters.policyExecutionId = PolicyExecution.id AND agree = false)'), 'disagreeCount']
+			]
+		}
+	});
+
 	var pledgeTotal = new Number(totalPledges.pledgeTotal);
-	res.render('dashboard/policy', { user, creator, policy: creator.policy, pledgeTotal });
+	res.render('dashboard/policy', { 
+		user, 
+		creator, 
+		policy: creator.policy, 
+		pledgeTotal,
+		activeExecution 
+	});
 });
 
 router.post('/policy',
