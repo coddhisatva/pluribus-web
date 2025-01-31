@@ -1,6 +1,9 @@
 const nodemailer = require('nodemailer');
-const config = require('../config/credentials');
+const config = require('../config/email');
 const fs = require('fs/promises');
+
+const env = process.env.NODE_ENV || 'development';
+const emailConfig = config[env];
 
 var email = {
 	dir: process.env.NODE_ENV === 'test' ? 'data/test/email' : 'data/email',
@@ -21,9 +24,13 @@ var email = {
 		}
 
 		// Real email sending for other environments
-		var transporter = nodemailer.createTransport(config.email);
+		var transporter = nodemailer.createTransport({
+			host: emailConfig.host,
+			port: emailConfig.port,
+			auth: emailConfig.auth
+		});
 		await transporter.sendMail({
-			from: config.email.from,
+			from: emailConfig.from,
 			to: to,
 			subject: subject,
 			text: text
