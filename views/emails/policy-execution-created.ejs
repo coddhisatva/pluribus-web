@@ -1,4 +1,4 @@
-<p>Hello <%= supporter.User.name %>,</p>
+<p>Hello <%= supporter.name || supporter.email.split('@')[0] %>,</p>
 
 <p><%= execution.Creator.name %> has activated their policy protection and is requesting to receive your pledged support.</p>
 

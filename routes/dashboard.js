@@ -703,9 +703,11 @@ router.post('/execute-policy/execute', auth.authorizeRole('creator'), async func
 				const emailText = await ejs.renderFile(
 					path.join(__dirname, '../views/emails/policy-execution-created.ejs'),
 					{ 
-						supporter: { User: supporter },
+						supporter: supporter,
 						execution: { Creator: creator, reason },
-						siteUrl: `${req.protocol}://${req.get('host')}`
+						siteUrl: process.env.NODE_ENV === 'development' ? 
+							'http://localhost:3000' : 
+							'https://becomepluribus.com'
 					}
 				);
 				

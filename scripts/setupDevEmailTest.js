@@ -31,7 +31,8 @@ async function setupDevEmailTest() {
   // Create you as supporter
   const supporter = await User.create({
     email: 'conoregan151@gmail.com',
-    password: auth.hashPassword('test123')
+    password: auth.hashPassword('test123'),
+    name: 'Conor Egan'
   });
 
   // Create pledge
