@@ -29,8 +29,7 @@ var email = {
 			from: emailConfig.from,
 			to: to,
 			subject: subject,
-			html: text,
-			text: text.text || text
+			html: text,  // Send as HTML only
 		});
 	},
 
