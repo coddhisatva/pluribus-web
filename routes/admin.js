@@ -7,7 +7,7 @@ require('../utils/handleAsyncErrors').fixRouter(router);
 const { Creator, User, sequelize, PolicyExecution } = require('../models');
 
 // Simplify to just role check
-router.all('*', auth.authorizeRole('admin'));
+router.all('*', auth.authorizeRole('admin', '/users/login'));
 
 router.get('/', async function(req, res, next) {
 	res.render('admin/index');

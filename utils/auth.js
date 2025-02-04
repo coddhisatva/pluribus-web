@@ -61,12 +61,6 @@ var auth = {
 			if(authorized) {
 				if(role) {
 					authorized = res.locals.authUser.roles && res.locals.authUser.roles.includes(role);
-				} else {
-					// Workaround for admin users not being real users (yet) - treat admins
-					// as unauthorized unless we're specifically checking for the 'admin' role.
-					if(res.locals.authUser.roles.includes('admin')) {
-						authorized = false;
-					}
 				}
 			}
 			if(!authorized) {

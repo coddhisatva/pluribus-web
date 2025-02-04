@@ -99,6 +99,7 @@ router.post('/login',
 		}
 
 		req.session.authUser = { id: user.id, email: user.email, name: user.name, roles };
+		console.log('Setting session with roles:', req.session.authUser);
 		if(remember) {
 			req.sessionOptions.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
 		}
