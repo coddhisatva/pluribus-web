@@ -5,7 +5,7 @@ const auth = require('../utils/auth');
 const csrf = require('../utils/csrf');
 const email = require('../utils/email');
 require('../utils/handleAsyncErrors').fixRouter(router);
-const { Creator, Follow, Guild, OneTimeCode, User } = require('../models');  
+const { Creator, Follow, Guild, OneTimeCode, User, sequelize } = require('../models');  
 
 /* GET /login */
 router.get('/login', (req, res, next) => {
@@ -27,14 +27,52 @@ router.post('/login',
 	body('password', 'Please enter your password').trim().isLength({min:1}),
 
 	async function(req, res, next) {
+		console.log('=== LOGIN ATTEMPT ===');
+		console.log('Body:', req.body);
+		console.log('Looking for user in database...');
 		const errors = validationResult(req).array();
 
 		var user;
 		if(errors.length == 0) {
-			user = await User.findOne({ where: { email: req.body.email }});
+			console.log('Attempting login with:', req.body.email);
+			// Try raw query first
+			const [results] = await sequelize.query(
+				"SELECT * FROM Users WHERE email = :email",
+				{
+					replacements: { email: req.body.email },
+					logging: console.log
+				}
+			);
+			console.log('Raw query results:', results);
+
+			user = await User.findOne({ 
+				where: { email: req.body.email },
+				logging: console.log
+			});
+			console.log('Login attempt:', {
+				email: req.body.email,
+				userFound: !!user,
+				password: req.body.password,
+				storedHash: user?.password,
+				roles: user?.roles
+			});
+			if (user) {
+				console.log('Found user:', {
+					id: user.id,
+					email: user.email,
+					password: user.password,
+					roles: user.roles
+				});
+			} else {
+				console.log('No user found with email:', req.body.email);
+			}
 			if(!user) {
+				console.log('User not found');
 				errors.push({ msg: 'Unknown user', param: 'email' });
 			} else if(!auth.verifyPassword(req.body.password, user.password)) {
+				console.log('Password verification failed');
+				console.log('Attempted:', req.body.password);
+				console.log('Stored hash:', user.password);
 				errors.push({ msg: 'Invalid password', param: 'password' });
 			}
 		}
@@ -46,14 +84,16 @@ router.post('/login',
 
 		var remember = req.body.remember == '1';
 		var creator = await Creator.count({ where: { userId: user.id }});
+		var guildAdmin = await Guild.count({ where: { userId: user.id } });
 
 		// Save authentication cookie
 		var roles = [ ];
+		if (user.roles) {
+			roles = roles.concat(user.roles);
+		}
 		if(creator > 0) {
 			roles.push('creator');
 		}
-
-		var guildAdmin = await Guild.count({ where: { userId: user.id } });
 		if(guildAdmin > 0) {
 			roles.push('guildAdmin');
 		}

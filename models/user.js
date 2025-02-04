@@ -25,7 +25,8 @@ module.exports = (sequelize, DataTypes) => {
     password: DataTypes.STRING,
     name: DataTypes.STRING,
     stripeCustomerId: DataTypes.STRING,
-    primaryCardPaymentMethodId: DataTypes.INTEGER
+    primaryCardPaymentMethodId: DataTypes.INTEGER,
+    roles: DataTypes.JSON 
   }, {
     sequelize,
     modelName: 'User',
