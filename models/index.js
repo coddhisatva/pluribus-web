@@ -5,7 +5,28 @@ const path = require('path');
 const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/db.json')[env];
+let config;
+
+if (process.env.DB_DEV_USERNAME) {
+  // Use environment variables if available
+  config = {
+    username: process.env[`DB_${env.toUpperCase()}_USERNAME`],
+    password: process.env[`DB_${env.toUpperCase()}_PASSWORD`],
+    database: env === 'production' ? 'pluribus_prod' : 
+             env === 'test' ? 'pluribus_test' : 'pluribus',
+    host: "localhost",
+    dialect: "mysql"
+  };
+  if (env === 'production') {
+    config.dialectOptions = {
+      socketPath: "/run/mysqld/mysqld.sock"
+    };
+  }
+} else {
+  // Fall back to JSON config
+  config = require(__dirname + '/../config/db.json')[env];
+}
+
 const db = {};
 
 let sequelize;

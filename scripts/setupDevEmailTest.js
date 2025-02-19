@@ -28,11 +28,11 @@ async function setupDevEmailTest() {
     stripeSubscriptionId: 'sub_test123'
   });
 
-  // Create you as supporter
+  // Create test supporter
   const supporter = await User.create({
-    email: 'conoregan151@gmail.com',
+    email: 'testsupporter@pluribus.com',
     password: auth.hashPassword('test123'),
-    name: 'Conor Egan'
+    name: 'Test Supporter'
   });
 
   // Create pledge

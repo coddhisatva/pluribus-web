@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": "your_dev_username",
+    "password": "your_dev_password",
+    "database": "pluribus",
+    "host": "localhost",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "your_test_username",
+    "password": "your_test_password",
+    "database": "pluribus_test",
+    "host": "localhost",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "your_prod_username",
+    "password": "your_prod_password",
+    "database": "pluribus_prod",
+    "host": "localhost",
+    "dialect": "mysql",
+    "dialectOptions": {
+      "socketPath": "/run/mysqld/mysqld.sock"
+    }
+  }
+} 

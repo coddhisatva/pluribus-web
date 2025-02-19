@@ -45,9 +45,9 @@ async function setupAdmin() {
 
     // Create test supporter
     const supporter = await User.create({
-      email: 'conoregan151@gmail.com',
+      email: 'testsupporter@pluribus.com',
       password: auth.hashPassword('test123'),
-      name: 'Conor Egan'
+      name: 'Test Supporter'
     });
     console.log('Test supporter created successfully');
 
@@ -63,7 +63,7 @@ async function setupAdmin() {
     console.log('\nYou can now login as:');
     console.log('Admin - Email: admin@pluribus.com, Password: test123');
     console.log('Creator - Email: testcreator@pluribus.com, Password: test123');
-    console.log('Supporter - Email: conoregan151@gmail.com, Password: test123');
+    console.log('Supporter - Email: testsupporter@pluribus.com, Password: test123');
   } catch (err) {
     console.error('Error:', err);
     process.exit(1);

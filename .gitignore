@@ -6,6 +6,11 @@
 /public/images/uploads
 /config/credentials.js
 /config/settings.js
+/config/email.js
+.env
+.env.*
+!.env.example
 david_changes.diff
 .DS_Store
 DatabaseExport/
+.git.backup/
