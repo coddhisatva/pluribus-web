@@ -1,4 +1,4 @@
-const { User } = require('../models');
+const { User, Creator, Pledge } = require('../models');
 const auth = require('../utils/auth');
 
 //Sets up Admin (for local dev)
@@ -11,7 +11,7 @@ async function setupAdmin() {
 
     // Delete existing admin if exists
     await User.destroy({ 
-      where: { email: 'admin@pluribus' }
+      where: { email: 'admin@pluribus.com' }
     });
     console.log('Cleaned up any existing admin user');
 
@@ -23,12 +23,49 @@ async function setupAdmin() {
     });
     console.log('Admin user created successfully');
 
-    console.log('\nYou can now login as admin:');
-    console.log('Email: admin@pluribus');
-    console.log('Password: test123');
+    // Create test creator
+    const testCreator = await User.create({
+      email: 'testcreator@pluribus.com',
+      password: auth.hashPassword('test123')
+    });
+    
+    const creator = await Creator.create({
+      userId: testCreator.id,
+      name: 'Test Creator',
+      about: 'Test bio',
+      policy: 'Test policy',
+      publicProfile: true,
+      displaySupporterCount: true,
+      displayPledgeTotal: true,
+      stripeConnectedAccountId: 'acct_test123',
+      stripeConnectedAccountOnboarded: true,
+      stripeSubscriptionId: 'sub_test123'
+    });
+    console.log('Test creator created successfully');
 
+    // Create test supporter
+    const supporter = await User.create({
+      email: 'conoregan151@gmail.com',
+      password: auth.hashPassword('test123'),
+      name: 'Conor Egan'
+    });
+    console.log('Test supporter created successfully');
+
+    // Create pledge
+    await Pledge.create({
+      userId: supporter.id,
+      creatorId: creator.id,
+      amount: 100,
+      frequency: 'one-time'
+    });
+    console.log('Test pledge created successfully');
+
+    console.log('\nYou can now login as:');
+    console.log('Admin - Email: admin@pluribus.com, Password: test123');
+    console.log('Creator - Email: testcreator@pluribus.com, Password: test123');
+    console.log('Supporter - Email: conoregan151@gmail.com, Password: test123');
   } catch (err) {
-    console.error('Error setting up admin:', err);
+    console.error('Error:', err);
     process.exit(1);
   }
 }
